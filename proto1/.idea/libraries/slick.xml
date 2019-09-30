@@ -2,6 +2,7 @@
   <library name="slick">
     <CLASSES>
       <root url="file://$PROJECT_DIR$/libs/slick" />
+      <root url="file://$PROJECT_DIR$/libs/slick/lib" />
     </CLASSES>
     <JAVADOC>
       <root url="file://$PROJECT_DIR$/libs/slick/javadoc" />
@@ -14,5 +15,6 @@
       <root url="file://$PROJECT_DIR$/libs/slick/tools" />
     </SOURCES>
     <jarDirectory url="file://$PROJECT_DIR$/libs/slick" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/libs/slick/lib" recursive="false" />
   </library>
 </component>
