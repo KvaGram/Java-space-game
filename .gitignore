@@ -90,3 +90,8 @@ fabric.properties
 
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
+*.iml
+Swingship/.idea/workspace.xml
+Swingship/.idea/vcs.xml
+Swingship/.idea/modules.xml
+Swingship/.idea/$PRODUCT_WORKSPACE_FILE$
