@@ -1,46 +1,51 @@
-//Usually you will require both swing and awt packages
+package unicus.spacegame;//Usually you will require both swing and awt packages
 // even if you are working with just swings.
 import javax.swing.*;
 import java.awt.*;
 import java.util.Random;
 
 class Swingmap extends JPanel {
+    Point[] starPoints = new Point[4];
+
+    public void newPoints(Random rand){
+        starPoints[0] = new Point(20 + rand.nextInt(400), 20 + rand.nextInt(200));
+        starPoints[1] = new Point(200 + rand.nextInt(400), 200 + rand.nextInt(200));
+        starPoints[2] = new Point(10 + rand.nextInt(580), 10 + rand.nextInt(380));
+        starPoints[3] = new Point(10 + rand.nextInt(580), 10 + rand.nextInt(380));
+    }
+
+
     public static void main(String args[]) {
+        Random rand = new Random(0);
+        Swingmap map = new Swingmap();
+        map.newPoints(rand);
 
         //Creating the Frame
-        JFrame frame = new JFrame("Map Frame");
-        frame.add(new Swingmap());
+        JFrame frame = new JFrame("Test swingmap");
+        frame.add(map);
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(650, 450);
 
-        JPanel panel = new JPanel(); // the panel is not visible in output
-
-        //Adding Components to the frame.
         frame.setVisible(true);
     }
 
+
+
     public void paint(Graphics g) {
-        Random rand = new Random();
         //Since the randomization is in the paint method, it will be re-rolled whenever you resize window.
         int starsize = 7;
-        int s1_x = 20 + rand.nextInt(400);
-        int s1_y = 20 + rand.nextInt(200);
-        int s2_x = 200 + rand.nextInt(400);
-        int s2_y = 200 + rand.nextInt(200);
-        int s3_x = 10 + rand.nextInt(580);
-        int s3_y = 10 + rand.nextInt(380);
-        int s4_x = 10 + rand.nextInt(580);
-        int s4_y = 10 + rand.nextInt(380);
+        
         g.setColor(Color.black);
         g.fillRect(0,0,600,400);
         g.setColor(Color.white);
-        g.drawLine(s1_x,s1_y,s2_x,s2_y);
-        g.drawLine(s1_x,s1_y,s3_x,s3_y);
-        g.drawLine(s1_x,s1_y,s4_x,s4_y);
+        g.drawLine(starPoints[0].x,starPoints[0].y,starPoints[1].x,starPoints[1].y);
+        g.drawLine(starPoints[0].x,starPoints[0].y,starPoints[2].x,starPoints[2].y);
+        g.drawLine(starPoints[0].x,starPoints[0].y,starPoints[3].x,starPoints[3].y);
         g.setColor(Color.yellow);
-        g.fillOval(s1_x-2,s1_y-2,starsize,starsize);
-        g.fillOval(s2_x-2,s2_y-2,starsize,starsize);
-        g.fillOval(s3_x-2,s3_y-2,starsize,starsize);
-        g.fillOval(s4_x-2,s4_y-2,starsize,starsize);
+        g.fillOval(starPoints[0].x-2,starPoints[0].y-2,starsize,starsize);
+        g.fillOval(starPoints[1].x-2,starPoints[1].y-2,starsize,starsize);
+        g.fillOval(starPoints[2].x-2,starPoints[2].y-2,starsize,starsize);
+        g.fillOval(starPoints[3].x-2,starPoints[3].y-2,starsize,starsize);
     }
 }
