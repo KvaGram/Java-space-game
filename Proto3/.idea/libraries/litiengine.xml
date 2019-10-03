@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="litiengine">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/libraries/litiengine" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/libraries/litiengine/litiengine-0.4.17-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/libraries/litiengine" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/libraries/litiengine" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/libraries/litiengine" recursive="false" type="SOURCES" />
+  </library>
+</component>

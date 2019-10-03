@@ -13,11 +13,12 @@ public class SlickTest extends BasicGame
     }
     public static void main(String[] args)
     {
-        SlickTest test = new SlickTest("TÆSTGAIM");
+        SlickTest test = new SlickTest("Testgame");
         AppGameContainer container;
         try
         {
-            container = new AppGameContainer(test, 500, 500, false);
+            container = new AppGameContainer(test);//, 500, 500, false);
+            container.setDisplayMode(500, 500, false);
             container.start();
         }
         catch (SlickException e)

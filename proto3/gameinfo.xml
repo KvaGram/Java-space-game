@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gameinfo>
+ <name>Untitled java space game</name>
+ <subTitle>The LITIengine prototype!</subTitle>
+ <description>A prototype, implemented with the LITIengine.</description>
+ <website>unicus.com</website>
+ <version>v0.0.0-alpha</version>
+ <company>unicus.com</company>
+ <developer>Lars Erik Grambo</developer>
+ <developer>Erik Johan Mesøy</developer>
+</gameinfo>
