@@ -2,7 +2,6 @@ package unicus.spacegame;
 
 import javax.swing.*;
 import java.awt.*;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -11,15 +10,78 @@ import java.util.Random;
  * Planet data should probably be moved to its own class in final product.
  *
  */
-public class SwingStarSystem extends JPanel {
+
+public class SwingStarSystem extends JLayeredPane {
     //Lists all planets, including the star.
     //Idea: add support for binary & ternary stars?
     Planet[] planets;
-    int planetcount;
+    //Contains the background graphics of the star system.
+    View viewLayer;
+    JPanel buttonLayer;
+
+
+    JButton btnNewSystem;
+    JButton btnDoTrade;
+    JButton btnDoRaid;
+    JButton btnDoMine;
+
+    public SwingStarSystem(){
+        planets = new Planet[0]; //placeholder empty system
+        viewLayer = new View();
+        //buttonLayer = new JPanel();
+        buttonLayer = new View();
+        viewLayer.setBounds(0, 0, 500, 500);
+        buttonLayer.setBounds(0, 0, 200, 200);
+
+        setPreferredSize(new Dimension(500, 500));
+        setBorder(BorderFactory.createTitledBorder("Hello world"));
+
+        //buttonLayer.setLayout(new BoxLayout(buttonLayer, BoxLayout.X_AXIS));
+
+        /*
+        btnNewSystem = new JButton("Generate new system");
+        btnDoTrade   = new JButton("Trade with locals");
+        btnDoRaid    = new JButton("Raid tradeShips");
+        btnDoMine    = new JButton("Mine asteroids");
+
+        buttonLayer.add(btnNewSystem);
+        buttonLayer.add(btnDoTrade);
+        buttonLayer.add(btnDoRaid);
+        buttonLayer.add(btnDoMine);
+        */
+
+        this.add(viewLayer, 100);
+        this.add(buttonLayer, 0);
+
+    }
+
+
+    /**
+     * View is an internal class that extends JPanel.
+     * It renders the current star system
+     */
+    private class View extends JPanel {
+        //public void paint(Graphics g)
+        @Override
+        public void paint(Graphics g)
+        {
+            super.paint(g);
+            Rectangle rect =  this.getBounds();
+            int planetCount = planets.length;
+            g.setColor(Color.black);
+            g.fillRect(rect.x,rect.y,rect.width,rect.height);
+
+            int i;
+            for(i = 0; i < planetCount; i++)
+                planets[i].paintOrbit(g, rect);
+            for(i = 0; i < planetCount; i++)
+                planets[i].paintPlanet(g, rect);
+        }
+    }
 
     public void newPlanets(Random rand){
         final float TAU = (float)Math.PI * 2;
-        planetcount = rand.nextInt(4) + 2; //between 1 and 4 planets in the system, + 1 star.
+        int planetcount = rand.nextInt(4) + 2; //between 1 and 4 planets in the system, + 1 star.
         planets = new Planet[planetcount];
 
         planets[0] = new Planet(randomPlanetColor(rand, PlanetType.star), 50, 0, 0);
@@ -34,6 +96,7 @@ public class SwingStarSystem extends JPanel {
             planets[i] = new Planet(color, size, orbitD, orbitR);
             nextSafeOrbit = orbitD + size + 10;
         }
+        repaint();
     }
     private Color randomPlanetColor(Random rand, PlanetType type){
         float h = rand.nextFloat();
@@ -60,17 +123,7 @@ public class SwingStarSystem extends JPanel {
         return hsbColor;
     }
 
-    public void paint(Graphics g)
-    {
-        g.setColor(Color.black);
-        g.fillRect(0,0,600,400);
 
-        int i;
-        for(i = 0; i < planetcount; i++)
-            planets[i].paintOrbit(g);
-        for(i = 0; i < planetcount; i++)
-            planets[i].paintPlanet(g);
-    }
     private enum PlanetType{
         star, dead, life;
 
@@ -97,17 +150,18 @@ public class SwingStarSystem extends JPanel {
             this.orbitDistance = orbitDistance;
             this.orbitRotation = orbitRotation;
         }
-        public void paintPlanet(Graphics g){
+        public void paintPlanet(Graphics g, Rectangle rect){
+
             int x = (int) (Math.cos(orbitRotation) * orbitDistance) + size;
             int y = (int) (Math.sin(orbitRotation) * orbitDistance) + size;
             g.setColor(color);
-            g.fillOval(300 - x, 200 - y, size*2, size*2);
+            g.fillOval(rect.width/2 - x, rect.height/2 - y, size*2, size*2);
         }
-        public void paintOrbit(Graphics g)
+        public void paintOrbit(Graphics g, Rectangle rect)
         {
 
             g.setColor(Color.white);
-            g.drawOval(300 - orbitDistance, 200 - orbitDistance, orbitDistance*2, orbitDistance*2);
+            g.drawOval(rect.width/2 - orbitDistance, rect.height/2 - orbitDistance, orbitDistance*2, orbitDistance*2);
         }
     }
     public static void main(String[] args) {
