@@ -11,12 +11,15 @@ import java.util.Random;
  *
  */
 
+//Intellij's warnings distracts development.
+// Note to self: occationally lift this to check for sound advice for improving code.
+@SuppressWarnings("ALL")
 public class SwingStarSystem extends JLayeredPane {
     //Lists all planets, including the star.
     //Idea: add support for binary & ternary stars?
     Planet[] planets;
     //Contains the background graphics of the star system.
-    View viewLayer;
+    SpaceView spaceViewLayer;
     JPanel buttonLayer;
 
 
@@ -27,18 +30,19 @@ public class SwingStarSystem extends JLayeredPane {
 
     public SwingStarSystem(){
         planets = new Planet[0]; //placeholder empty system
-        viewLayer = new View();
-        //buttonLayer = new JPanel();
-        buttonLayer = new View();
-        viewLayer.setBounds(0, 0, 500, 500);
-        buttonLayer.setBounds(0, 0, 200, 200);
+        spaceViewLayer = new SpaceView();
+        buttonLayer = new JPanel();
+        buttonLayer.setOpaque(false);
+        //buttonLayer = new SpaceView();
+        spaceViewLayer.setBounds(0, 0, 900, 720);
+        buttonLayer.setBounds(0, 620, 900, 100);
 
-        setPreferredSize(new Dimension(500, 500));
+        setPreferredSize(new Dimension(900, 720));
         setBorder(BorderFactory.createTitledBorder("Hello world"));
 
         //buttonLayer.setLayout(new BoxLayout(buttonLayer, BoxLayout.X_AXIS));
 
-        /*
+
         btnNewSystem = new JButton("Generate new system");
         btnDoTrade   = new JButton("Trade with locals");
         btnDoRaid    = new JButton("Raid tradeShips");
@@ -48,9 +52,9 @@ public class SwingStarSystem extends JLayeredPane {
         buttonLayer.add(btnDoTrade);
         buttonLayer.add(btnDoRaid);
         buttonLayer.add(btnDoMine);
-        */
 
-        this.add(viewLayer, 100);
+
+        this.add(spaceViewLayer, 100);
         this.add(buttonLayer, 0);
 
     }
@@ -60,16 +64,18 @@ public class SwingStarSystem extends JLayeredPane {
      * View is an internal class that extends JPanel.
      * It renders the current star system
      */
-    private class View extends JPanel {
+    private class SpaceView extends JPanel {
+        public SpaceView()
+        {
+            setBackground(Color.black);
+        }
         //public void paint(Graphics g)
         @Override
-        public void paint(Graphics g)
+        public void paintComponent(Graphics g)
         {
-            super.paint(g);
+            super.paintComponent(g);
             Rectangle rect =  this.getBounds();
             int planetCount = planets.length;
-            g.setColor(Color.black);
-            g.fillRect(rect.x,rect.y,rect.width,rect.height);
 
             int i;
             for(i = 0; i < planetCount; i++)
@@ -137,6 +143,10 @@ public class SwingStarSystem extends JLayeredPane {
             return types[rand.nextInt(numTypes)];
         }
     }
+
+    /**
+     *
+     */
     private class Planet{
         final public double TAU = Math.PI * 2;
 
@@ -174,7 +184,7 @@ public class SwingStarSystem extends JLayeredPane {
         frame.add(starsys);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(650, 450);
+        frame.setSize(900, 720);
 
         frame.setVisible(true);
     }
