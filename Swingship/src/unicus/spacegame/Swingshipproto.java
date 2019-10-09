@@ -30,6 +30,7 @@ public class Swingshipproto {
 
         //Creating the image area
         ShipPanel upperpanel = new ShipPanel(); //extends JPanel
+        upperpanel.setupModules();
         ImageIcon shuttleimage = new ImageIcon("shuttlesideview.png");
         upperpanel.add(new JLabel(shuttleimage));
 
@@ -52,6 +53,10 @@ public class Swingshipproto {
 
 class ShipPanel extends JPanel {
     boolean hasCargo = false;
+    private int shipImgWidth = 1111;
+    private int shipImgHeight = 716;
+    private int[][] moduleBounds;
+
     @Override //?
     public void paint(Graphics g) {
         super.paint(g);
@@ -60,17 +65,48 @@ class ShipPanel extends JPanel {
             g.fillRect(440,190,120,50);
             g.setColor(Color.black);
             g.drawString("Full cargo bay", 450, 215);
-            System.out.println("in if statement");
+            //System.out.println("in if statement");
         } else {
             g.setColor(Color.red);
             g.fillRect(440,190,120,50);
             g.setColor(Color.black);
             g.drawString("Empty cargo bay", 450, 215);
-            System.out.println("in else statement");
+            //System.out.println("in else statement");
+        }
+        g.setColor(new Color(150,100,0)); //brown
+        g.fillRect(moduleBounds[0][0],moduleBounds[0][1],moduleBounds[0][2],moduleBounds[0][3]); // This is ugly but it works.
+        // Officially suggested approach is to overload the method name: g.fillRect(int[] a) { g.fillRect(a[0][0], a[0][1]...) }
+        // but that requires me to figure out access to Graphics g and its methods somehow. Maybe lambda?
+        g.fillRect(moduleBounds[13][0],moduleBounds[13][1],moduleBounds[13][2],moduleBounds[13][3]);
+        g.setColor(new Color(100,250,100));
+        g.fillRect(moduleBounds[1][0],moduleBounds[1][1], moduleBounds[1][2],moduleBounds[1][3]);
+        for (int i=1; i<=6; i++){
+            g.fillRect(moduleBounds[i][0],moduleBounds[i][1], moduleBounds[i][2],moduleBounds[i][3]);
+        }
+        g.setColor(new Color(250,100,100));
+        for (int i=7; i<=12; i++){
+            g.fillRect(moduleBounds[i][0],moduleBounds[i][1], moduleBounds[i][2],moduleBounds[i][3]);
         }
     }
-        public void drawEmptyCargo() {
-        // (Graphics g)
-        //super.paintComponent(g);
+
+    public void setupModules() {
+        moduleBounds = new int[14][4]; //14 modules initially, each with topleft X, topleft Y, width X, height Y
+        int sw = shipImgWidth;
+        int sh = shipImgHeight; // for modularity, so transform from image values to percentages can be adjusted
+        int mw = (int) (sw * 0.1); //module box width
+        int mh = (int) (sh * 0.08); //module box height
+
+        int[] engine_coords ={(int)(sw*0.06), (int)(sh*0.4), mw, mh};
+        moduleBounds[0] = engine_coords;
+        int[] bridge_coords ={(int)(sw*0.9), (int)(sh*0.4), mw, mh};
+        moduleBounds[13] = bridge_coords;
+        for (int i=0; i<4; i++) {
+            for (int j=0; j<3; j++) {
+                int[] temp = {(int)(sw*(0.2+(i*0.15))), (int)(sh*(0.35+(j*0.1))), mw, mh};
+                int x = 1 +(3*i)+ j;
+                moduleBounds[x] = (temp.clone());
+            }
+        }
+        //
     }
 }
