@@ -5,7 +5,7 @@ import java.awt.*;
 public class Swingshipproto {
 
     public static void main(String[] args) {
-        //this part is mostly copypasted from codejava.net and I will research invokeLater later.
+        //this part is mostly copypasted from codejava.net
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ex) {
