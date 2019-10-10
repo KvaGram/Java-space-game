@@ -23,7 +23,7 @@ import static java.lang.System.out;
 public class SwingStarSystem extends JLayeredPane implements ActionListener {
     //Lists all planets, including the star.
     //Idea: add support for binary & ternary stars?
-    Planet[] planets;
+    Base_Planet[] planets;
     //Contains the background graphics of the star system.
     SpaceView spaceViewLayer;
     JPanel buttonLayer;
@@ -34,7 +34,7 @@ public class SwingStarSystem extends JLayeredPane implements ActionListener {
     JButton btnDoMine;
 
     public SwingStarSystem(){
-        planets = new Planet[0]; //placeholder empty system
+        planets = new Base_Planet[0]; //placeholder empty system
         spaceViewLayer = new SpaceView();
         buttonLayer = new JPanel();
         buttonLayer.setOpaque(false);
@@ -117,8 +117,8 @@ public class SwingStarSystem extends JLayeredPane implements ActionListener {
 
     public void newPlanets(Random rand){
         final float TAU = (float)Math.PI * 2;
-        int planetcount = rand.nextInt(4) + 2; //between 1 and 4 planets in the system, + 1 star.
-        planets = new Planet[planetcount];
+        int planetcount = rand.nextInt(4) + 3; //between 1 and 4 planets in the system, + 1 star and 1 asteroidbelt.
+        planets = new Base_Planet[planetcount];
 
         planets[0] = new Planet(PlanetType.star, randomPlanetColor(rand, PlanetType.star), 50, 0, 0, null);
         int nextSafeOrbit = 75;
@@ -132,6 +132,7 @@ public class SwingStarSystem extends JLayeredPane implements ActionListener {
             planets[i] = new Planet(type, color, size, orbitD, orbitR, planets[0]);
             nextSafeOrbit = orbitD + size + 10;
         }
+        planets[planetcount-1] = new Asteroidbelt(nextSafeOrbit + 30, planets[0]);
         repaint();
     }
     private Color randomPlanetColor(Random rand, PlanetType type){
@@ -178,14 +179,14 @@ public class SwingStarSystem extends JLayeredPane implements ActionListener {
 //NOTE: The enum could be replaced with a bitset.
 //That way it could act more of a set of flags then just a label.
 enum PlanetType {
-    star, dead, life;
+    star, asteroidbelt, dead, life;
 
     public static PlanetType random(Random rand, boolean starAllowed){
         final int numStarTypes = 1;
-        PlanetType[] types = values();
-        if(!starAllowed)
-            types = Arrays.copyOfRange(types, numStarTypes, types.length);
-
+        PlanetType[] types = {
+                PlanetType.dead,
+                PlanetType.life
+        };
         int numTypes = types.length;
         return types[rand.nextInt(numTypes)];
     }
@@ -213,8 +214,58 @@ abstract class Base_Planet {
     public abstract void PaintPlanet(Graphics g, Rectangle rect);
     public abstract void paintOrbit(Graphics g, Rectangle rect);
 }
+class Asteroidbelt extends Base_Planet {
+    public int orbitDistance;
+
+    public Asteroidbelt(int orbitDistance, Base_Planet parent) {
+        super(PlanetType.asteroidbelt, parent);
+        this.orbitDistance = orbitDistance;
+    }
+
+    @Override
+    public Point GetPoint(Rectangle rect) {
+        if(parent == null)
+            return new Point((int)rect.getCenterX(), (int)rect.getCenterY());
+        Point p = parent.GetPoint(rect);
+        p.x += 0;
+        p.y += orbitDistance;
+        return p;
+    }
+
+    @Override
+    public void PaintPlanet(Graphics g, Rectangle rect){
+        Random localRand = new Random(0); //A seed MUST be set, if to maintain consistency.
+        int maxsize = 12;
+        int minsize = 2;
+        int count = 20;
+        int noise = 20; //random offset in x and y, applied on each asteroid
+        Color color = Color.LIGHT_GRAY;
+
+        g.setColor(color);
+
+        for(int i = 0; i < count; i++){
+            Point p2 = parent.GetPoint(rect);
+            double rot = TAU * i / count;
+
+            p2.x += (int) (Math.cos(rot) * orbitDistance) - noise/2 + localRand.nextInt(noise);
+            p2.y += (int) (Math.sin(rot) * orbitDistance) - noise/2 + localRand.nextInt(noise);
+            int aSize = localRand.nextInt(maxsize-minsize) + minsize;
+
+            g.fillRect(p2.x - aSize, p2.y - aSize, aSize, aSize);
+        }
+
+    }
+
+    @Override
+    public void paintOrbit(Graphics g, Rectangle rect) {
+        g.setColor(Color.darkGray);
+        g.drawOval(rect.width/2 - orbitDistance, rect.height/2 - orbitDistance, orbitDistance*2, orbitDistance*2);
+    }
+}
+
 /**
- *
+ * A typical planet.
+ * It may or may not hold life.
  */
 class Planet extends Base_Planet {
 
