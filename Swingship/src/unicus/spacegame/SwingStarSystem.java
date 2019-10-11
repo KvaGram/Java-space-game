@@ -6,7 +6,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import static java.lang.System.out;
@@ -32,6 +34,8 @@ public class SwingStarSystem extends JLayeredPane implements ActionListener {
     JButton btnDoTrade;
     JButton btnDoRaid;
     JButton btnDoMine;
+
+    final float TAU = 6.283185307179586f;
 
     public SwingStarSystem(){
         planets = new Base_Planet[0]; //placeholder empty system
@@ -115,30 +119,108 @@ public class SwingStarSystem extends JLayeredPane implements ActionListener {
         }
     }
 
+    /**
+     * Generates a star ssytem
+     * @param rand The random number generator to use.
+     */
     public void newPlanets(Random rand){
-        final float TAU = (float)Math.PI * 2;
-        int planetcount = rand.nextInt(4) + 3; //between 1 and 4 planets in the system, + 1 star and 1 asteroidbelt.
-        planets = new Base_Planet[planetcount];
 
-        planets[0] = new Planet(PlanetType.star, randomPlanetColor(rand, PlanetType.star), 50, 0, 0, null);
-        int nextSafeOrbit = 75;
-        for(int i = 1; i < planetcount; i++) {
+        //asteroid belts count as 'planet' in this limit
+        int maxPlanets = 10; //The system's number of planets will number
+        int minPlanets = 1;  //     between this minimum and maximum.
+        int maxMoons = 1; //A asteroid ring counts as a moon in this list
+        int maxLife = 2; //Maximum number of planets that may have life on them.
+        int maxBelts = 3; //maximum number of asteroid belts in the system
 
-            PlanetType type = PlanetType.random(rand, false);
-            int size = rand.nextInt(20) + 5;
-            int orbitD = rand.nextInt(20) + nextSafeOrbit;
-            float orbitR = rand.nextFloat() * TAU;
-            Color color = randomPlanetColor(rand, type);
-            planets[i] = new Planet(type, color, size, orbitD, orbitR, planets[0]);
-            nextSafeOrbit = orbitD + size + 10;
-        }
-        planets[planetcount-1] = new Asteroidbelt(nextSafeOrbit + 30, planets[0]);
-        repaint();
+
+        //setting constants for odds of a planet
+        float planetHasMoon = 0.2f;
+        float planetHasRing = 0.2f;
+        //note: planet cannot have both a moon and a belt.
+        //If a planet rolls a moon, the roll for a belt is ignored.
+        float planetIsAsteroidbelt = 0.1f;
+        float planetHasLife = 0.3f;
+
+        ArrayList<Base_Planet> newPlanetsList = new ArrayList<Base_Planet>();
+
+        // - Generate star
+        Star star = new Star(randomPlanetColor(rand, PlanetType.star), 40);
+        newPlanetsList.add(star);
+
+        // - generate planets
+       int numPlanets = rand.nextInt(maxPlanets - minPlanets) + minPlanets;
+       int nextSafeOrbit = 70;
+
+       int lifeCreated = 0;
+       int beltsCreated = 0;
+
+       for(int i = 0; i < numPlanets; i++) {
+           int orbitD = rand.nextInt(20) + nextSafeOrbit;
+           boolean isABelt = rand.nextFloat() < planetIsAsteroidbelt;
+
+           // - Asteroidbelt
+           if (isABelt && beltsCreated < maxBelts) {
+               Asteroidbelt belt = new Asteroidbelt(orbitD + 10, star);
+               nextSafeOrbit = orbitD + 50;
+               newPlanetsList.add(belt);
+               beltsCreated++;
+               continue;
+           }
+           boolean hasLife = rand.nextFloat() < planetHasLife;
+           PlanetType type = PlanetType.dead;
+
+           // - Planet with life
+           if (hasLife && lifeCreated < maxLife) {
+               type = PlanetType.life;
+               lifeCreated++;
+           }
+           int size = rand.nextInt(20) + 5;
+           float orbitR = rand.nextFloat() * TAU;
+           Planet planet = new Planet(type, randomPlanetColor(rand, type), size, orbitD, orbitR, star);
+           newPlanetsList.add(planet);
+           nextSafeOrbit = orbitD + size + 10;
+
+           // - Creating moons
+           float m_orbitR = rand.nextFloat() * TAU;
+           int m_size = Math.min(rand.nextInt(10) + 2, (int) (size * 0.6));
+           int m_orbitD = size + m_size + rand.nextInt(5);
+
+           boolean hasRing = rand.nextFloat() < planetHasRing;
+           if (hasRing && beltsCreated < maxBelts) {
+               //counting the rings as asteroidbelts.
+               Asteroidbelt belt = Asteroidbelt.MakeRing(m_orbitD, planet);
+               nextSafeOrbit += 10;
+               newPlanetsList.add(belt);
+               beltsCreated++;
+           }
+           //currently limited to just 1 moon.
+           boolean hasMoon = rand.nextFloat() < planetHasMoon;
+           if (hasMoon) {
+               boolean m_hasLife = rand.nextFloat() < planetHasLife;
+               PlanetType m_type = PlanetType.dead;
+
+               // - Moon with life
+               if (hasLife && lifeCreated < maxLife) {
+                   type = PlanetType.life;
+                   lifeCreated++;
+               }
+               Planet moon = new Planet(m_type, randomPlanetColor(rand, m_type), m_size, m_orbitD, m_orbitR, planet);
+               //regarding above declaration, does anyone else Della Duck's theme playing in the background? (joke)
+               newPlanetsList.add(moon);
+               nextSafeOrbit += 15;
+           }
+       }
+       planets = newPlanetsList.toArray(new Base_Planet[newPlanetsList.size()]);
+       repaint();
     }
-    private Color randomPlanetColor(Random rand, PlanetType type){
-        float h = rand.nextFloat();
-        float s = rand.nextFloat();
-        float b = rand.nextFloat();
+    private Color randomPlanetColor(Random rand, PlanetType type) {
+        float[] hsb = {rand.nextFloat(), rand.nextFloat(), rand.nextFloat()};
+        return randomPlanetColor(hsb, type);
+    }
+    private Color randomPlanetColor(float[] hsb, PlanetType type) {
+        float h = hsb[0];
+        float s = hsb[1];
+        float b = hsb[2];
         switch (type) {
             case dead:
                 s = s / 10; //low saturation on dead planets
@@ -216,10 +298,24 @@ abstract class Base_Planet {
 }
 class Asteroidbelt extends Base_Planet {
     public int orbitDistance;
+    int maxsize = 12;
+    int minsize = 2;
+    int count = 20;
+    int noise = 20; //random offset in x and y, applied on each asteroid
 
     public Asteroidbelt(int orbitDistance, Base_Planet parent) {
         super(PlanetType.asteroidbelt, parent);
         this.orbitDistance = orbitDistance;
+    }
+
+    public static Asteroidbelt MakeRing(int orbitDistance, Base_Planet parent) {
+        Asteroidbelt belt = new Asteroidbelt(orbitDistance, parent);
+        belt.maxsize = 3;
+        belt.minsize = 1;
+        belt.count = 10;
+        belt.noise = 2;
+
+        return belt;
     }
 
     @Override
@@ -235,10 +331,6 @@ class Asteroidbelt extends Base_Planet {
     @Override
     public void PaintPlanet(Graphics g, Rectangle rect){
         Random localRand = new Random(0); //A seed MUST be set, if to maintain consistency.
-        int maxsize = 12;
-        int minsize = 2;
-        int count = 20;
-        int noise = 20; //random offset in x and y, applied on each asteroid
         Color color = Color.LIGHT_GRAY;
 
         g.setColor(color);
@@ -280,6 +372,74 @@ class Planet extends Base_Planet {
         this.size = size;
         this.orbitDistance = orbitDistance;
         this.orbitRotation = orbitRotation;
+    }
+
+    @Override
+    public void PaintPlanet(Graphics g, Rectangle rect){
+
+        //int x = (int) (Math.cos(orbitRotation) * orbitDistance) + size;
+        //int y = (int) (Math.sin(orbitRotation) * orbitDistance) + size;
+        Point p = GetPoint(rect);
+        g.setColor(color);
+        g.fillOval(p.x-size, p.y - size, size*2, size*2);
+    }
+    @Override
+    public void paintOrbit(Graphics g, Rectangle rect)
+    {
+        if(parent == null)
+            return;
+
+        Point p = parent.GetPoint(rect);
+        g.setColor(Color.white);
+        g.drawOval(p.x - orbitDistance, p.y - orbitDistance, orbitDistance*2, orbitDistance*2);
+    }
+
+    @Override
+    public Point GetPoint(Rectangle rect) {
+        if(parent == null)
+            return new Point((int)rect.getCenterX(), (int)rect.getCenterY());
+        Point p = parent.GetPoint(rect);
+        p.x += (int) (Math.cos(orbitRotation) * orbitDistance);
+        p.y += (int) (Math.sin(orbitRotation) * orbitDistance);
+        return p;
+    }
+}
+
+class Star extends Base_Planet {
+
+    public Color color;
+    public int size;
+    public int orbitDistance;
+    public float orbitRotation;
+
+    /**
+     * Constructor for orbiting or co-orbiting star.
+     * @param color
+     * @param size
+     * @param orbitDistance
+     * @param orbitRotation
+     * @param parent
+     */
+    public Star(Color color, int size, int orbitDistance, float orbitRotation, Base_Planet parent) {
+        super(PlanetType.star, parent);
+        this.color = color;
+        this.size = size;
+        this.orbitDistance = orbitDistance;
+        this.orbitRotation = orbitRotation;
+    }
+
+    /**
+     * Constructor for a single star in the center of the system
+     * @param color
+     * @param size
+     */
+    public Star (Color color, int size){
+        super(PlanetType.star, null);
+        this.color = color;
+        this.size = size;
+
+        orbitDistance = 0;
+        orbitRotation = 0;
     }
 
     @Override
