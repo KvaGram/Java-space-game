@@ -92,7 +92,11 @@ public class SwingStarSystem extends JLayeredPane implements ActionListener {
         }
 
     }
-
+    private void setButtonsActive(){
+        btnDoTrade.setEnabled(GetNumLife() >= 1);
+        btnDoRaid.setEnabled(GetNumLife() >= 2);
+        btnDoMine.setEnabled(GetNumMinable() >= 1);
+    }
 
     /**
      * View is an internal class that extends JPanel.
@@ -211,6 +215,7 @@ public class SwingStarSystem extends JLayeredPane implements ActionListener {
            }
        }
        planets = newPlanetsList.toArray(new Base_Planet[newPlanetsList.size()]);
+       setButtonsActive();
        repaint();
     }
     private Color randomPlanetColor(Random rand, PlanetType type) {
@@ -242,6 +247,26 @@ public class SwingStarSystem extends JLayeredPane implements ActionListener {
         return hsbColor;
     }
 
+    public int GetNumLife()
+    {
+        int found = 0;
+        for(int i = 0; i < planets.length; i++)
+        {
+            if (planets[i].GetType() == PlanetType.life)
+                found ++;
+        }
+        return found;
+    }
+    public int GetNumMinable()
+    {
+        int found = 0;
+        for(int i = 0; i < planets.length; i++)
+        {
+            if (planets[i].GetType() == PlanetType.asteroidbelt)
+                found ++;
+        }
+        return found;
+    }
 
     public static void main(String[] args) {
         Random rand = new Random();
@@ -281,11 +306,14 @@ enum PlanetType {
 abstract class Base_Planet {
     final public double TAU = Math.PI * 2;
     Base_Planet parent;
-
+    PlanetType type;
     public Base_Planet(PlanetType type, @Nullable Base_Planet parent){
         this.parent = parent;
+        this.type = type;
     }
-
+    public PlanetType GetType(){
+        return type;
+    }
     /** Calculate the X and Y coordinates to draw this object.
      * Orbit distance and orbit rotation are calulated in relation to the parent (eg. a star)
      * If the object have no parent, the center of the Rectangle is returned.
