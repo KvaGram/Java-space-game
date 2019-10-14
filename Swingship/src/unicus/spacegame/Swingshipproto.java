@@ -60,6 +60,7 @@ class ShipPanel extends JPanel {
     @Override //?
     public void paint(Graphics g) {
         super.paint(g);
+        //int w = getWidth(); ?
         if (hasCargo) {
             g.setColor(Color.yellow);
             g.fillRect(440,190,120,50);
