@@ -134,3 +134,30 @@ class ShipPanel extends JPanel {
         }
     }
 }
+
+
+enum SectionType {
+    None, Normal, Wheel
+};
+enum ModuleType {
+    Empty, Habitat
+};
+
+
+class ShipModule{
+    private SectionType sectionType;
+    private ModuleType moduleType;
+
+    public ShipModule (SectionType sectionType, ModuleType moduleType) {
+        super();
+        this.sectionType = sectionType;
+        this.moduleType = moduleType;
+    }
+
+    //Paints this module.
+    //Called from the section
+    public void paintModule(Graphics2D g) {
+
+    }
+}
+
