@@ -78,12 +78,11 @@ class ShipPanel extends JPanel {
         // Officially suggested approach is to overload the method name: g.fillRect(int[] a) { g.fillRect(a[0][0], a[0][1]...) }
         // but that requires me to figure out access to Graphics g and its methods somehow. Maybe lambda?
         g.fillRect(moduleBounds[13][0],moduleBounds[13][1],moduleBounds[13][2],moduleBounds[13][3]);
-        g.setColor(new Color(100,250,100));
-        g.fillRect(moduleBounds[1][0],moduleBounds[1][1], moduleBounds[1][2],moduleBounds[1][3]);
+        g.setColor(new Color(100,250,100)); //light green
         for (int i=1; i<=6; i++){
             g.fillRect(moduleBounds[i][0],moduleBounds[i][1], moduleBounds[i][2],moduleBounds[i][3]);
         }
-        g.setColor(new Color(250,100,100));
+        g.setColor(new Color(250,100,100)); //light red
         for (int i=7; i<=12; i++){
             g.fillRect(moduleBounds[i][0],moduleBounds[i][1], moduleBounds[i][2],moduleBounds[i][3]);
         }
@@ -107,6 +106,5 @@ class ShipPanel extends JPanel {
                 moduleBounds[x] = (temp.clone());
             }
         }
-        //
     }
 }
