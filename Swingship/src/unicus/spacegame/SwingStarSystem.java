@@ -1,6 +1,6 @@
 package unicus.spacegame;
 
-import org.jetbrains.annotations.Nullable;
+//import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -307,10 +307,15 @@ abstract class Base_Planet {
     final public double TAU = Math.PI * 2;
     Base_Planet parent;
     PlanetType type;
-    public Base_Planet(PlanetType type, @Nullable Base_Planet parent){
+    public Base_Planet(PlanetType type, Base_Planet parent){
         this.parent = parent;
         this.type = type;
     }
+    public Base_Planet(PlanetType type){
+        this.parent = null;
+        this.type = type;
+    }
+
     public PlanetType GetType(){
         return type;
     }
