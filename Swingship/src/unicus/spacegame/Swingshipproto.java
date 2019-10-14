@@ -60,7 +60,9 @@ class ShipPanel extends JPanel {
     @Override //?
     public void paint(Graphics g) {
         super.paint(g);
-        //int w = getWidth(); ?
+        shipImgWidth = getWidth();
+        shipImgHeight = getHeight();
+        setupModules();
         if (hasCargo) {
             g.setColor(Color.yellow);
             g.fillRect(440,190,120,50);
@@ -98,7 +100,7 @@ class ShipPanel extends JPanel {
 
         int[] engine_coords ={(int)(sw*0.06), (int)(sh*0.4), mw, mh};
         moduleBounds[0] = engine_coords;
-        int[] bridge_coords ={(int)(sw*0.9), (int)(sh*0.4), mw, mh};
+        int[] bridge_coords ={(int)(sw*0.85), (int)(sh*0.4), mw, mh};
         moduleBounds[13] = bridge_coords;
         for (int i=0; i<4; i++) {
             for (int j=0; j<3; j++) {
