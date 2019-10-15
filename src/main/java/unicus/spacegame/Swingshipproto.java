@@ -1,6 +1,8 @@
 package unicus.spacegame;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.util.Random;
 
 public class Swingshipproto {
 
@@ -136,15 +138,144 @@ class ShipPanel extends JPanel {
 }
 
 
+//New code.
+class Spaceship {
+    int length;
+    //lists the type of sections currently installed. 0 is near bridge, other end near engineering.
+    SectionType[] sectionTypes;
+    ShipModule[][] modules;
+
+    public Spaceship(int length)
+    {
+        this.length = length;
+        sectionTypes = new SectionType[length];
+        modules = new ShipModule[length][0];
+        for (int i = 0; i < length; i++)
+        {
+            //None-type sections
+            sectionTypes[i] = SectionType.None;
+            modules[i] = new ShipModule[0];
+        }
+    }
+    //Warning: this WILL replace existing any existing modules.
+    //Code calling this should check with CanBuildSection first
+    public void BuildSection(int index, SectionType sectionType)
+    {
+        // ( index >= 0 && index < length);
+        int sLength = sectionType.getNumModules();
+        sectionTypes[index] = sectionType;
+        modules[index] = new ShipModule[sLength];
+        for(int i = 0; i < sLength; i++){
+            modules[index][i] = new ShipModule(sectionType);
+        }
+    }
+
+    public boolean CanBuildSection(int index){
+        //(this is a stub)
+        return true; //TODO: write CanBuildSection
+    }
+
+    //Warning: this WILL replace existing the existing module.
+    //Code calling this should check with CanBuildmodule first
+    public void BuildModule(int sIndex, int mIndex, ModuleType mType){
+        modules[sIndex][mIndex] = new ShipModule(sectionTypes[sIndex], mType);
+    }
+
+    public boolean CanBuildmodule(int sIndex, int mIndex, ModuleType mType){
+        //(this is a stub)
+        return true; //TODO: write CanBuildSection
+    }
+
+    static public Spaceship GenerateStart1(Random rand, int minLength, int maxLength, float minFull, float maxFull){
+        int length = rand.nextInt(maxLength - minLength) + minLength;
+        float fullRange = maxFull - minFull;
+        float full = rand.nextFloat() * fullRange + minFull;
+        return GenerateStart1(rand, length, full);
+    }
+
+    private static Spaceship GenerateStart1(Random rand, int length, float full){
+        //length MUST be at least 2.
+        if (length < 2)
+            length = 2;
+
+        Spaceship ship = new Spaceship(length);
+        //center of the wheel section hosts the first hab module
+        int habstart = SectionType.Wheel.getNumModules() / 2;
+        ship.BuildSection(0, SectionType.Wheel);
+        ship.BuildModule(0, habstart, ModuleType.Habitat);
+
+        int normSize = SectionType.Normal.getNumModules();
+        float currentFilled = 0.0f;
+        float fillPerModule = 1.0f / (normSize * (length-1));
+        for(int i = 1; i < length; i++){
+            //stub. TODO: add some fudge to have some empty sections
+            ship.BuildSection(i, SectionType.Normal);
+            for(int j = 0; j < normSize; j++)
+            {
+                //stub. TODO: add some fudge on what modules has cargo.
+                ModuleType type = ModuleType.Cargo;
+                ship.BuildModule(i, j, type);
+            }
+        }
+        return ship;
+    }
+
+    public static void main(String[] args) {
+        Spaceship ship = Spaceship.GenerateStart1(new Random(0), 2, 10, 0.0f, 1.0f);
+        System.out.println(ship.toString());
+    }
+}
+
+
 enum SectionType {
-    None, Normal, Wheel
+    None{@Override
+        int getNumModules() {
+            return 0;
+        }
+        @Override
+        boolean getHasGravity() {
+            return false;
+        }
+    }, Normal {@Override
+        int getNumModules() {
+            return 5;
+        }
+        @Override
+        boolean getHasGravity() {
+            return false;
+        }
+    }, Wheel {@Override
+        int getNumModules() {
+            return 3;
+        }
+        @Override
+        boolean getHasGravity() {
+            return true;
+        }
+    };
+    abstract int getNumModules();
+    abstract boolean getHasGravity();
 };
 enum ModuleType {
-    Empty, Habitat
+    Empty{@Override
+        boolean getNeedGravity() {
+            return false;
+        }
+    },Cargo {@Override
+        boolean getNeedGravity() {
+            return false;
+        }
+    }, Habitat {@Override
+        boolean getNeedGravity() {
+            return true;
+        }
+    };
+
+    abstract boolean getNeedGravity();
 };
 
 
-class ShipModule{
+class ShipModule {
     private SectionType sectionType;
     private ModuleType moduleType;
 
@@ -153,11 +284,10 @@ class ShipModule{
         this.sectionType = sectionType;
         this.moduleType = moduleType;
     }
-
-    //Paints this module.
-    //Called from the section
-    public void paintModule(Graphics2D g) {
-
+    public ShipModule(SectionType sectionType) {
+        super();
+        this.sectionType = sectionType;
+        this.moduleType = ModuleType.Empty;
     }
 }
 
