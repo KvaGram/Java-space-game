@@ -137,13 +137,86 @@ class ShipPanel extends JPanel {
     }
 }
 
+class SpaceshipGUI extends JPanel
+{
+    Spaceship spaceship;
+    public SpaceshipGUI(Spaceship spaceship)
+    {
+        this.spaceship = spaceship;
+    }
+    @Override
+    public void paintComponent(Graphics _g){
+        Graphics2D g = (Graphics2D) _g;
+        Rectangle bounds = getBounds();
+
+        //Paint modules
+        for(int i = 0; i < spaceship.length; i++)
+            for (int j = 0; j < spaceship.modules[i].length; j++)
+                PaintShipModule(i, j, g);
+
+        //Paint bridge
+        int bridgeWidth = bounds.width / (spaceship.length + 2) - 10;
+        int bridgeHeight = bounds.height / 2;
+        int bridgeX = 10;
+        int bridgeY = bounds.height / 4;
+
+        g.setColor(Color.green);
+        g.fillArc(bridgeX, bridgeY, bridgeWidth*2, bridgeHeight, 90, 180);
+        g.setColor(Color.BLACK);
+        g.setStroke(new BasicStroke(4));
+        g.drawArc(bridgeX, bridgeY, bridgeWidth*2, bridgeHeight, 90, 180);
+        g.drawLine(bridgeX + bridgeWidth, bridgeY, bridgeX + bridgeWidth, bridgeY+bridgeHeight);
+
+        //paint engineering
+
+
+    }
+    void PaintShipModule(int sIndex, int mIndex, Graphics2D g){
+        Rectangle bounds = getBounds();
+
+        int baseWidth = bounds.width / (spaceship.length + 2);
+        int baseHeight = bounds.height / (spaceship.sectionTypes[sIndex].getNumModules());
+
+        Rectangle drawRect = new Rectangle();
+        int width  = baseWidth - 20;
+        int height = baseHeight - 20;
+        int x = baseWidth * (sIndex + 1) + 10 + bounds.x;
+        int y = baseHeight * mIndex + 10 + bounds.x;
+
+        g.setStroke(new BasicStroke(1));
+        g.setColor(spaceship.modules[sIndex][mIndex].moduleType.getPaintColor());
+        g.fillRoundRect(x, y, width, height, 10, 10);
+
+        g.setColor(Color.BLACK);
+        g.setStroke(new BasicStroke(4));
+        g.drawRoundRect(x, y, width, height, 10, 10);
+
+    }
+    public static void main(String[] args) {
+        Spaceship ship = Spaceship.GenerateStart1(new Random(0), 2, 10, 0.0f, 1.0f);
+        SpaceshipGUI gui = new SpaceshipGUI(ship);
+
+        JFrame frame = new JFrame("Ship modules proto");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(1200, 800);
+        gui.setBounds(0,0,1200, 800);
+        frame.add(gui);
+
+        frame.setVisible(true);
+
+
+
+        System.out.println(ship.toString());
+    }
+}
+
 
 //New code.
 class Spaceship {
-    int length;
+    public int length;
     //lists the type of sections currently installed. 0 is near bridge, other end near engineering.
-    SectionType[] sectionTypes;
-    ShipModule[][] modules;
+    public SectionType[] sectionTypes;
+    public ShipModule[][] modules;
 
     public Spaceship(int length)
     {
@@ -261,23 +334,37 @@ enum ModuleType {
         boolean getNeedGravity() {
             return false;
         }
+        @Override
+        Color getPaintColor() {
+            return new Color(50,50,70);
+        }
     },Cargo {@Override
         boolean getNeedGravity() {
             return false;
+        }
+
+        @Override
+        Color getPaintColor() {
+            return new Color(160,82,45);
         }
     }, Habitat {@Override
         boolean getNeedGravity() {
             return true;
         }
+        @Override
+        Color getPaintColor() {
+            return new Color(100,200,0);
+        }
     };
 
     abstract boolean getNeedGravity();
+    abstract Color getPaintColor();
 };
 
 
 class ShipModule {
-    private SectionType sectionType;
-    private ModuleType moduleType;
+    public SectionType sectionType;
+    public ModuleType moduleType;
 
     public ShipModule (SectionType sectionType, ModuleType moduleType) {
         super();
