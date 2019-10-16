@@ -1,7 +1,13 @@
 package unicus.spacegame;
 import javax.swing.*;
+import javax.swing.event.MouseInputListener;
 import java.awt.*;
-import java.awt.geom.Rectangle2D;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Swingshipproto {
@@ -137,17 +143,20 @@ class ShipPanel extends JPanel {
     }
 }
 
-class SpaceshipGUI extends JPanel
+class SpaceshipGUI extends JPanel implements MouseInputListener, ComponentListener
 {
     Spaceship spaceship;
     public SpaceshipGUI(Spaceship spaceship)
     {
         this.spaceship = spaceship;
+        this.mousePoint = new Point(0, 0);
+        this.buildMouseTargets();
+
+        this.addMouseListener(this);
     }
     @Override
     public void paintComponent(Graphics _g){
         Graphics2D g = (Graphics2D) _g;
-        Rectangle bounds = getBounds();
 
         //Paint modules
         for(int i = 0; i < spaceship.length; i++)
@@ -231,12 +240,144 @@ class SpaceshipGUI extends JPanel
         gui.setBounds(0,0,1200, 800);
         frame.add(gui);
 
+        /*
+        frame.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                System.out.println("Hello world");
+            }
+        });
+        */
+
+
         frame.setVisible(true);
-
-
 
         System.out.println(ship.toString());
     }
+
+    public void buildMouseTargets()
+    {
+        mouseTargets = new ArrayList<MouseTarget>();
+        mouseTargets.add(new MouseTarget(
+                "static module", "bridge",
+                getBridgeRect(), new Point()
+        ));
+        mouseTargets.add(new MouseTarget(
+                "static module", "engine",
+                getBridgeRect(), new Point()
+        ));
+        for(int i = 0; i < spaceship.length; i++) {
+            for (int j = 0; j < spaceship.modules[i].length; j++) {
+                mouseTargets.add(new MouseTarget(
+                        "module",
+                        spaceship.modules[i][j].GetName(),
+                        getBridgeRect(), new Point()
+                ));
+            }
+        }
+        for (MouseTarget t : mouseTargets) {
+            if (t.rect.contains(mousePoint)){
+                mouseTarget = t;
+                return;
+            }
+        }
+        mouseTarget = null;
+    }
+
+
+    //<editor-fold desc="Mouse events">
+    @Override
+    public void mouseClicked(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        mousePoint.x = e.getXOnScreen();
+        mousePoint.y = e.getYOnScreen();
+
+        System.out.println(mousePoint.toString());
+
+        for (MouseTarget t : mouseTargets) {
+            if (t.rect.contains(mousePoint)){
+                if (t != mouseTarget){
+                    String out = MessageFormat.format("Hello, my name is {0}", t.name);
+                    System.out.println(out);
+                }
+                mouseTarget = t;
+                return;
+            }
+        }
+        mouseTarget = null;
+    }
+    //</editor-fold>
+
+    ArrayList<MouseTarget> mouseTargets;
+    Point mousePoint;
+    MouseTarget mouseTarget;
+
+    //<editor-fold desc="component listener">
+    @Override
+    public void componentResized(ComponentEvent e) {
+        buildMouseTargets();
+    }
+
+    @Override
+    public void componentMoved(ComponentEvent e) {
+        buildMouseTargets();
+    }
+
+    @Override
+    public void componentShown(ComponentEvent e) {
+        buildMouseTargets();
+    }
+
+    @Override
+    public void componentHidden(ComponentEvent e) {
+
+    }
+    //</editor-fold>
+
+
+    class MouseTarget
+    {
+        String type;
+        String name;
+        Rectangle rect;
+        Point loc;
+        public MouseTarget(String type, String name, Rectangle rect, Point loc){
+            this.type = type;
+            this.name = name;
+            this.rect = rect;
+            this.loc  =  loc;
+        }
+    }
+
 }
 
 
@@ -404,6 +545,10 @@ class ShipModule {
         super();
         this.sectionType = sectionType;
         this.moduleType = ModuleType.Empty;
+    }
+
+    public String GetName() {
+        return sectionType.toString() + " " + moduleType.toString();
     }
 }
 
