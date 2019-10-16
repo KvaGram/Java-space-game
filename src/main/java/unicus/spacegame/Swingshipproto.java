@@ -311,7 +311,7 @@ class SpaceshipGUI extends JPanel implements MouseInputListener, ComponentListen
                 mouseTargets.add(new MouseTarget(
                         "module",
                         spaceship.modules[i][j].GetName(),
-                        getShipModuleRect(i, j), new Point()
+                        getShipModuleRect(i, j), new Point(i, j)
                 ));
             }
         }
