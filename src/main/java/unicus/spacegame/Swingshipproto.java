@@ -155,6 +155,22 @@ class SpaceshipGUI extends JPanel implements MouseInputListener, ComponentListen
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
     }
+    public static void main(String[] args) {
+        Spaceship ship = Spaceship.GenerateStart1(new Random(0), 2, 10, 0.0f, 1.0f);
+        SpaceshipGUI gui = new SpaceshipGUI(ship);
+
+
+
+        JFrame frame = new JFrame("Ship modules proto");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(1200, 800);
+        gui.setBounds(0,0,1200, 800);
+        frame.add(gui);
+
+        frame.setVisible(true);
+
+        System.out.println(ship.toString());
+    }
     @Override
     public void paintComponent(Graphics _g){
         Graphics2D g = (Graphics2D) _g;
@@ -184,8 +200,50 @@ class SpaceshipGUI extends JPanel implements MouseInputListener, ComponentListen
         g.setColor(Color.red);
         g.fillOval(mousePoint.x, mousePoint.y, 5,5);
 
+        if(mouseTarget != null){
+            paintTooltip(g);
+        }
+
+
         buildMouseTargets();
     }
+
+    private void paintTooltip(Graphics2D g){
+        //Rectangle tipRect = new Rectangle(mousePoint.x, mousePoint.y, 300, 50);
+        Font font = new Font("Serif", Font.BOLD, 20);
+        g.setFont(font);
+
+        String[] tipText = mouseTarget.getToolTip().split("\n");
+        if (tipText.length < 1)
+            return;
+
+        int tipX = mousePoint.x;
+        int tipY = mousePoint.y;
+
+        int charLength = 0;
+        for (String s : tipText)
+            charLength = Math.max(s.length(), charLength);
+
+        int tipWidth = (charLength+2) * 10;
+        int tipHeight = tipText.length * 30;
+
+        Rectangle bounds = getBounds();
+        int xMargin = bounds.x + bounds.width - tipX - tipWidth;
+        if (xMargin < 0)
+            tipX += xMargin;
+        int yMargin = bounds.y + bounds.height - tipY - tipHeight;
+        if (yMargin < 0)
+            tipY += yMargin;
+
+
+        g.setColor(new Color(200, 200, 200));
+        g.fillRect(tipX, tipY, tipWidth, tipHeight);
+
+        g.setColor(new Color(20, 20, 20));
+        for(int i = 0; i < tipText.length; i++)
+            g.drawString(tipText[i], tipX + 20, tipY + i * 30 + 20);
+    }
+
     void PaintShipModule(int sIndex, int mIndex, Graphics2D g){
         Rectangle r = getShipModuleRect(sIndex, mIndex);
 
@@ -235,31 +293,6 @@ class SpaceshipGUI extends JPanel implements MouseInputListener, ComponentListen
         return drawRect;
     }
 
-    public static void main(String[] args) {
-        Spaceship ship = Spaceship.GenerateStart1(new Random(0), 2, 10, 0.0f, 1.0f);
-        SpaceshipGUI gui = new SpaceshipGUI(ship);
-
-        JFrame frame = new JFrame("Ship modules proto");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1200, 800);
-        gui.setBounds(0,0,1200, 800);
-        frame.add(gui);
-
-        /*
-        frame.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                System.out.println("Hello world");
-            }
-        });*/
-        //frame.addMouseListener(gui);
-
-
-
-        frame.setVisible(true);
-
-        System.out.println(ship.toString());
-    }
 
 
     public void buildMouseTargets()
@@ -386,6 +419,24 @@ class SpaceshipGUI extends JPanel implements MouseInputListener, ComponentListen
             this.name = name;
             this.rect = rect;
             this.loc  =  loc;
+        }
+
+        public String getToolTip() {
+            String text = "";
+
+            if(type == "module"){
+                text =  "Ship module located at section " + loc.x + " index " + loc.y;
+                text += "\nThis is a " + name;
+                text += "\nClick to switch out module or section";
+            }
+            else if (type == "static module")
+            {
+                text =  "This is the " + name + ".";
+                text += "\nClick to access information";
+            }
+
+
+            return text;
         }
     }
 
