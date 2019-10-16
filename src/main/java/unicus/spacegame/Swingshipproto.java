@@ -153,6 +153,7 @@ class SpaceshipGUI extends JPanel implements MouseInputListener, ComponentListen
         this.buildMouseTargets();
 
         this.addMouseListener(this);
+        this.addMouseMotionListener(this);
     }
     @Override
     public void paintComponent(Graphics _g){
@@ -180,6 +181,10 @@ class SpaceshipGUI extends JPanel implements MouseInputListener, ComponentListen
         g.drawArc(engine.x - engine.width, engine.y, engine.width*2, engine.height, 270, 180);
         g.drawLine(engine.x, engine.y, engine.x, engine.y + engine.height);
 
+        g.setColor(Color.red);
+        g.fillOval(mousePoint.x, mousePoint.y, 5,5);
+
+        buildMouseTargets();
     }
     void PaintShipModule(int sIndex, int mIndex, Graphics2D g){
         Rectangle r = getShipModuleRect(sIndex, mIndex);
@@ -246,14 +251,16 @@ class SpaceshipGUI extends JPanel implements MouseInputListener, ComponentListen
             public void mousePressed(MouseEvent e) {
                 System.out.println("Hello world");
             }
-        });
-        */
+        });*/
+        //frame.addMouseListener(gui);
+
 
 
         frame.setVisible(true);
 
         System.out.println(ship.toString());
     }
+
 
     public void buildMouseTargets()
     {
@@ -264,14 +271,14 @@ class SpaceshipGUI extends JPanel implements MouseInputListener, ComponentListen
         ));
         mouseTargets.add(new MouseTarget(
                 "static module", "engine",
-                getBridgeRect(), new Point()
+                getEngineRect(), new Point()
         ));
         for(int i = 0; i < spaceship.length; i++) {
             for (int j = 0; j < spaceship.modules[i].length; j++) {
                 mouseTargets.add(new MouseTarget(
                         "module",
                         spaceship.modules[i][j].GetName(),
-                        getBridgeRect(), new Point()
+                        getShipModuleRect(i, j), new Point()
                 ));
             }
         }
@@ -288,50 +295,54 @@ class SpaceshipGUI extends JPanel implements MouseInputListener, ComponentListen
     //<editor-fold desc="Mouse events">
     @Override
     public void mouseClicked(MouseEvent e) {
-
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-
+        //System.out.println("Hello mousePressed");
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-
+        //System.out.println("Hello mouseReleased");
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
-
+        //System.out.println("Hello mouseEntered");
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-
+        //System.out.println("Hello mouseExited");
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-
+        //System.out.println("Hello mouseDragged");
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        mousePoint.x = e.getXOnScreen();
-        mousePoint.y = e.getYOnScreen();
+        repaint();
+        mousePoint.x = e.getX();
+        mousePoint.y = e.getY();
 
-        System.out.println(mousePoint.toString());
+        //System.out.println(mousePoint.toString());
 
         for (MouseTarget t : mouseTargets) {
             if (t.rect.contains(mousePoint)){
                 if (t != mouseTarget){
-                    String out = MessageFormat.format("Hello, my name is {0}", t.name);
-                    System.out.println(out);
+                    //String out = MessageFormat.format("Hello, my name is {0}", t.name);
+                    //System.out.println(out);
                 }
                 mouseTarget = t;
+                //String out = MessageFormat.format("Mouse is over {0}", t.name);
+                //System.out.println(out);
                 return;
             }
+            //String out = MessageFormat.format("target {0} checked", t.name);
+            //System.out.println(out);
         }
         mouseTarget = null;
     }
