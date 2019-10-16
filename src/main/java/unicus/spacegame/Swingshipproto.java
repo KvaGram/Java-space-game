@@ -153,18 +153,23 @@ class SpaceshipGUI extends JPanel
         for(int i = 0; i < spaceship.length; i++)
             for (int j = 0; j < spaceship.modules[i].length; j++)
                 PaintShipModule(i, j, g);
-
+        g.setStroke(new BasicStroke(4));
         //Paint bridge
         Rectangle bridge = getBridgeRect();
 
         g.setColor(Color.green);
         g.fillArc(bridge.x, bridge.y, bridge.width*2, bridge.height, 90, 180);
         g.setColor(Color.BLACK);
-        g.setStroke(new BasicStroke(4));
         g.drawArc(bridge.x, bridge.y, bridge.width*2, bridge.height, 90, 180);
         g.drawLine(bridge.x + bridge.width, bridge.y, bridge.x + bridge.width, bridge.y+bridge.height);
 
         //paint engineering
+        Rectangle engine = getEngineRect();
+        g.setColor(Color.red);
+        g.fillArc(engine.x - engine.width, engine.y, engine.width*2, engine.height, 270, 180);
+        g.setColor(Color.black);
+        g.drawArc(engine.x - engine.width, engine.y, engine.width*2, engine.height, 270, 180);
+        g.drawLine(engine.x, engine.y, engine.x, engine.y + engine.height);
 
     }
     void PaintShipModule(int sIndex, int mIndex, Graphics2D g){
@@ -210,7 +215,7 @@ class SpaceshipGUI extends JPanel
         Rectangle drawRect = new Rectangle();
         drawRect.width = bounds.width / (spaceship.length + 2) - 10;
         drawRect.height = bounds.height / 2;
-        drawRect.x = spaceship.length * baseWidth;
+        drawRect.x = (spaceship.length+1) * baseWidth;
         drawRect.y = bounds.height / 4;
 
         return drawRect;
