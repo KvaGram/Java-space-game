@@ -155,43 +155,67 @@ class SpaceshipGUI extends JPanel
                 PaintShipModule(i, j, g);
 
         //Paint bridge
-        int bridgeWidth = bounds.width / (spaceship.length + 2) - 10;
-        int bridgeHeight = bounds.height / 2;
-        int bridgeX = 10;
-        int bridgeY = bounds.height / 4;
+        Rectangle bridge = getBridgeRect();
 
         g.setColor(Color.green);
-        g.fillArc(bridgeX, bridgeY, bridgeWidth*2, bridgeHeight, 90, 180);
+        g.fillArc(bridge.x, bridge.y, bridge.width*2, bridge.height, 90, 180);
         g.setColor(Color.BLACK);
         g.setStroke(new BasicStroke(4));
-        g.drawArc(bridgeX, bridgeY, bridgeWidth*2, bridgeHeight, 90, 180);
-        g.drawLine(bridgeX + bridgeWidth, bridgeY, bridgeX + bridgeWidth, bridgeY+bridgeHeight);
+        g.drawArc(bridge.x, bridge.y, bridge.width*2, bridge.height, 90, 180);
+        g.drawLine(bridge.x + bridge.width, bridge.y, bridge.x + bridge.width, bridge.y+bridge.height);
 
         //paint engineering
 
-
     }
     void PaintShipModule(int sIndex, int mIndex, Graphics2D g){
+        Rectangle r = getShipModuleRect(sIndex, mIndex);
+
+        g.setStroke(new BasicStroke(1));
+        g.setColor(spaceship.modules[sIndex][mIndex].moduleType.getPaintColor());
+        g.fillRoundRect(r.x, r.y, r.width, r.height, 10, 10);
+
+        g.setColor(Color.BLACK);
+        g.setStroke(new BasicStroke(4));
+        g.drawRoundRect(r.x, r.y, r.width, r.height, 10, 10);
+
+    }
+    public Rectangle getShipModuleRect(int sIndex, int mIndex){
         Rectangle bounds = getBounds();
 
         int baseWidth = bounds.width / (spaceship.length + 2);
         int baseHeight = bounds.height / (spaceship.sectionTypes[sIndex].getNumModules());
 
         Rectangle drawRect = new Rectangle();
-        int width  = baseWidth - 20;
-        int height = baseHeight - 20;
-        int x = baseWidth * (sIndex + 1) + 10 + bounds.x;
-        int y = baseHeight * mIndex + 10 + bounds.x;
+        drawRect.width  = baseWidth - 20;
+        drawRect.height = baseHeight - 20;
+        drawRect.x = baseWidth * (sIndex + 1) + 10 + bounds.x;
+        drawRect.y = baseHeight * mIndex + 10 + bounds.x;
 
-        g.setStroke(new BasicStroke(1));
-        g.setColor(spaceship.modules[sIndex][mIndex].moduleType.getPaintColor());
-        g.fillRoundRect(x, y, width, height, 10, 10);
-
-        g.setColor(Color.BLACK);
-        g.setStroke(new BasicStroke(4));
-        g.drawRoundRect(x, y, width, height, 10, 10);
-
+        return drawRect;
     }
+    public Rectangle getBridgeRect(){
+        Rectangle bounds = getBounds();
+        Rectangle drawRect = new Rectangle();
+        drawRect.width = bounds.width / (spaceship.length + 2) - 10;
+        drawRect.height = bounds.height / 2;
+        drawRect.x = 10;
+        drawRect.y = bounds.height / 4;
+
+        return drawRect;
+    }
+    public Rectangle getEngineRect(){
+        Rectangle bounds = getBounds();
+        int baseWidth = bounds.width / (spaceship.length + 2);
+
+        Rectangle drawRect = new Rectangle();
+        drawRect.width = bounds.width / (spaceship.length + 2) - 10;
+        drawRect.height = bounds.height / 2;
+        drawRect.x = spaceship.length * baseWidth;
+        drawRect.y = bounds.height / 4;
+
+        return drawRect;
+    }
+
     public static void main(String[] args) {
         Spaceship ship = Spaceship.GenerateStart1(new Random(0), 2, 10, 0.0f, 1.0f);
         SpaceshipGUI gui = new SpaceshipGUI(ship);
