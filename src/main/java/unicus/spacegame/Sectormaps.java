@@ -1,16 +1,17 @@
+package unicus.spacegame;
 //Usually you will require both swing and awt packages
 // even if you are working with just swings.
 import javax.swing.*;
 import java.awt.*;
 import java.util.Random;
 
-class Main extends JPanel {
+class Sectormaps extends JPanel {
     Random rand;
     int starsize;
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         JFrame frame = new JFrame("Map Frame");
-        frame.add(new Main());
+        frame.add(new Sectormaps());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1050, 650);
         JPanel panel = new JPanel(); //the magic of copy and paste from stackoverflow
@@ -34,16 +35,42 @@ class Main extends JPanel {
         double ab = Math.abs(a-b);
         double ac = Math.abs(a-c);
         double bc = Math.abs(b-c);
-        if ( (ab<theta) || (ac<theta) || (bc<theta) ) { return true; }
-        else { return false; }
+        return (ab < theta) || (ac < theta) || (bc < theta); /*carefully compacted*/
+    }
+    public int[][] getClosestPair(int[][] sector1, int[][] sector2) {
+        int[][] result = new int[2][2];
+        result[0] = sector1[0].clone();
+        result[1] = sector2[0].clone();
+        double shortest = Math.sqrt(Math.pow((sector1[0][0]-sector2[0][0]),2) + Math.pow((sector1[0][1]-sector2[0][1]),2));
+        for (int i=0; i<sector1.length; i++) {
+            for (int j=0; j<sector2.length; j++) {
+                double hyp = Math.sqrt(Math.pow((sector1[i][0]-sector2[j][0]),2) + Math.pow((sector1[i][1]-sector2[j][1]),2));
+                if (hyp < shortest) {
+                    //System.out.println(Double.toString(hyp) + " shorter than " + Double.toString(shortest));
+                    shortest = hyp;
+                    result[0] = sector1[i].clone();
+                    result[1] = sector2[j].clone();
+                }
+            }
+        }
+        return result;
     }
 
     public int[] pointInTriangle(int P1x, int P1y, int P2x, int P2y, int P3x, int P3y) {
+        //Take the triangle corner points P1-P3 as arguments.
+        //Shift inwards to create a buffer near zone edges.
+        double bp = 0.03; //buffer fraction. 0.1 = 10%
+        int Q1x = (int) (P1x + (bp*((P2x-P1x)+(P3x-P1x))));
+        int Q1y = (int) (P1y + (bp*((P2y-P1y)+(P3y-P1y))));
+        int Q2x = (int) (P2x + (bp*((P1x-P2x)+(P3x-P2x))));
+        int Q2y = (int) (P2y + (bp*((P1y-P2y)+(P3y-P2y))));
+        int Q3x = (int) (P3x + (bp*((P1x-P3x)+(P2x-P3x))));
+        int Q3y = (int) (P3y + (bp*((P1y-P3y)+(P2y-P3y))));
         Random r = new Random();
         double s = r.nextDouble();
         double t = Math.sqrt(r.nextDouble()); //counters biasing towards P3 due to wedge compression
-        double protox = (((1-t)*P1x) + (t*(((1-s)*P2x) + (s*P3x))));
-        double protoy = (((1-t)*P1y) + (t*(((1-s)*P2y) + (s*P3y))));
+        double protox = (((1-t)*Q1x) + (t*(((1-s)*Q2x) + (s*Q3x))));
+        double protoy = (((1-t)*Q1y) + (t*(((1-s)*Q2y) + (s*Q3y))));
         int x = (int) protox;
         int y = (int) protoy;
         int[] result = {x,y};
@@ -63,8 +90,8 @@ class Main extends JPanel {
         int xstart = 20;
         int xwidth = 300;
         int xmid = (int) (xwidth/2); //A triangle's base is xwidth; a triangle's area is xmid*yheight.
-        int room = 40; //pixels
-        double angle = 0.14; //radians. About 8 degrees.
+        int room = 30; //pixels, how far apart stars should be
+        double angle = 0.14; //radians, how far apart connecting hyperlanes should be, About 8 degrees.
 
         //Draw triangles to get an idea of what I'm doing;
         g.setColor(Color.red);
@@ -85,7 +112,7 @@ class Main extends JPanel {
         //Place and connect stars in the first triangle just to have some idea what I'm doing.
         //Point generation
         int sys1stars = 3; //general case will probably be 1d3
-        int s1coords[][] = new int[sys1stars][2]; //first dimension stars, second dimension x and y coords
+        int[][] s1coords = new int[sys1stars][2]; //first dimension stars, second dimension x and y coords
         s1coords[0] = pointInTriangle(xstart,(ystart+yheight), (xstart+xmid),ystart, (xstart+xmid+xmid),(ystart+yheight)).clone();
         s1coords[1] = pointInTriangle(xstart,(ystart+yheight), (xstart+xmid),ystart, (xstart+xmid+xmid),(ystart+yheight)).clone();
         s1coords[2] = pointInTriangle(xstart,(ystart+yheight), (xstart+xmid),ystart, (xstart+xmid+xmid),(ystart+yheight)).clone();
@@ -109,7 +136,7 @@ class Main extends JPanel {
 
         //Second sector
         int sys2stars = 2;
-        int s2coords[][] = new int[sys2stars][2];
+        int[][] s2coords = new int[sys2stars][2];
         int[] s2p1 = {(xstart+xmid),ystart};
         int[] s2p2 = {(xstart+xmid+xmid),(ystart+yheight)}; //Triangle corners
         int[] s2p3 = {(xstart+(3*xmid)),ystart};
@@ -132,7 +159,7 @@ class Main extends JPanel {
 
         //Third sector
         int sys3stars = 3; //general case will probably be 1d3
-        int s3coords[][] = new int[sys3stars][2]; //first dimension stars, second dimension x and y coords
+        int[][] s3coords = new int[sys3stars][2]; //first dimension stars, second dimension x and y coords
         s3coords[0] = pointInTriangle((xstart+2*xmid),(ystart+yheight), (xstart+3*xmid),ystart, (xstart+4*xmid),(ystart+yheight)).clone();
         s3coords[1] = pointInTriangle((xstart+2*xmid),(ystart+yheight), (xstart+3*xmid),ystart, (xstart+4*xmid),(ystart+yheight)).clone();
         s3coords[2] = pointInTriangle((xstart+2*xmid),(ystart+yheight), (xstart+3*xmid),ystart, (xstart+4*xmid),(ystart+yheight)).clone();
@@ -152,5 +179,10 @@ class Main extends JPanel {
         }
         g.drawLine(s3coords[s3coords.length-1][0],s3coords[s3coords.length-1][1],s3coords[0][0],s3coords[0][1]);
 
+        //Todo: replace with int[sectors][][] to create ragged array, loop over it.
+        int[][] onetwo = getClosestPair(s1coords, s2coords);
+        g.drawLine(onetwo[0][0],onetwo[0][1],onetwo[1][0],onetwo[1][1]);
+        int[][] twothree = getClosestPair(s2coords, s3coords);
+        g.drawLine(twothree[0][0],twothree[0][1],twothree[1][0],twothree[1][1]);
     }
 }
