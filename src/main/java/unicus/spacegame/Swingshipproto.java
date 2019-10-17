@@ -1,13 +1,14 @@
 package unicus.spacegame;
+import org.apache.commons.lang3.ArrayUtils;
+
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
+import java.lang.reflect.Array;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.Random;
 
 public class Swingshipproto {
@@ -143,17 +144,71 @@ class ShipPanel extends JPanel {
     }
 }
 
-class SpaceshipGUI extends JPanel implements MouseInputListener, ComponentListener
+class SpaceshipGUI extends JPanel implements ComponentListener
 {
     Spaceship spaceship;
+    JPopupMenu popBuild;
+    JMenuItem[] popBuildOptions;
+    UIState uiState;
+
+
+
     public SpaceshipGUI(Spaceship spaceship)
     {
         this.spaceship = spaceship;
         this.mousePoint = new Point(0, 0);
+        this.uiState = UIState.select;
         this.buildMouseTargets();
 
-        this.addMouseListener(this);
-        this.addMouseMotionListener(this);
+        //Setup handlers for moving or clicking mouse.
+        MouseAdapter adapter = new MouseAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                super.mouseMoved(e);
+                mousePoint.x = e.getX();
+                mousePoint.y = e.getY();
+                updateTarget();
+                repaint();
+            }
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                System.out.println("CLICK");
+                if(uiState == UIState.build){
+                    closeBuildMenu();
+                    return;
+                }
+
+                if(mouseTarget != null && mouseTarget.type == MouseTargetType.module){
+                    popBuild.setLocation(e.getXOnScreen(), e.getYOnScreen());
+                    openBuildMenu();
+                }
+            }
+        };
+        this.addMouseListener(adapter);
+        this.addMouseMotionListener(adapter);
+
+
+        //Setup context menu for building modules
+        ModuleType[] mTypes = ModuleType.values();
+        popBuild = new JPopupMenu("Build menu");
+        popBuildOptions = new JMenuItem[mTypes.length];
+        ActionListener buildMenuHandler = new ActionListener() {
+            public void actionPerformed(ActionEvent e)
+            {
+                int index = ArrayUtils.indexOf(popBuildOptions, e.getSource());
+                if (index >= 0){
+                    System.out.println("Doing stuff! -> " + ModuleType.values()[index]);
+                    tryBuildModule(ModuleType.values()[index]);
+                }else{
+                    System.out.println("Not doing stuff :-\\");
+                }
+                closeBuildMenu();
+            }
+        };
+        for(int i = 0; i < mTypes.length; i++) {
+            popBuildOptions[i] = new JMenuItem("Build " + mTypes[i]);
+            popBuildOptions[i].addActionListener(buildMenuHandler);
+        }
     }
     public static void main(String[] args) {
         Spaceship ship = Spaceship.GenerateStart1(new Random(0), 2, 10, 0.0f, 1.0f);
@@ -165,14 +220,40 @@ class SpaceshipGUI extends JPanel implements MouseInputListener, ComponentListen
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1200, 800);
         gui.setBounds(0,0,1200, 800);
+        gui.setOpaque(true);
+        gui.setBackground(Color.GRAY);
         frame.add(gui);
 
         frame.setVisible(true);
 
         System.out.println(ship.toString());
     }
+
+    public void openBuildMenu() {
+        for(int i = 0; i < popBuildOptions.length; i++){
+            //TODO filter away module types that don't fit
+            popBuild.add(popBuildOptions[i]);
+        }
+        popBuild.setVisible(true);
+        uiState = UIState.build;
+    }
+    public void closeBuildMenu() {
+        popBuild.removeAll();
+        popBuild.revalidate();
+        popBuild.setVisible(false);
+
+        uiState = UIState.select;
+    }
+    public void tryBuildModule(ModuleType type) {
+        //TODO try building module
+        spaceship.BuildModule(mouseTarget.loc.x, mouseTarget.loc.y, type);
+        repaint();
+    }
+
     @Override
     public void paintComponent(Graphics _g){
+
+        super.paintComponent(_g);
         Graphics2D g = (Graphics2D) _g;
 
         //Paint modules
@@ -197,10 +278,10 @@ class SpaceshipGUI extends JPanel implements MouseInputListener, ComponentListen
         g.drawArc(engine.x - engine.width, engine.y, engine.width*2, engine.height, 270, 180);
         g.drawLine(engine.x, engine.y, engine.x, engine.y + engine.height);
 
-        g.setColor(Color.red);
-        g.fillOval(mousePoint.x, mousePoint.y, 5,5);
+        //g.setColor(Color.red);
+        //g.fillOval(mousePoint.x, mousePoint.y, 5,5);
 
-        if(mouseTarget != null){
+        if(uiState == UIState.select && mouseTarget != null){
             paintTooltip(g);
         }
 
@@ -299,17 +380,17 @@ class SpaceshipGUI extends JPanel implements MouseInputListener, ComponentListen
     {
         mouseTargets = new ArrayList<MouseTarget>();
         mouseTargets.add(new MouseTarget(
-                "static module", "bridge",
+                MouseTargetType.staticModule, "bridge",
                 getBridgeRect(), new Point()
         ));
         mouseTargets.add(new MouseTarget(
-                "static module", "engine",
+                MouseTargetType.staticModule, "engine",
                 getEngineRect(), new Point()
         ));
         for(int i = 0; i < spaceship.length; i++) {
             for (int j = 0; j < spaceship.modules[i].length; j++) {
                 mouseTargets.add(new MouseTarget(
-                        "module",
+                        MouseTargetType.module,
                         spaceship.modules[i][j].GetName(),
                         getShipModuleRect(i, j), new Point(i, j)
                 ));
@@ -324,62 +405,22 @@ class SpaceshipGUI extends JPanel implements MouseInputListener, ComponentListen
         mouseTarget = null;
     }
 
-
-    //<editor-fold desc="Mouse events">
-    @Override
-    public void mouseClicked(MouseEvent e) {
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        //System.out.println("Hello mousePressed");
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        //System.out.println("Hello mouseReleased");
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        //System.out.println("Hello mouseEntered");
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-        //System.out.println("Hello mouseExited");
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-        //System.out.println("Hello mouseDragged");
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent e) {
-        repaint();
-        mousePoint.x = e.getX();
-        mousePoint.y = e.getY();
-
-        //System.out.println(mousePoint.toString());
-
+    public void updateTarget() {
+        //only change target in select state.
+        if(uiState != UIState.select)
+            return;
         for (MouseTarget t : mouseTargets) {
-            if (t.rect.contains(mousePoint)){
-                if (t != mouseTarget){
-                    //String out = MessageFormat.format("Hello, my name is {0}", t.name);
-                    //System.out.println(out);
+            if (t.rect.contains(mousePoint)) {
+                if (t != mouseTarget) {
+                    //Target changed
                 }
                 mouseTarget = t;
-                //String out = MessageFormat.format("Mouse is over {0}", t.name);
-                //System.out.println(out);
                 return;
             }
-            //String out = MessageFormat.format("target {0} checked", t.name);
-            //System.out.println(out);
         }
         mouseTarget = null;
     }
-    //</editor-fold>
+
 
     ArrayList<MouseTarget> mouseTargets;
     Point mousePoint;
@@ -407,14 +448,22 @@ class SpaceshipGUI extends JPanel implements MouseInputListener, ComponentListen
     }
     //</editor-fold>
 
+    enum UIState {
+        select, build
+    }
+    enum MouseTargetType {
+        module, staticModule, section
+    }
+
+
 
     class MouseTarget
     {
-        String type;
+        MouseTargetType type;
         String name;
         Rectangle rect;
         Point loc;
-        public MouseTarget(String type, String name, Rectangle rect, Point loc){
+        public MouseTarget(MouseTargetType type, String name, Rectangle rect, Point loc){
             this.type = type;
             this.name = name;
             this.rect = rect;
@@ -424,12 +473,12 @@ class SpaceshipGUI extends JPanel implements MouseInputListener, ComponentListen
         public String getToolTip() {
             String text = "";
 
-            if(type == "module"){
+            if(type == MouseTargetType.module){
                 text =  "Ship module located at section " + loc.x + " index " + loc.y;
                 text += "\nThis is a " + name;
                 text += "\nClick to switch out module or section";
             }
-            else if (type == "static module")
+            else if (type == MouseTargetType.staticModule)
             {
                 text =  "This is the " + name + ".";
                 text += "\nClick to access information";
@@ -613,4 +662,3 @@ class ShipModule {
         return sectionType.toString() + " " + moduleType.toString();
     }
 }
-
