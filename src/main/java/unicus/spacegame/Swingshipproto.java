@@ -11,42 +11,67 @@ public class Swingshipproto {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
         //Creating the Frame
-        JFrame outerframe = new JFrame("Chat Frame");
+        JFrame outerframe = new JFrame("Ship view proto");
         outerframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         outerframe.setSize(1200, 800);
 
-        //Creating the buttons row
-        JPanel bottompanel = new JPanel();
+        //Creates main content panel
+        JLayeredPane mainpanel = new JLayeredPane();
+
+        //Create panel to host buttons
+        JPanel buttonLayer = new JPanel();
+        //set no background to be drawn
+        buttonLayer.setOpaque(false);
+        //Set bounds manually (not normally recommended)
+        //This sets the panel to use the bottom 100 pixels of the frame screen.
+        buttonLayer.setBounds(0, 700, 1200, 100);
+
+        //Create dummy buttons
         JButton b_add = new JButton("Add cargo");
         JButton b_remove = new JButton("Remove cargo");
         JButton b_dummy = new JButton("More buttons to come");
         JButton b_crew = new JButton("Crew for example");
-        bottompanel.add(b_add);
-        bottompanel.add(b_remove);
-        bottompanel.add(b_dummy);
-        bottompanel.add(b_crew);
 
-        //Creating the image area
-        ShipPanel upperpanel = new ShipPanel(); //extends JPanel
-        upperpanel.setupModules();
-        ImageIcon shuttleimage = new ImageIcon("shuttlesideview.png");
-        upperpanel.add(new JLabel(shuttleimage));
+        //Add the buttons to the button layer
+        buttonLayer.add(b_add);
+        buttonLayer.add(b_remove);
+        buttonLayer.add(b_dummy);
+        buttonLayer.add(b_crew);
 
-        //Button actions
+        //Create the ship ui layer
+        ShipPanel shipUiLayer = new ShipPanel(); //extends JPanel
+        shipUiLayer.setupModules();
+        shipUiLayer.setOpaque(false);
+        //Set bounds manually (not normally recommended)
+        //This sets the panel to use the whole frame screen
+        shipUiLayer.setBounds(0, 0, 1200, 800);
+
+        //Create the background layer
+        ImageIcon shuttleimage = new ImageIcon("resources/shuttlesideview.png");
+        JLabel bgLayer = new JLabel(shuttleimage);
+        //Set bounds manually (not normally recommended)
+        //This sets the panel to use the whole frame screen
+        bgLayer.setBounds(0, 0, 1200, 800);
+
+        //set action listeners for cargo buttons
         b_add.addActionListener(arg0 -> {
-            upperpanel.hasCargo = true;
-            upperpanel.repaint();
+            shipUiLayer.hasCargo = true;
+            shipUiLayer.repaint();
         });
         b_remove.addActionListener(arg0 -> {
-            upperpanel.hasCargo = false;
-            upperpanel.repaint();
+            shipUiLayer.hasCargo = false;
+            shipUiLayer.repaint();
         });
 
-        //Add components in frame and show it.
-        outerframe.getContentPane().add("South", bottompanel);
-        outerframe.getContentPane().add("North", upperpanel);
+
+        //Adds the panels to the main panel
+        mainpanel.add(buttonLayer, 0);
+        mainpanel.add(shipUiLayer, 100);
+        mainpanel.add(bgLayer, 200);
+
+        //Adds the main panel to the frame.
+        outerframe.add(mainpanel);
         outerframe.setVisible(true);
     }
 }
@@ -58,11 +83,9 @@ class ShipPanel extends JPanel {
     private int[][] moduleBounds;
 
     @Override //?
-    public void paint(Graphics g) {
-        super.paint(g);
-        shipImgWidth = getWidth();
-        shipImgHeight = getHeight();
-        setupModules();
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        //int w = getWidth(); ?
         if (hasCargo) {
             g.setColor(Color.yellow);
             g.fillRect(440,190,120,50);
