@@ -7,6 +7,13 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * Swingshipproto and ShipPanel belong to a previous prototype.
+ * Feel free to run and test those, but the current version is the SpaceshipGUI.
+ * @see Swingshipproto
+ * @see ShipPanel
+ * @see SpaceshipGUI
+ */
 public class Swingshipproto {
 
     public static void main(String[] args) {
@@ -264,7 +271,7 @@ class SpaceshipGUI extends JPanel implements ComponentListener
         popBuild.setVisible(true);
         uiState = UIState.build;
     }
-    public void closeBuildMenu() {
+    private void closeBuildMenu() {
         popBuild.removeAll();
         popBuild.revalidate();
         popBuild.setVisible(false);
@@ -595,20 +602,10 @@ class Spaceship {
         }
     }
 
-    public boolean CanBuildSection(int index){
-        //(this is a stub)
-        return true; //TODO: write CanBuildSection
-    }
-
     //Warning: this WILL replace existing the existing module.
     //Code calling this should check with CanBuildmodule first
     public void BuildModule(int sIndex, int mIndex, ModuleType mType){
         modules[sIndex][mIndex] = new ShipModule(sectionTypes[sIndex], mType);
-    }
-
-    public boolean CanBuildmodule(int sIndex, int mIndex, ModuleType mType){
-        //(this is a stub)
-        return true; //TODO: write CanBuildSection
     }
 
     static public Spaceship GenerateStart1(Random rand, int minLength, int maxLength, float minFull, float maxFull){
@@ -629,18 +626,34 @@ class Spaceship {
         ship.BuildSection(0, SectionType.Wheel);
         ship.BuildModule(0, habstart, ModuleType.Habitat);
 
+
         int normSize = SectionType.Normal.getNumModules();
-        float currentFilled = 0.0f;
-        float fillPerModule = 1.0f / (normSize * (length-1));
+        int totCargoSpace = (normSize * (length-1));
+        int usedCargoSpace = 0;
+        int targetFilled = Math.round( (float)totCargoSpace * full);
+
         for(int i = 1; i < length; i++){
-            //stub. TODO: add some fudge to have some empty sections
-            ship.BuildSection(i, SectionType.Normal);
-            for(int j = 0; j < normSize; j++)
-            {
-                //stub. TODO: add some fudge on what modules has cargo.
-                ModuleType type = ModuleType.Cargo;
-                ship.BuildModule(i, j, type);
+            //If none of the modules are used, can targetFilled still be reached?
+            boolean canBeEmpty = (usedCargoSpace + normSize * (length - i - 2)) < targetFilled;
+            if(canBeEmpty && rand.nextFloat() < 0.3f){
+                ship.BuildSection(i, SectionType.None);
+            } else {
+                ship.BuildSection(i, SectionType.Normal);
+                for(int j = 0; j < normSize; j++)
+                {
+                    ModuleType type;
+                    if( usedCargoSpace >= targetFilled || (canBeEmpty && rand.nextFloat() < 0.3f)){
+                        type = ModuleType.Empty;
+                    } else {
+                        type = ModuleType.Cargo;
+                        usedCargoSpace++;
+                    }
+                    ship.BuildModule(i, j, type);
+                }
             }
+
+
+
         }
         return ship;
     }
