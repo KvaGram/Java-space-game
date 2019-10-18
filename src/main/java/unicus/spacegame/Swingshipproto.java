@@ -293,7 +293,7 @@ class SpaceshipGUI extends JPanel implements ComponentListener
         } else {
             rand = new Random();
         }
-        Spaceship ship = Spaceship.GenerateStart1(rand, 2, 10, 0.0f, 1.0f);
+        Spaceship ship = Spaceship.GenerateStart1(rand, 2, 10, 0.3f, 1.0f);
         SpaceshipGUI gui = new SpaceshipGUI(ship);
 
         JFrame frame = new JFrame("Ship modules proto");
@@ -775,9 +775,6 @@ class Spaceship {
         }
     }
 
-    //Warning: this WILL replace existing the existing module.
-    //Code calling this should check with CanBuildmodule first
-
     /**
      * Replaces a module of the spaceship.
      * Warning: this WILL replace the existing module, without asking!
@@ -831,17 +828,23 @@ class Spaceship {
         int usedCargoSpace = 0;
         int targetFilled = Math.round( (float)totCargoSpace * full);
 
+        System.out.println("Total cargo space: " + totCargoSpace + ", target cargo: " + targetFilled);
+
         for(int i = 1; i < length; i++){
             //If none of the modules are used, can targetFilled still be reached?
-            boolean canBeEmpty = (usedCargoSpace + normSize * (length - i - 2)) < targetFilled;
-            if(canBeEmpty && rand.nextFloat() < 0.3f){
+            boolean canBeEmpty = (usedCargoSpace + normSize * (length - i - 1)) > targetFilled;
+            float sectionEmptyChance = rand.nextFloat();
+            System.out.println("Chance section is empty: " + sectionEmptyChance + " can be empty: " + canBeEmpty);
+            if(canBeEmpty && sectionEmptyChance < 0.3f){
                 ship.BuildSection(i, SectionType.None);
             } else {
                 ship.BuildSection(i, SectionType.Normal);
                 for(int j = 0; j < normSize; j++)
                 {
                     ModuleType type;
-                    if( usedCargoSpace >= targetFilled || (canBeEmpty && rand.nextFloat() < 0.3f)){
+                    float moduleEmptyChance = rand.nextFloat();
+                    System.out.println("Chance module is empty: " + moduleEmptyChance + " can be empty: " + canBeEmpty);
+                    if( usedCargoSpace >= targetFilled || (canBeEmpty && moduleEmptyChance < 0.6f)){
                         type = ModuleType.Empty;
                     } else {
                         type = ModuleType.Cargo;
