@@ -2,13 +2,9 @@ package unicus.spacegame;
 import org.apache.commons.lang3.ArrayUtils;
 
 import javax.swing.*;
-import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.awt.event.*;
-import java.lang.reflect.Array;
-import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.EventListener;
 import java.util.Random;
 
 public class Swingshipproto {
@@ -148,7 +144,9 @@ class SpaceshipGUI extends JPanel implements ComponentListener
 {
     Spaceship spaceship;
     JPopupMenu popBuild;
-    JMenuItem[] popBuildOptions;
+    JMenuItem[] popBuildOptionsModules;
+    JMenuItem[] popBuildOptionsSections;
+    JMenuItem[] popBuildSeparators;
     UIState uiState;
 
 
@@ -178,10 +176,13 @@ class SpaceshipGUI extends JPanel implements ComponentListener
                     return;
                 }
 
-                if(mouseTarget != null && mouseTarget.type == MouseTargetType.module){
-                    popBuild.setLocation(e.getXOnScreen(), e.getYOnScreen());
-                    openBuildMenu();
+                if(mouseTarget != null){
+                    if(mouseTarget.type == MouseTargetType.module || mouseTarget.type == MouseTargetType.section) {
+                        popBuild.setLocation(e.getXOnScreen(), e.getYOnScreen());
+                        openBuildMenu();
+                    }
                 }
+
             }
         };
         this.addMouseListener(adapter);
@@ -190,31 +191,48 @@ class SpaceshipGUI extends JPanel implements ComponentListener
 
         //Setup context menu for building modules
         ModuleType[] mTypes = ModuleType.values();
+        SectionType[] sTypes = SectionType.values();
         popBuild = new JPopupMenu("Build menu");
-        popBuildOptions = new JMenuItem[mTypes.length];
-        ActionListener buildMenuHandler = new ActionListener() {
-            public void actionPerformed(ActionEvent e)
-            {
-                int index = ArrayUtils.indexOf(popBuildOptions, e.getSource());
-                if (index >= 0){
-                    System.out.println("Doing stuff! -> " + ModuleType.values()[index]);
-                    tryBuildModule(ModuleType.values()[index]);
-                }else{
-                    System.out.println("Not doing stuff :-\\");
-                }
-                closeBuildMenu();
+        popBuildOptionsModules  = new JMenuItem[mTypes.length];
+        popBuildOptionsSections = new JMenuItem[sTypes.length];
+        popBuildSeparators      = new JMenuItem[1];
+
+        ActionListener buildMenuHandlerModule = e -> {
+            int index = ArrayUtils.indexOf(popBuildOptionsModules, e.getSource());
+            if (index >= 0){
+                System.out.println("Doing stuff! -> " + ModuleType.values()[index]);
+                tryBuildModule(ModuleType.values()[index]);
+            }else{
+                System.out.println("Not doing stuff :-\\");
             }
+            closeBuildMenu();
+        };
+        ActionListener buildMenuHandlerSection = e -> {
+            int index = ArrayUtils.indexOf(popBuildOptionsSections, e.getSource());
+            if (index >= 0){
+                System.out.println("Doing stuff! -> " + SectionType.values()[index]);
+                tryBuildSection(SectionType.values()[index]);
+            }else{
+                System.out.println("Not doing stuff :-\\");
+            }
+            closeBuildMenu();
         };
         for(int i = 0; i < mTypes.length; i++) {
-            popBuildOptions[i] = new JMenuItem("Build " + mTypes[i]);
-            popBuildOptions[i].addActionListener(buildMenuHandler);
+            popBuildOptionsModules[i] = new JMenuItem("Build Module: " + mTypes[i]);
+            popBuildOptionsModules[i].addActionListener(buildMenuHandlerModule);
         }
+        for(int i = 0; i < sTypes.length; i++) {
+            popBuildOptionsSections[i] = new JMenuItem("Build Section: " + sTypes[i]);
+            popBuildOptionsSections[i].addActionListener(buildMenuHandlerSection);
+        }
+        for(int i= 0; i < 1; i++){
+            popBuildSeparators[i] = new JMenuItem(" --- ");
+        }
+
     }
     public static void main(String[] args) {
         Spaceship ship = Spaceship.GenerateStart1(new Random(0), 2, 10, 0.0f, 1.0f);
         SpaceshipGUI gui = new SpaceshipGUI(ship);
-
-
 
         JFrame frame = new JFrame("Ship modules proto");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -230,9 +248,18 @@ class SpaceshipGUI extends JPanel implements ComponentListener
     }
 
     public void openBuildMenu() {
-        for(int i = 0; i < popBuildOptions.length; i++){
-            //TODO filter away module types that don't fit
-            popBuild.add(popBuildOptions[i]);
+        if(mouseTarget.type == MouseTargetType.staticModule)
+            return;
+        if(mouseTarget.type == MouseTargetType.module) {
+            for (int i = 0; i < popBuildOptionsModules.length; i++) {
+                //TODO filter away module types that don't fit
+                popBuild.add(popBuildOptionsModules[i]);
+            }
+            popBuild.add(popBuildSeparators[0]); //adds a separator.
+        }
+        for(int i = 0; i < popBuildOptionsSections.length; i++){
+            //TODO filter away current section type
+            popBuild.add(popBuildOptionsSections[i]);
         }
         popBuild.setVisible(true);
         uiState = UIState.build;
@@ -249,6 +276,11 @@ class SpaceshipGUI extends JPanel implements ComponentListener
         spaceship.BuildModule(mouseTarget.loc.x, mouseTarget.loc.y, type);
         repaint();
     }
+    public void tryBuildSection(SectionType type) {
+        //TODO try building section
+        spaceship.BuildSection(mouseTarget.loc.x, type);
+        repaint();
+    }
 
     @Override
     public void paintComponent(Graphics _g){
@@ -257,9 +289,13 @@ class SpaceshipGUI extends JPanel implements ComponentListener
         Graphics2D g = (Graphics2D) _g;
 
         //Paint modules
-        for(int i = 0; i < spaceship.length; i++)
-            for (int j = 0; j < spaceship.modules[i].length; j++)
+        for(int i = 0; i < spaceship.length; i++) {
+            int sLength = spaceship.modules[i].length;
+            if(sLength < 1)
+                paintEmptySec(i, g);
+            for (int j = 0; j < sLength; j++)
                 PaintShipModule(i, j, g);
+        }
         g.setStroke(new BasicStroke(4));
         //Paint bridge
         Rectangle bridge = getBridgeRect();
@@ -284,7 +320,6 @@ class SpaceshipGUI extends JPanel implements ComponentListener
         if(uiState == UIState.select && mouseTarget != null){
             paintTooltip(g);
         }
-
 
         buildMouseTargets();
     }
@@ -335,8 +370,8 @@ class SpaceshipGUI extends JPanel implements ComponentListener
         g.setColor(Color.BLACK);
         g.setStroke(new BasicStroke(4));
         g.drawRoundRect(r.x, r.y, r.width, r.height, 10, 10);
-
     }
+
     public Rectangle getShipModuleRect(int sIndex, int mIndex){
         Rectangle bounds = getBounds();
 
@@ -351,6 +386,29 @@ class SpaceshipGUI extends JPanel implements ComponentListener
 
         return drawRect;
     }
+    void paintEmptySec(int sIndex, Graphics2D g){
+        Rectangle r = getShipEmptySecRect(sIndex);
+
+        g.setStroke(new BasicStroke(1));
+        g.setColor(Color.PINK);
+        g.fillRoundRect(r.x, r.y, r.width, r.height, 10, 10);
+
+        g.setColor(Color.BLACK);
+        g.setStroke(new BasicStroke(4));
+        g.drawRoundRect(r.x, r.y, r.width, r.height, 10, 10);
+    }
+    public Rectangle getShipEmptySecRect(int sIndex){
+        Rectangle bounds = getBounds();
+        Rectangle drawRect = new Rectangle();
+        int baseWidth = bounds.width / (spaceship.length + 2);
+        drawRect.height = bounds.height / 10;
+        drawRect.width = bounds.width / (spaceship.length + 2) - 10;
+        drawRect.x = baseWidth * (sIndex + 1) + 10 + bounds.x;
+        drawRect.y = bounds.height / 2 - bounds.height / 20;
+
+        return drawRect;
+    }
+
     public Rectangle getBridgeRect(){
         Rectangle bounds = getBounds();
         Rectangle drawRect = new Rectangle();
@@ -388,6 +446,13 @@ class SpaceshipGUI extends JPanel implements ComponentListener
                 getEngineRect(), new Point()
         ));
         for(int i = 0; i < spaceship.length; i++) {
+            if (spaceship.modules[i].length < 1) {
+                mouseTargets.add(new MouseTarget(
+                   MouseTargetType.section,
+                   "empty section",
+                   getShipEmptySecRect(i), new Point(i, -1)
+                ));
+            }
             for (int j = 0; j < spaceship.modules[i].length; j++) {
                 mouseTargets.add(new MouseTarget(
                         MouseTargetType.module,
@@ -396,6 +461,8 @@ class SpaceshipGUI extends JPanel implements ComponentListener
                 ));
             }
         }
+
+        //force-update the mouse target. (warning: breaks out of function if target was found)
         for (MouseTarget t : mouseTargets) {
             if (t.rect.contains(mousePoint)){
                 mouseTarget = t;
@@ -482,6 +549,10 @@ class SpaceshipGUI extends JPanel implements ComponentListener
             {
                 text =  "This is the " + name + ".";
                 text += "\nClick to access information";
+            }
+            else if (type == MouseTargetType.section){
+                text  = "Empty ship section at index" + loc.x + ".";
+                text += "\nClick to construct a section here.";
             }
 
 
@@ -603,6 +674,14 @@ enum SectionType {
             return 3;
         }
         @Override
+        boolean getHasGravity() {
+            return true;
+        }
+    }, GravityPlated {
+        @Override
+        int getNumModules() {
+            return 4;
+        }@Override
         boolean getHasGravity() {
             return true;
         }
