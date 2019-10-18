@@ -13,6 +13,7 @@ import java.util.Random;
  * @see Swingshipproto
  * @see ShipPanel
  * @see SpaceshipGUI
+ *
  */
 public class Swingshipproto {
 
@@ -88,6 +89,10 @@ public class Swingshipproto {
     }
 }
 
+
+/**
+ * ShipPanel renders a model of a spaceship.
+ */
 class ShipPanel extends JPanel {
     boolean hasCargo = false;
     private int shipImgWidth = 1111;
@@ -147,17 +152,49 @@ class ShipPanel extends JPanel {
     }
 }
 
+/**
+ * SpaceshipGUI renders a model of Spaceship
+ * and allows a user to edit module layout of the spaceship.
+ * @see Spaceship
+ *
+ * This prototype UI feature a popout drop-menu that allows
+ * the user to change either a single module or an entire section.
+ * (despite what the tooltip suggest, there is no information to get from bridge or engine ..yet)
+ */
 class SpaceshipGUI extends JPanel implements ComponentListener
 {
+    // spaceship is the datastructure this UI represents.
     Spaceship spaceship;
+
+    //popBuild is the drop-menu that appears when clicking on a menu.
+    //See methods openBuildMenu and closeBuildMenu.
     JPopupMenu popBuild;
+
+    //These JMenuItem arrays are lists of elements that may appear in the popout drop-menu.
     JMenuItem[] popBuildOptionsModules;
     JMenuItem[] popBuildOptionsSections;
     JMenuItem[] popBuildSeparators;
+
+    //The uiState prevents the tooltip box from rendering when popBuild is open.
+    //It also prevents mouseTarget from being changed when popBuild is open
     UIState uiState;
 
+    //mouseTargets is a list of Rectangle structures and target data.
+    //mouseTarget is compared with the mousePoint to determine if the mouse is over a component.
+    ArrayList<MouseTarget> mouseTargets;
+    //The location of the mouse
+    //see mouseMoved in the constructor.
+    Point mousePoint;
+    //mouseTarget is a reference to the current component the mouse is over.
+    //If the mouse is not over a component, it is null.
+    //It is set in updateTarget()
+    MouseTarget mouseTarget;
 
-
+    /**
+     * Constructor of the Spaceship UI.
+     * Requires a reference to the spaceship.
+     * @param spaceship The spaceship to display and edit.
+     */
     public SpaceshipGUI(Spaceship spaceship)
     {
         this.spaceship = spaceship;
@@ -237,14 +274,32 @@ class SpaceshipGUI extends JPanel implements ComponentListener
         }
 
     }
+
+    /**
+     * Test runner for SpaceshipGUI.
+     * Generates a Spaceship based a random seed or args[0].
+     * Makes basic JFrame sized 1200 x 400 to host the spaceshipGUI.
+     * @param args (optional) argument 1 is random seed.
+     */
     public static void main(String[] args) {
-        Spaceship ship = Spaceship.GenerateStart1(new Random(0), 2, 10, 0.0f, 1.0f);
+        Random rand;
+        if(args.length > 1){
+            try{
+                rand = new Random(Integer.parseInt(args[0]));
+            } catch (NumberFormatException err) {
+                System.err.println(err);
+                rand = new Random();
+            }
+        } else {
+            rand = new Random();
+        }
+        Spaceship ship = Spaceship.GenerateStart1(rand, 2, 10, 0.0f, 1.0f);
         SpaceshipGUI gui = new SpaceshipGUI(ship);
 
         JFrame frame = new JFrame("Ship modules proto");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1200, 800);
-        gui.setBounds(0,0,1200, 800);
+        frame.setSize(1200, 400);
+        gui.setBounds(0,0,1200, 400);
         gui.setOpaque(true);
         gui.setBackground(Color.GRAY);
         frame.add(gui);
@@ -254,6 +309,10 @@ class SpaceshipGUI extends JPanel implements ComponentListener
         System.out.println(ship.toString());
     }
 
+    /**
+     * Opens the popBuild, showing only the menu elements needed in the context.
+     * Sets uiState to Build.
+     */
     public void openBuildMenu() {
         if(mouseTarget.type == MouseTargetType.staticModule)
             return;
@@ -271,6 +330,11 @@ class SpaceshipGUI extends JPanel implements ComponentListener
         popBuild.setVisible(true);
         uiState = UIState.build;
     }
+
+    /**
+     * Closes the popBuild, hiding all menu elements.
+     * resets uiState back to Select.
+     */
     private void closeBuildMenu() {
         popBuild.removeAll();
         popBuild.revalidate();
@@ -278,17 +342,38 @@ class SpaceshipGUI extends JPanel implements ComponentListener
 
         uiState = UIState.select;
     }
+
+    /**
+     * Replaces a module in Spaceship.
+     * Uses data from MouseTarget to find the module to replace.
+     * The type Empty represents the lack of a module where one could be built.
+     *  Currently not yet implemented conditions where a module could not be built.
+     * @param type type of module to construct.
+     */
     public void tryBuildModule(ModuleType type) {
         //TODO try building module
         spaceship.BuildModule(mouseTarget.loc.x, mouseTarget.loc.y, type);
         repaint();
     }
+
+    /**
+     * Replaces an entire section in Spaceship.
+     * Uses data from MouseTarget to find the section to replace.
+     * The type None represents a section stripped down to the framework.
+     *  Currently not yet implemented conditions where a section could not be built.
+     * @param type type of section to construct
+     */
     public void tryBuildSection(SectionType type) {
         //TODO try building section
         spaceship.BuildSection(mouseTarget.loc.x, type);
         repaint();
     }
 
+    /**
+     * This function is called by Swing.
+     * It renders the model.
+     * @param _g the Swing graphics reference for rendering elements on screen.
+     */
     @Override
     public void paintComponent(Graphics _g){
 
@@ -331,6 +416,11 @@ class SpaceshipGUI extends JPanel implements ComponentListener
         buildMouseTargets();
     }
 
+    /**
+     * Renders a small tooltip when uiState is set to Select,
+     * and the mouse is over a MouseTarget.
+     * @param g the Swing graphics reference
+     */
     private void paintTooltip(Graphics2D g){
         //Rectangle tipRect = new Rectangle(mousePoint.x, mousePoint.y, 300, 50);
         Font font = new Font("Serif", Font.BOLD, 20);
@@ -367,6 +457,12 @@ class SpaceshipGUI extends JPanel implements ComponentListener
             g.drawString(tipText[i], tipX + 20, tipY + i * 30 + 20);
     }
 
+    /**
+     * Renders a module of the spaceship.
+     * @param sIndex The section index.
+     * @param mIndex The module index (of section)
+     * @param g the Swing graphics reference, casted to Graphics2D.
+     */
     void PaintShipModule(int sIndex, int mIndex, Graphics2D g){
         Rectangle r = getShipModuleRect(sIndex, mIndex);
 
@@ -379,6 +475,13 @@ class SpaceshipGUI extends JPanel implements ComponentListener
         g.drawRoundRect(r.x, r.y, r.width, r.height, 10, 10);
     }
 
+    /**
+     * Generates a Rectangle for a spaceship module, based on component screenspace.
+     * used by buildMouseTargets and PaintShipModule
+     * @param sIndex The section index.
+     * @param mIndex The module index (of section)
+     * @return
+     */
     public Rectangle getShipModuleRect(int sIndex, int mIndex){
         Rectangle bounds = getBounds();
 
@@ -393,6 +496,13 @@ class SpaceshipGUI extends JPanel implements ComponentListener
 
         return drawRect;
     }
+
+    /**
+     * Renders a representation of naked framework for a
+     * None type SectionType. This is needed as there would be no modules to render.
+     * @param sIndex The section index
+     * @param g the Swing graphics reference, casted to Graphics2D.
+     */
     void paintEmptySec(int sIndex, Graphics2D g){
         Rectangle r = getShipEmptySecRect(sIndex);
 
@@ -404,6 +514,14 @@ class SpaceshipGUI extends JPanel implements ComponentListener
         g.setStroke(new BasicStroke(4));
         g.drawRoundRect(r.x, r.y, r.width, r.height, 10, 10);
     }
+
+    /**
+     * Generates a Rectangle representation for a naked framework for a
+     * None type SectionType. This is needed as there would be no modules to click on.
+     * Used by buildMouseTargets and getShipModuleRect
+     * @param sIndex The section index
+     * @return
+     */
     public Rectangle getShipEmptySecRect(int sIndex){
         Rectangle bounds = getBounds();
         Rectangle drawRect = new Rectangle();
@@ -416,6 +534,11 @@ class SpaceshipGUI extends JPanel implements ComponentListener
         return drawRect;
     }
 
+    /**Generates a Rectangle representing the size and location of
+     * the Bridge of the Spaceship.
+     * Used by buildMouseTargets and PaintComponent
+     * @return
+     */
     public Rectangle getBridgeRect(){
         Rectangle bounds = getBounds();
         Rectangle drawRect = new Rectangle();
@@ -426,6 +549,12 @@ class SpaceshipGUI extends JPanel implements ComponentListener
 
         return drawRect;
     }
+
+    /**Generates a Rectangle representing the size and location of
+     * the Engines of the Spaceship.
+     * Used by buildMouseTargets and PaintComponent
+     * @return
+     */
     public Rectangle getEngineRect(){
         Rectangle bounds = getBounds();
         int baseWidth = bounds.width / (spaceship.length + 2);
@@ -440,7 +569,11 @@ class SpaceshipGUI extends JPanel implements ComponentListener
     }
 
 
-
+    /**
+     * Defines the clickable areas of the UI.
+     * Currently called every time the screen is re-rendered.
+     * (this is excessive and should be improved if better alternatives are found!)
+     */
     public void buildMouseTargets()
     {
         mouseTargets = new ArrayList<MouseTarget>();
@@ -479,6 +612,11 @@ class SpaceshipGUI extends JPanel implements ComponentListener
         mouseTarget = null;
     }
 
+    /**
+     * Updates what component (if any) the mouse is over.
+     * Runs whenever the mouse is moved.
+     * Runs only when uiState is set to Select.
+     */
     public void updateTarget() {
         //only change target in select state.
         if(uiState != UIState.select)
@@ -496,9 +634,7 @@ class SpaceshipGUI extends JPanel implements ComponentListener
     }
 
 
-    ArrayList<MouseTarget> mouseTargets;
-    Point mousePoint;
-    MouseTarget mouseTarget;
+
 
     //<editor-fold desc="component listener">
     @Override
@@ -522,20 +658,37 @@ class SpaceshipGUI extends JPanel implements ComponentListener
     }
     //</editor-fold>
 
+    /**
+     * The program states.
+     * Select - select a module or section to do stuff with
+     * Build - do stuff with a module or section.
+     */
     enum UIState {
         select, build
     }
+
+    /**
+     * The types of targets the mouse can find.
+     *
+     * module - can build modules and sections from here.
+     * static module - can currently not do anything (other than seeing a tooltip)
+     * section - currently only appears on empty sections, can only build sections from here.
+     */
     enum MouseTargetType {
         module, staticModule, section
     }
 
 
-
+    /**
+     * A target the mouse can hover over and click on.
+     */
     class MouseTarget
     {
         MouseTargetType type;
         String name;
+        //The rect is the region the mouse must be within.
         Rectangle rect;
+        //Where applicable, x - the section, y - the module, of the Spaceship.
         Point loc;
         public MouseTarget(MouseTargetType type, String name, Rectangle rect, Point loc){
             this.type = type;
@@ -544,6 +697,10 @@ class SpaceshipGUI extends JPanel implements ComponentListener
             this.loc  =  loc;
         }
 
+        /**
+         * Generates the text for a tooltip to be displayed.
+         * @return
+         */
         public String getToolTip() {
             String text = "";
 
@@ -570,13 +727,22 @@ class SpaceshipGUI extends JPanel implements ComponentListener
 }
 
 
-//New code.
+/**
+ * The datastructure representing a spaceship.
+ * The spaceship has a length of sections (at least 2).
+ * Each section has a number of modules, depending on the SectionType.
+ */
 class Spaceship {
     public int length;
     //lists the type of sections currently installed. 0 is near bridge, other end near engineering.
     public SectionType[] sectionTypes;
     public ShipModule[][] modules;
 
+    /**
+     * Creates a length long spaceship, naked down to the framework.
+     * Not meant to be used directly. Use one of the Generate functions instead.
+     * @param length
+     */
     public Spaceship(int length)
     {
         this.length = length;
@@ -589,8 +755,15 @@ class Spaceship {
             modules[i] = new ShipModule[0];
         }
     }
-    //Warning: this WILL replace existing any existing modules.
-    //Code calling this should check with CanBuildSection first
+
+    /**
+     * Replaces a section of the spaceship.
+     * Warning: this WILL replace the existing modules in it with empty modules, without asking!
+     * Planned: function to check if replacing a section should be allowed (by gameplay rules)
+     *
+     * @param index section index of module to replace.
+     * @param sectionType The new section type.
+     */
     public void BuildSection(int index, SectionType sectionType)
     {
         // ( index >= 0 && index < length);
@@ -604,10 +777,29 @@ class Spaceship {
 
     //Warning: this WILL replace existing the existing module.
     //Code calling this should check with CanBuildmodule first
+
+    /**
+     * Replaces a module of the spaceship.
+     * Warning: this WILL replace the existing module, without asking!
+     * Planned: function to check if replacing a module should be allowed (by gameplay rules)
+     *
+     * @param sIndex The section index
+     * @param mIndex The module index (of section)
+     * @param mType The new module type.
+     */
     public void BuildModule(int sIndex, int mIndex, ModuleType mType){
         modules[sIndex][mIndex] = new ShipModule(sectionTypes[sIndex], mType);
     }
 
+    /**
+     * Generates a new spaceship, with adjustable range of specification.
+     * @param rand The instance of Random to use.
+     * @param minLength minimal length of the ship
+     * @param maxLength maximum length of the ship
+     * @param minFull minimal cargo to spawn with (range 0, 1)
+     * @param maxFull maximum cargo to spawn with (range 0, 1)
+     * @return A Spaceship
+     */
     static public Spaceship GenerateStart1(Random rand, int minLength, int maxLength, float minFull, float maxFull){
         int length = rand.nextInt(maxLength - minLength) + minLength;
         float fullRange = maxFull - minFull;
@@ -615,6 +807,13 @@ class Spaceship {
         return GenerateStart1(rand, length, full);
     }
 
+    /**
+     * Generates a new spaceship, with some fixed specification
+     * @param rand The instance of Random to use.
+     * @param length The length of the Spaceship
+     * @param full How much of the potential space will be filled with cargo (range 0, 1)
+     * @return A Spaceship
+     */
     private static Spaceship GenerateStart1(Random rand, int length, float full){
         //length MUST be at least 2.
         if (length < 2)
@@ -658,6 +857,10 @@ class Spaceship {
         return ship;
     }
 
+    /**
+     * Test-creates a spaceship, then prints the structure to console.
+     * @param args
+     */
     public static void main(String[] args) {
         Spaceship ship = Spaceship.GenerateStart1(new Random(0), 2, 10, 0.0f, 1.0f);
         System.out.println(ship.toString());
@@ -665,6 +868,11 @@ class Spaceship {
 }
 
 
+/**
+ * The type of Section a spaceship may have.
+ * A SectionType have different amount of modules,
+ * and some may not have gravity.
+ */
 enum SectionType {
     None{@Override
         int getNumModules() {
@@ -702,6 +910,12 @@ enum SectionType {
     abstract int getNumModules();
     abstract boolean getHasGravity();
 };
+
+/**
+ * The type of Module a section may have.
+ * A module may require gravity to be constructed.
+ * A module has a color associated with it.
+ */
 enum ModuleType {
     Empty{@Override
         boolean getNeedGravity() {
@@ -734,7 +948,10 @@ enum ModuleType {
     abstract Color getPaintColor();
 };
 
-
+/**
+ * A datastructure that a Spaceship is full of.
+ * Needs to know what ModuleType it is, and what SectionType it is hosted in.
+ */
 class ShipModule {
     public SectionType sectionType;
     public ModuleType moduleType;
