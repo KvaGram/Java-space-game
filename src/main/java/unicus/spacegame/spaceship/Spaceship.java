@@ -1,5 +1,7 @@
 package unicus.spacegame.spaceship;
 
+import java.awt.*;
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -142,5 +144,41 @@ public class Spaceship {
     public static void main(String[] args) {
         Spaceship ship = Spaceship.GenerateStart1(new Random(0), 2, 10, 0.0f, 1.0f);
         System.out.println(ship.toString());
+    }
+
+    public ArrayList<Integer> GetBuildableModules(Point loc) {
+        ArrayList<Integer> list = new ArrayList<Integer>();
+        if(loc.y < 0 || loc.x < 0)
+            return list;
+        else {
+            SectionType sectionType = sectionTypes[loc.x];
+            ShipModule module = modules[loc.x][loc.y];
+            ModuleType[] mTypes = ModuleType.values();
+
+            for (int i = 0; i < mTypes.length; i++)
+            {
+                if(mTypes[i] == module.moduleType)
+                    continue; //Do not include existing type.
+                if(mTypes[i].getNeedGravity() && !sectionType.getHasGravity())
+                    continue; //Do not include gravity modules for non-gravity section
+                list.add(i);
+            }
+            return list;
+        }
+
+    }
+
+    public ArrayList<Integer> GetBuildableSections(Point loc) {
+        ArrayList<Integer> list = new ArrayList<Integer>();
+        if(loc.y < 0)
+            return list;
+        SectionType sectionType = sectionTypes[loc.x];
+        SectionType[] sTypes    = SectionType.values();
+        for (int i = 0; i < sTypes.length; i++){
+            if(sTypes[i] == sectionType)
+                continue; //Do not include existing type.
+            list.add(i);
+        }
+        return list;
     }
 }

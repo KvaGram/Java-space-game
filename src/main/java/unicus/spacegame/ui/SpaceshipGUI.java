@@ -181,19 +181,28 @@ public class SpaceshipGUI extends JPanel
     public void openBuildMenu() {
         if(mouseTarget.type == MouseTargetType.staticModule)
             return;
-        if(mouseTarget.type == MouseTargetType.module) {
-            for (int i = 0; i < popBuildOptionsModules.length; i++) {
-                //TODO filter away module types that don't fit
-                popBuild.add(popBuildOptionsModules[i]);
+        ArrayList<Integer> validModules  = spaceship.GetBuildableModules(mouseTarget.loc);
+        ArrayList<Integer> validSections = spaceship.GetBuildableSections(mouseTarget.loc);
+
+        if(!validModules.isEmpty()) {
+            for (int i = 0; i < popBuildOptionsModules.length; i++)
+            {
+                if (validModules.contains(i))
+                    popBuild.add(popBuildOptionsModules[i]);
             }
             popBuild.add(popBuildSeparators[0]); //adds a separator.
         }
-        for(int i = 0; i < popBuildOptionsSections.length; i++){
-            //TODO filter away current section type
-            popBuild.add(popBuildOptionsSections[i]);
+        if(!validSections.isEmpty()) {
+            for (int i = 0; i < popBuildOptionsSections.length; i++)
+            {
+                if(validSections.contains(i))
+                    popBuild.add(popBuildOptionsSections[i]);
+            }
         }
-        popBuild.setVisible(true);
-        uiState = UIState.build;
+        if(!validModules.isEmpty() || !validSections.isEmpty()){
+            popBuild.setVisible(true);
+            uiState = UIState.build;
+        }
     }
 
     /**
@@ -216,8 +225,8 @@ public class SpaceshipGUI extends JPanel
      * @param type type of module to construct.
      */
     public void tryBuildModule(ModuleType type) {
-        //TODO try building module
         spaceship.BuildModule(mouseTarget.loc.x, mouseTarget.loc.y, type);
+        buildMouseTargets();
         repaint();
     }
 
@@ -229,8 +238,8 @@ public class SpaceshipGUI extends JPanel
      * @param type type of section to construct
      */
     public void tryBuildSection(SectionType type) {
-        //TODO try building section
         spaceship.BuildSection(mouseTarget.loc.x, type);
+        buildMouseTargets();
         repaint();
     }
 
