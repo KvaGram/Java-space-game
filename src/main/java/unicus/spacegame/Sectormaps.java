@@ -165,16 +165,12 @@ class Sectormaps extends JPanel {
                 sc[2] = new int[]{xstart + xwidth + (i * xmid), ystart + (yheight * (up + j))};
                 int secstars_n = rft.nextInt(4)+1; //0-3 +1
                 int[][] secstars_c = new int[secstars_n][2];
-                for (int n = 0; n < secstars_n; n++) {
-                    int[] starcoords = pointInTriangle(sc[0][0], sc[0][1], sc[1][0], sc[1][1], sc[2][0], sc[2][1]);
-                    secstars_c[n] = starcoords.clone();
-                }
-                while (tooCloseInSector(secstars_c, room) || tooLinearInSector(secstars_c, angle)) {
+                do {
                     for (int n = 0; n < secstars_n; n++) {
                         int[] starcoords = pointInTriangle(sc[0][0], sc[0][1], sc[1][0], sc[1][1], sc[2][0], sc[2][1]);
                         secstars_c[n] = starcoords.clone();
                     }
-                }
+                } while (tooCloseInSector(secstars_c, room) || tooLinearInSector(secstars_c, angle));
 
                 g.setColor(new Color(100,200,50));
                 for (int n=0; n<secstars_n; n++){
