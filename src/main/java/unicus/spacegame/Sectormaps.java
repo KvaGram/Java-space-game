@@ -7,23 +7,53 @@ import java.util.Random;
 
 class Sectormaps extends JPanel {
     Random rand;
-    int starsize;
+    int starsize = 7;
+    int ystart = 20;
+    int yheight = 200;
+    int xstart = 20;
+    int xwidth = 300;
+    int xmid = xwidth/2; //A triangle's base is xwidth; a triangle's area is xmid*yheight.
+    int room = 30; //pixels, how far apart stars should be
+    double angle = 0.25; //radians, how far apart connecting hyperlanes should be, About 15 degrees.
+
+    int x_secs = 5;
+    int y_secs = 4;
+    int t_secs = x_secs * y_secs;
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Map Frame");
-        frame.add(new Sectormaps());
+        frame.add(new Sectormaps(new Random()));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1050, 1050);
         frame.setVisible(true);
     }
 
-    //NOTE: If distance argument * number of stars is too large compared to sector size, stars may never fit and generator algo may loop forever.
-    public boolean tooCloseStarPair(int[] p1, int[] p2, int distance) {
-        int xdist = Math.abs(p1[0]-p2[0]);
-        int ydist = Math.abs(p1[1]-p2[1]);
-        double hyp = Math.sqrt((xdist*xdist)+(ydist*ydist));
-        return (hyp < distance);
+    public Sectormaps(Random r) {
+        rand = new Random(0);
     }
+
+    //NOTE: If distance argument * number of stars is too large compared to sector size, stars may never fit and generator algo may loop forever.
+
+    /** Calculates whether the hypotenuse between two points is shorter than the minimum distance argument.
+     * Uses squares to save a square root call.
+     * @param p1 [x,y] coordinates of first point
+     * @param p2 [x,y] coordinates of second point
+     * @param distance minimum separation distance expected between points
+     * @return boolean Whether or not the points were closer than minimum distance
+     */
+    public boolean tooCloseStarPair(int[] p1, int[] p2, int distance) {
+        int x_dist = Math.abs(p1[0]-p2[0]);
+        int y_dist = Math.abs(p1[1]-p2[1]);
+        double hyp_square = (x_dist*x_dist)+(y_dist*y_dist);
+        double distance_square = (distance*distance);
+        return (hyp_square < distance_square);
+    }
+    /**
+     * Iterates over stars in sector to determine whether any of them are closer to each other than minimum distance.
+     * @param sector A sector of stars, 2D array where first layer is stars, second layer is coordinates of stars
+     * @param distance Minimum separation distance expected between stars
+     * @return boolean Whether or not a pair of stars was found closer than minimum distance
+     */
     public boolean tooCloseInSector(int[][] sector, int distance) {
         if (sector.length <= 1) {
             return false;
@@ -33,12 +63,25 @@ class Sectormaps extends JPanel {
             boolean foundClosePair = false;
             for (int i=0; i<sector.length; i++) {
                 for (int j=0; j<i; j++) {
-                    foundClosePair = foundClosePair || tooCloseStarPair(sector[i],sector[j],distance);
+                    /* Note strict inequality j<i so we don't check a star's distance to itself.
+                     * In the case of e.g. 4 stars, test order will be (1,0) (2,0) (2,1) (3,0) (3,1) (3,2).
+                     * Distances are symmetrical, so we only need to test in one direction.
+                     */
+                    foundClosePair = foundClosePair || tooCloseStarPair(sector[i],sector[j],distance); //Short-circuit evaluation saves us further calls if a too close pair is found.
                 }
             }
             return foundClosePair;
         }
     }
+    /** Checks whether a triplet of points forms an angle that is too linear, as determined by minimum angle argument theta.
+     * Equivalently, whether one of the interior angles of the triangle is too blunt: >(Pi-theta).
+     * Intended to catch degenerate line-like triangles of the form (0,0) (100,1) (200,0).
+     * @param p1 [x,y] coordinates of first point
+     * @param p2 [x,y] coordinates of second point
+     * @param p3 [x,y] coordinates of third point
+     * @param theta Minimum angle
+     * @return boolean Whether or not the triangle formed by the points has an overly sharp angle.
+     */
     public boolean tooLinearTriple(int[] p1, int[] p2, int[] p3, double theta) {
         double a = Math.atan2((p2[1]-p1[1]),(p2[0]-p1[0]));
         double b = Math.atan2((p3[1]-p1[1]),(p3[0]-p1[0]));
@@ -48,7 +91,15 @@ class Sectormaps extends JPanel {
         double bc = Math.abs(b-c);
         return (ab < theta) || (ac < theta) || (bc < theta); /*carefully compacted*/
     }
+    /** Iterates over the stars in a sector to determine whether any triplet of them forms an overly linear angle smaller than theta.
+     * @param sector A set of stars represented as {x,y}{x,y}{x,y} points.
+     * @param theta Minimum angle
+     * @return boolean Whether or not a triangle with overly sharp angle was found.
+     */
     public boolean tooLinearInSector(int[][] sector, double theta) {
+        /*
+         * i.e. sharper than theta at pointy end, or flatter than (PI-theta) radians at blunt end of triangle.
+         */
         if (sector.length <= 2) {
             return false;
         } else {
@@ -56,7 +107,7 @@ class Sectormaps extends JPanel {
             for (int i=0; i<sector.length; i++) {
                 for (int j=0; j<i; j++) {
                     for (int k=0; k<j; k++) {
-                        foundLinearTriplet = foundLinearTriplet || tooLinearTriple(sector[i],sector[j],sector[k], theta);
+                        foundLinearTriplet = foundLinearTriplet || tooLinearTriple(sector[i],sector[j],sector[k], theta); //Short-circuit evaluation saves us further calls if a too close pair is found.
                     }
                 }
             }
@@ -64,7 +115,20 @@ class Sectormaps extends JPanel {
         }
     }
 
+    /** Gets the closest pair of a star in sector1 and a star in sector2. Pythagorean distance.
+     * Starts with first star in sector 1 and first star in sector 2 as 'default' result value
+     * then iterates over all stars in each sector, calculating whether distance between those is shorter
+     * if so, store those in result instead
+     * requires O(n^2) comparisons, but n is very small (<10) number of stars per sector
+     * finally returns pair of stars for which shortest distance was found.
+     *
+     * @param sector1 First sector of stars
+     * @param sector2 Second sector of stars
+     * @return The pair of stars with the shortest cross-sector distance between them
+     */
     public int[][] getClosestPair(int[][] sector1, int[][] sector2) {
+        /*
+         */
         int[][] result = new int[2][];
         result[0] = sector1[0].clone();
         result[1] = sector2[0].clone();
@@ -73,7 +137,6 @@ class Sectormaps extends JPanel {
             for (int j=0; j<sector2.length; j++) {
                 double hyp = Math.sqrt(Math.pow((sector1[i][0]-sector2[j][0]),2) + Math.pow((sector1[i][1]-sector2[j][1]),2));
                 if (hyp < shortest) {
-                    //System.out.println(Double.toString(hyp) + " shorter than " + Double.toString(shortest));
                     shortest = hyp;
                     result[0] = sector1[i].clone();
                     result[1] = sector2[j].clone();
@@ -84,20 +147,23 @@ class Sectormaps extends JPanel {
     }
 
     public int[] pointInTriangle(int P1x, int P1y, int P2x, int P2y, int P3x, int P3y) {
-        //Take the triangle corner points P1-P3 as arguments.
-        //Shifts inwards to create a buffer near zone edges.
-        double bf = 0.03; //buffer fraction. 0.1 = 10%
-        int Q1x = (int) (P1x + (bf*((P2x-P1x)+(P3x-P1x))));
+        /* Takes the triangle corner points P1,P2,P3 as arguments.
+         * Shifts inwards to create a buffer near zone edges.
+         * Randomly selects a point within the buffered inner triangle.
+         */
+        double bf = 0.03; //buffer fraction, where 0.1 = 10%.
+        int Q1x = (int) (P1x + (bf*((P2x-P1x)+(P3x-P1x)))); //New corner coordinates, moved bf of the way towards the others
         int Q1y = (int) (P1y + (bf*((P2y-P1y)+(P3y-P1y))));
         int Q2x = (int) (P2x + (bf*((P1x-P2x)+(P3x-P2x))));
         int Q2y = (int) (P2y + (bf*((P1y-P2y)+(P3y-P2y))));
         int Q3x = (int) (P3x + (bf*((P1x-P3x)+(P2x-P3x))));
         int Q3y = (int) (P3y + (bf*((P1y-P3y)+(P2y-P3y))));
+        //Now Q1,Q2,Q3 are the new corners
         Random r = new Random();
         double s = r.nextDouble();
-        double t = Math.sqrt(r.nextDouble()); //counters biasing towards P3 due to wedge compression
-        double protox = (((1-t)*Q1x) + (t*(((1-s)*Q2x) + (s*Q3x))));
-        double protoy = (((1-t)*Q1y) + (t*(((1-s)*Q2y) + (s*Q3y))));
+        double t = Math.sqrt(r.nextDouble()); //The sqrt counters biasing towards one corner that would result from wedge compression
+        double protox = (((1-t)*Q1x) + (t*(((1-s)*Q2x) + (s*Q3x)))); //Randomly weighted average of the coordinates of the corners
+        double protoy = (((1-t)*Q1y) + (t*(((1-s)*Q2y) + (s*Q3y)))); //Ditto
         int x = (int) protox;
         int y = (int) protoy;
         return new int[]{x,y};
@@ -108,20 +174,7 @@ class Sectormaps extends JPanel {
         g.setColor(Color.black);
         g.fillRect(0,0,1000,1000);
 
-        rand = new Random(0);
-        starsize = 7;
-        int ystart = 20;
-        int yheight = 200;
-        int xstart = 20;
-        int xwidth = 300;
-        int xmid = xwidth/2; //A triangle's base is xwidth; a triangle's area is xmid*yheight.
-        int room = 30; //pixels, how far apart stars should be
-        double angle = 0.25; //radians, how far apart connecting hyperlanes should be, About 15 degrees.
 
-
-        int x_secs = 5;
-        int y_secs = 4;
-        int t_secs = x_secs * y_secs;
         g.setColor(new Color(240,60,140));
 
         //Sector grid drawing
