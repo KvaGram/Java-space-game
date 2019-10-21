@@ -1,6 +1,7 @@
 package unicus.spacegame.ui;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.w3c.dom.css.Rect;
 import unicus.spacegame.spaceship.ModuleType;
 import unicus.spacegame.spaceship.SectionType;
 import unicus.spacegame.spaceship.Spaceship;
@@ -22,7 +23,7 @@ import java.util.Random;
  * the user to change either a single module or an entire section.
  * (despite what the tooltip suggest, there is no information to get from bridge or engine ..yet)
  */
-public class SpaceshipGUI extends JPanel implements ComponentListener
+public class SpaceshipGUI extends JPanel
 {
     // spaceship is the datastructure this UI represents.
     Spaceship spaceship;
@@ -51,6 +52,8 @@ public class SpaceshipGUI extends JPanel implements ComponentListener
     //It is set in updateTarget()
     MouseTarget mouseTarget;
 
+    private Rectangle screen;
+
     /**
      * Constructor of the Spaceship UI.
      * Requires a reference to the spaceship.
@@ -61,6 +64,7 @@ public class SpaceshipGUI extends JPanel implements ComponentListener
         this.spaceship = spaceship;
         this.mousePoint = new Point(0, 0);
         this.uiState = UIState.select;
+        this.screen = this.getBounds();
         this.buildMouseTargets();
 
         //Setup handlers for moving or clicking mouse.
@@ -237,10 +241,13 @@ public class SpaceshipGUI extends JPanel implements ComponentListener
      */
     @Override
     public void paintComponent(Graphics _g){
-
         super.paintComponent(_g);
         Graphics2D g = (Graphics2D) _g;
 
+        if(!getBounds().equals(screen)){
+            screen = getBounds();
+            buildMouseTargets();
+        }
         //Paint modules
         for(int i = 0; i < spaceship.length; i++) {
             int sLength = spaceship.modules[i].length;
@@ -273,8 +280,6 @@ public class SpaceshipGUI extends JPanel implements ComponentListener
         if(uiState == UIState.select && mouseTarget != null){
             paintTooltip(g);
         }
-
-        buildMouseTargets();
     }
 
     /**
@@ -437,6 +442,7 @@ public class SpaceshipGUI extends JPanel implements ComponentListener
      */
     public void buildMouseTargets()
     {
+        //System.out.println("Re-calculating mouse targets");
         mouseTargets = new ArrayList<MouseTarget>();
         mouseTargets.add(new MouseTarget(
                 MouseTargetType.staticModule, "bridge",
@@ -493,31 +499,6 @@ public class SpaceshipGUI extends JPanel implements ComponentListener
         }
         mouseTarget = null;
     }
-
-
-
-
-    //<editor-fold desc="component listener">
-    @Override
-    public void componentResized(ComponentEvent e) {
-        buildMouseTargets();
-    }
-
-    @Override
-    public void componentMoved(ComponentEvent e) {
-        buildMouseTargets();
-    }
-
-    @Override
-    public void componentShown(ComponentEvent e) {
-        buildMouseTargets();
-    }
-
-    @Override
-    public void componentHidden(ComponentEvent e) {
-
-    }
-    //</editor-fold>
 
     /**
      * The program states.
