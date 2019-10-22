@@ -174,6 +174,18 @@ public class SpaceshipGUI extends JPanel
     }
 
     /**
+     * Replaces the current spaceship
+     * @param spaceship New spaceship to display and manage.
+     */
+    public void setSpaceship(Spaceship spaceship){
+        this.spaceship = spaceship;
+        uiState = UIState.select;
+        mouseTarget = null;
+        buildMouseTargets();
+        repaint();
+    }
+
+    /**
      * Opens the popBuild, showing only the menu elements needed in the context.
      * Sets uiState to Build.
      */
