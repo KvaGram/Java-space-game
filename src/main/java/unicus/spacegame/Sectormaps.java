@@ -3,10 +3,10 @@ package unicus.spacegame;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
 import java.util.Random;
 
 class Sectormaps extends JPanel {
-    Random rand;
     Random rft; //re-factor tractor
     Random TriangleRandom;
     int starsize = 7;
@@ -21,12 +21,12 @@ class Sectormaps extends JPanel {
     int x_secs = 5;
     int y_secs = 4;
     int t_secs = x_secs * y_secs;
-    int[][][] secs_stars_coords = new int[t_secs][][]; //[n][m][] is {x,y,seed for Lars} to be implemented later.
+    int[][][] secs_stars_coords = new int[t_secs][][]; //[n][m][] is {x,y,seed for Lars}.
 
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Map Frame");
-        frame.add(new Sectormaps(new Random()));
+        frame.add(new Sectormaps());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1050, 1050);
         frame.setVisible(true);
@@ -174,8 +174,10 @@ class Sectormaps extends JPanel {
     }
 
 
-    public Sectormaps(Random r) {
-        rand = new Random(0);
+    public Sectormaps() {
+        //initial background
+        this.setOpaque(true);
+        this.setBackground(Color.black);
         rft = new Random(41356);
         TriangleRandom = new Random(333);
 
@@ -205,12 +207,22 @@ class Sectormaps extends JPanel {
                 secs_stars_coords[ij] = secstars_c.clone();
             }
         }
+        //Make seeds for Lars
+        for (int i=0; i<secs_stars_coords.length; i++) {
+            for (int j=0; j<secs_stars_coords[i].length; j++) {
+                int seedseed = secs_stars_coords[i][j][0]*10000 + secs_stars_coords[i][j][1];
+                Random lars = new Random(seedseed);
+                int seed = lars.nextInt();
+                int[] coords_plus_seed = Arrays.copyOf(secs_stars_coords[i][j], secs_stars_coords[i][j].length+1);
+                coords_plus_seed[2] = seed;
+                secs_stars_coords[i][j] = coords_plus_seed.clone();
+            }
+        }
     }
 
+    @Override
     public void paintComponent(Graphics g) {
-        //initial background
-        g.setColor(Color.black);
-        g.fillRect(0,0,1000,1000);
+        super.paintComponent(g);
 
         //Draw hyperlanes
         g.setColor(new Color(20,100,40));
@@ -226,7 +238,7 @@ class Sectormaps extends JPanel {
                 g.drawLine(localsector[0][0], localsector[0][1], localsector[2][0], localsector[2][1]);
                 g.drawLine(localsector[1][0], localsector[1][1], localsector[2][0], localsector[2][1]);
             } else if (localsector.length >= 4) {
-                int hub = rft.nextInt(localsector.length);
+                int hub = new Random(localsector[0][2]).nextInt(localsector.length); //uses the lars seed
                 for (int v = 0; v < localsector.length; v++) {
                     if (v != hub) {
                         g.drawLine(localsector[v][0], localsector[v][1], localsector[hub][0], localsector[hub][1]);
