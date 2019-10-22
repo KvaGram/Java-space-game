@@ -3,6 +3,10 @@ package unicus.spacegame;
 
 import javax.swing.*;
 import java.awt.*;
+//I don't know why I need to import these next two separately
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
 import java.util.Arrays;
 import java.util.Random;
 
@@ -22,13 +26,33 @@ class Sectormaps extends JPanel {
     int y_secs = 4;
     int t_secs = x_secs * y_secs;
     int[][][] secs_stars_coords = new int[t_secs][][]; //[n][m][] is {x,y,seed for Lars}.
+    boolean showGrid = true;
 
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Map Frame");
-        frame.add(new Sectormaps());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1050, 1050);
+        frame.setSize(1050, 1000);
+
+        JLayeredPane masterPanel = new JLayeredPane();
+        frame.add(masterPanel);
+        Sectormaps map = new Sectormaps();
+        JButton b_gridToggle = new JButton("Toggle grid");
+
+        masterPanel.add(map, Integer.valueOf(0));
+        masterPanel.add(b_gridToggle, Integer.valueOf(10));
+
+        map.setBounds(0, 0, 1050, 1000);
+        b_gridToggle.setBounds(1050/2-50, 900, 150, 50);
+
+        //frame.add(b_gridToggle);
+        b_gridToggle.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                map.toggleGrid();
+                map.repaint();
+            }
+        });
+
         frame.setVisible(true);
     }
 
@@ -172,6 +196,7 @@ class Sectormaps extends JPanel {
         int y = (int) proto_y;
         return new int[]{x,y};
     }
+    public void toggleGrid() { showGrid = !showGrid;}
 
 
     public Sectormaps() {
@@ -268,27 +293,29 @@ class Sectormaps extends JPanel {
         }
 
         //Draw sector grid
-        g.setColor(new Color(240,60,140));
-        for (int i=0; i<=y_secs; i++) { //draw horizontal sector lines
-            if (i % 2 == 0) {
-                g.drawLine((xstart+xmid),(ystart+(i*yheight)), (xstart+(xmid*(x_secs+((x_secs+1)%2)))),(ystart+(i*yheight)));
-            } else {
-                g.drawLine(xstart,(ystart+(i*yheight)), (xstart+(xmid*(x_secs+(x_secs%2)))),(ystart+(i*yheight)));
+        if (this.showGrid) {
+            g.setColor(new Color(240, 60, 140));
+            for (int i = 0; i <= y_secs; i++) { //draw horizontal sector lines
+                if (i % 2 == 0) {
+                    g.drawLine((xstart + xmid), (ystart + (i * yheight)), (xstart + (xmid * (x_secs + ((x_secs + 1) % 2)))), (ystart + (i * yheight)));
+                } else {
+                    g.drawLine(xstart, (ystart + (i * yheight)), (xstart + (xmid * (x_secs + (x_secs % 2)))), (ystart + (i * yheight)));
+                }
             }
-        }
-        for (int i=0; i<=x_secs; i++) { //draw diagonal sector lines
-            for (int j=0; j<y_secs; j++) {
-                if ( j % 2 == 0) { //even j
-                    if (i % 2 == 0) { //even i
-                        g.drawLine(xstart+(i*xmid),(ystart+yheight+(j*yheight)), (xstart+xmid+(i*xmid)),ystart+(j*yheight));
-                    } else { //odd i
-                        g.drawLine(xstart+(i*xmid),(ystart+(j*yheight)), (xstart+xmid+(i*xmid)), (ystart+yheight+(j*yheight)));
-                    }
-                } else { //odd j
-                    if (i % 2 == 0) { //even i
-                        g.drawLine(xstart+xmid+(i*xmid),(ystart+yheight+(j*yheight)), (xstart+(i*xmid)),(ystart+(j*yheight)));
-                    } else { //odd i
-                        g.drawLine((xstart+xmid+(i*xmid)),(ystart+(j*yheight)), xstart+(i*xmid),(ystart+yheight+(j*yheight)));
+            for (int i = 0; i <= x_secs; i++) { //draw diagonal sector lines
+                for (int j = 0; j < y_secs; j++) {
+                    if (j % 2 == 0) { //even j
+                        if (i % 2 == 0) { //even i
+                            g.drawLine(xstart + (i * xmid), (ystart + yheight + (j * yheight)), (xstart + xmid + (i * xmid)), ystart + (j * yheight));
+                        } else { //odd i
+                            g.drawLine(xstart + (i * xmid), (ystart + (j * yheight)), (xstart + xmid + (i * xmid)), (ystart + yheight + (j * yheight)));
+                        }
+                    } else { //odd j
+                        if (i % 2 == 0) { //even i
+                            g.drawLine(xstart + xmid + (i * xmid), (ystart + yheight + (j * yheight)), (xstart + (i * xmid)), (ystart + (j * yheight)));
+                        } else { //odd i
+                            g.drawLine((xstart + xmid + (i * xmid)), (ystart + (j * yheight)), xstart + (i * xmid), (ystart + yheight + (j * yheight)));
+                        }
                     }
                 }
             }
