@@ -1,7 +1,6 @@
 package unicus.spacegame.ui;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.w3c.dom.css.Rect;
 import unicus.spacegame.spaceship.ModuleType;
 import unicus.spacegame.spaceship.SectionType;
 import unicus.spacegame.spaceship.Spaceship;
@@ -257,6 +256,12 @@ public class SpaceshipGUI extends JPanel
             screen = getBounds();
             buildMouseTargets();
         }
+
+        //debug screen bounds
+//        g.setColor(Color.white);
+//        Rectangle bounds = this.getBounds();
+//        g.fillRect (0, 0, bounds.width, bounds.height);
+
         //Paint modules
         for(int i = 0; i < spaceship.length; i++) {
             int sLength = spaceship.modules[i].length;
@@ -316,10 +321,10 @@ public class SpaceshipGUI extends JPanel
         int tipHeight = tipText.length * 30;
 
         Rectangle bounds = getBounds();
-        int xMargin = bounds.x + bounds.width - tipX - tipWidth;
+        int xMargin = bounds.width - tipX - tipWidth;
         if (xMargin < 0)
             tipX += xMargin;
-        int yMargin = bounds.y + bounds.height - tipY - tipHeight;
+        int yMargin = bounds.height - tipY - tipHeight;
         if (yMargin < 0)
             tipY += yMargin;
 
@@ -366,8 +371,8 @@ public class SpaceshipGUI extends JPanel
         Rectangle drawRect = new Rectangle();
         drawRect.width  = baseWidth - 20;
         drawRect.height = baseHeight - 20;
-        drawRect.x = baseWidth * (sIndex + 1) + 10 + bounds.x;
-        drawRect.y = baseHeight * mIndex + 10 + bounds.x;
+        drawRect.x = baseWidth * (sIndex + 1) + 10;// + bounds.x;
+        drawRect.y = baseHeight * mIndex + 10;// + bounds.y;
 
         return drawRect;
     }
@@ -403,7 +408,7 @@ public class SpaceshipGUI extends JPanel
         int baseWidth = bounds.width / (spaceship.length + 2);
         drawRect.height = bounds.height / 10;
         drawRect.width = bounds.width / (spaceship.length + 2) - 10;
-        drawRect.x = baseWidth * (sIndex + 1) + 10 + bounds.x;
+        drawRect.x = baseWidth * (sIndex + 1) + 10;
         drawRect.y = bounds.height / 2 - bounds.height / 20;
 
         return drawRect;
