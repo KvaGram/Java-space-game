@@ -1,7 +1,17 @@
 package unicus.spacegame;
+import unicus.spacegame.ui.SpaceshipGUI;
+
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Swingshipproto and ShipPanel are part of the first prototype of the spaceship ui.
+ * Feel free to run and test those, but the current version is the SpaceshipGUI.
+ * @see Swingshipproto
+ * @see ShipPanel
+ * @see SpaceshipGUI
+ *
+ */
 public class Swingshipproto {
 
     public static void main(String[] args) {
@@ -76,6 +86,10 @@ public class Swingshipproto {
     }
 }
 
+
+/**
+ * ShipPanel renders a model of a spaceship.
+ */
 class ShipPanel extends JPanel {
     boolean hasCargo = false;
     private int shipImgWidth = 1111;

@@ -7,6 +7,13 @@
     <groupId>unicus.spacegame</groupId>
     <artifactId>javaspacegame</artifactId>
     <version>1.0-PROTOTYPES</version>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.5</version>
+        </dependency>
+    </dependencies>
 
     <properties>
         <maven.compiler.source>1.13</maven.compiler.source>
