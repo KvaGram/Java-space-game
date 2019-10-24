@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.Random;
 
-class Sectormaps extends JPanel {
+public class Sectormaps extends JPanel {
     Random rft; //re-factor tractor
     Random TriangleRandom;
     int starsize = 7;
@@ -52,7 +52,6 @@ class Sectormaps extends JPanel {
                 map.repaint();
             }
         });
-
         frame.setVisible(true);
     }
 
@@ -198,13 +197,23 @@ class Sectormaps extends JPanel {
     }
     public void toggleGrid() { showGrid = !showGrid;}
 
-
-    public Sectormaps() {
+    public Sectormaps(){
+        this(new Random());
+    }
+    public Sectormaps(long seed){
+        this(new Random(seed));
+    }
+    public Sectormaps(Random sourceRand) {
         //initial background
         this.setOpaque(true);
         this.setBackground(Color.black);
-        rft = new Random(41356);
-        TriangleRandom = new Random(333);
+
+        //  (old hardcoded random initializers)
+        //rft = new Random(41356);
+        //TriangleRandom = new Random(333);
+
+        rft = new Random(sourceRand.nextLong());
+        TriangleRandom = new Random(sourceRand.nextLong());
 
         //Create stars in secs_stars_coords[][][].
         for (int i=0; i<x_secs; i++) {
@@ -243,6 +252,82 @@ class Sectormaps extends JPanel {
                 secs_stars_coords[i][j] = coords_plus_seed.clone();
             }
         }
+        //Sets pixel size of panel, for use with scrolledPanes and layout managers.
+        //NOTE: If number of or size of sectors change in runtime, remember to update this.
+        // Set using number of sectors times sector height and width + start x and y + 20px padding at the end of both axis.
+        // - Lars
+        this.setPreferredSize(new Dimension(xwidth * x_secs + xstart + 20,yheight * y_secs + ystart + 20));
+    }
+
+    //NOTE:
+    // The following get-methods were added to avoid exposing internal variables.
+    // When splitting the view and model, make sure these functions go to the correct place.
+    // - Lars.
+
+    /**
+     * @return Pixel size of stars
+     */
+    public int getStarsize(){
+        return starsize;
+    }
+
+    /**
+     * @return Number of sub-sectors.
+     */
+    public int getNumSubSectors() {
+        return secs_stars_coords.length;
+    }
+
+    /**
+     * @param subSector The sub-sector to search
+     * @return number os stars in sub-sector
+     * @throws ArrayIndexOutOfBoundsException will throw an error if you request an invalid sub-sector index.
+     */
+    public int getNumStarsBySector(int subSector) throws ArrayIndexOutOfBoundsException {
+        return  secs_stars_coords[subSector].length;
+    }
+
+    /**
+     * gets X and Y coordinates of star from secs_stars_coords
+     * @param subsection
+     * @param index
+     * @return
+     */
+    public Point getStarPoint(int subsection, int index){
+        int[] stardata;
+        try {
+            stardata = getStarData(subsection, index);
+        } catch (ArrayIndexOutOfBoundsException err) {
+            return new Point();
+        }
+        return new Point(stardata[0], stardata[1]);
+    }
+
+    /**
+     * gets seed value of star from secs_stars_coords
+     * @param subsection
+     * @param index
+     * @return
+     */
+    public long getStarSeed(int subsection, int index){
+        int[] stardata;
+        try {
+            stardata = getStarData(subsection, index);
+        } catch (ArrayIndexOutOfBoundsException err) {
+            return 0;
+        }
+        return (long)stardata[2];
+    }
+
+    /**
+     * Gets data array of a star from secs_stars_coords
+     * @param subsection
+     * @param index
+     * @return
+     * @throws ArrayIndexOutOfBoundsException
+     */
+    public int[] getStarData(int subsection, int index) throws ArrayIndexOutOfBoundsException {
+        return secs_stars_coords[subsection][index];
     }
 
     @Override

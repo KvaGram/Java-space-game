@@ -2,6 +2,7 @@ package unicus.spacegame;
 
 import unicus.spacegame.spaceship.Spaceship;
 import unicus.spacegame.ui.ShipViewUI;
+import unicus.spacegame.ui.StarmapUI;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,7 +22,7 @@ public class Demo1 extends JPanel {
     JPanel setupPanel;
 
     SwingStarSystem     starSysView;
-    Sectormaps          starMapView;
+    StarmapUI           starMapView;
     ShipViewUI          starShipView;
 
     private final static String starSysTabName  = "Star system view";
@@ -74,12 +75,12 @@ public class Demo1 extends JPanel {
     public void startGame(Random r)
     {
         Random shipRand = new Random(r.nextLong());
-        Random StarRandom = new Random(r.nextLong());
+        long starRandom = r.nextLong();
 
         Spaceship ship = Spaceship.GenerateStart1(shipRand, 4, 8, 0.3f, 0.8f);
 
         starSysView  = new SwingStarSystem();
-        starMapView  = new Sectormaps();
+        starMapView  = new StarmapUI(starRandom);
         starShipView = new ShipViewUI(ship);
 
         gamePane.addTab(starSysTabName, starSysView);

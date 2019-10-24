@@ -10,6 +10,11 @@ import java.util.Random;
 
 import static java.lang.System.out;
 
+/**
+ * ShipViewUI acts are a wrapper for SpaceshipGUI.
+ * Adding to the existing functionality, this class adds a button to generating a new spaceship.
+ * It also adds some dummy buttons and a background image.
+ */
 public class ShipViewUI extends JLayeredPane implements ActionListener {
     //The spaceshipGUI renders a workable model of the spaceship.
     private SpaceshipGUI spaceshipGUI;
