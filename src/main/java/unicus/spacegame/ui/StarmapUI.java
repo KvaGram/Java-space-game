@@ -1,15 +1,12 @@
 package unicus.spacegame.ui;
 
-import unicus.spacegame.Main;
 import unicus.spacegame.Sectormaps;
 
 import javax.swing.*;
+import javax.swing.event.EventListenerList;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 
 /**
@@ -53,6 +50,7 @@ public class StarmapUI extends JPanel {
                     if(st.contains(mousePoint)) {
                         int[] d = map.getStarData(st.subSector, st.index);
                         System.out.println("Found star! : x " + d[0] +" y "+ d[1] +" seed "+ d[2]);
+                        fireStarTravel(d, st.subSector, st.index);
                         return;
                     }
                 }
@@ -84,6 +82,27 @@ public class StarmapUI extends JPanel {
     }
 
 
+    //Event system based on tutorial https://www.javaworld.com/article/2077351/events-and-listeners.html
+    private EventListenerList StarEventListeners = new EventListenerList();
+    public void AddStarListener(StarEventListener listener)    {
+        StarEventListeners.add(StarEventListener.class, listener);
+    }
+    public void ARemoveStarListener(StarEventListener listener)    {
+        StarEventListeners.remove(StarEventListener.class, listener);
+    }
+    protected void fireStarTravel(int[] starData, int subsection, int index){
+        Object[] listeners = StarEventListeners.getListenerList();
+        // loop through each listener and pass on the event if needed
+        int numListeners = listeners.length;
+        for (int i = 0; i<numListeners; i+=2)
+        {
+            if (listeners[i]==StarEventListener.class)
+            {
+                // pass the event to the listeners event dispatch method
+                ((StarEventListener)listeners[i+1]).onTravelToStar(starData, subsection, index);
+            }
+        }
+    }
     class StarTarget{
         Rectangle rect;
         int subSector;

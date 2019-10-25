@@ -2,6 +2,7 @@ package unicus.spacegame;
 
 import unicus.spacegame.spaceship.Spaceship;
 import unicus.spacegame.ui.ShipViewUI;
+import unicus.spacegame.ui.StarEventListener;
 import unicus.spacegame.ui.StarmapUI;
 
 import javax.swing.*;
@@ -91,10 +92,19 @@ public class Demo1 extends JPanel {
         gamePane.addTab(starSysTabName, starSysView);
         gamePane.addTab(starMapTabName, starMapView);
         gamePane.addTab(starShipTabName, starShipView);
+
+        StarEventListener starEventListener = new StarEventListener() {
+            @Override
+            public void onTravelToStar(int[] starData, int subsection, int index) {
+                //todo: starSysView.setSystem(starData);
+
+                System.out.println(String.format("Traveling to system subsec %1s index %2s with seed %3s, located at x%4s y%5s", subsection, index, starData[2], starData[0], starData[1]));
+            }
+        };
+        starMapView.AddStarListener(starEventListener);
+
         this.add(gamePane);//, 0);
         this.remove(setupPanel);
-        //repaint();
-        //gamePane.setBounds(0,0,getWidth(), getHeight());
 
     }
 
