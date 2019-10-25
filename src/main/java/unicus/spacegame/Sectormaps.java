@@ -351,7 +351,7 @@ public class Sectormaps extends JPanel implements Scrollable{
         //Draw hyperlanes
         g.setColor(new Color(20,100,40));
         //Within sectors
-        for (int i=1; i < secs_stars_coords.length; i++ ) {
+        for (int i=0; i < secs_stars_coords.length; i++ ) {
             int[][] localsector = secs_stars_coords[i];
             if (localsector.length == 1) {
                 //Pass
