@@ -5,6 +5,7 @@ import unicus.spacegame.ui.ShipViewUI;
 import unicus.spacegame.ui.StarmapUI;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,7 +36,8 @@ public class Demo1 extends JPanel {
 
     public Demo1()
     {
-        super();
+        super(new CardLayout());
+        setBorder(new EmptyBorder(4,4,4,4));
         gamePane = new JTabbedPane(JTabbedPane.BOTTOM, JTabbedPane.WRAP_TAB_LAYOUT);
         setupPanel = new JPanel();
         setupPanel.setBackground(Color.white);
@@ -74,6 +76,9 @@ public class Demo1 extends JPanel {
      */
     public void startGame(Random r)
     {
+        //gamePane.setLayout(new GridBagLayout());
+
+
         Random shipRand = new Random(r.nextLong());
         long starRandom = r.nextLong();
 
@@ -86,10 +91,10 @@ public class Demo1 extends JPanel {
         gamePane.addTab(starSysTabName, starSysView);
         gamePane.addTab(starMapTabName, starMapView);
         gamePane.addTab(starShipTabName, starShipView);
-
+        this.add(gamePane);//, 0);
         this.remove(setupPanel);
-        this.add(gamePane);
-        gamePane.setBounds(0,0,getWidth(), getHeight());
+        //repaint();
+        //gamePane.setBounds(0,0,getWidth(), getHeight());
 
     }
 
@@ -98,7 +103,7 @@ public class Demo1 extends JPanel {
 
         JFrame frame = new JFrame("Ship view proto");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1200, 720);
+        frame.setSize(1600, 900);
         demo.setOpaque(true);
         demo.setBackground(Color.GRAY);
         frame.add(demo);

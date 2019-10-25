@@ -31,7 +31,10 @@ public class StarmapUI extends JPanel {
 
 
     public StarmapUI(long seed){
-        //this.setLayout(new BoxLayout(this, 1));
+        this.setLayout(new BoxLayout(this, 1));
+
+        //this.setLayout(new BorderLayout());
+
         map = new Sectormaps(seed);
         toggleGrid = new JButton("Toggle grid");
         scrollPane = new JScrollPane(map, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);

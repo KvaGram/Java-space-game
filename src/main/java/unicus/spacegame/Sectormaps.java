@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.Random;
 
-public class Sectormaps extends JPanel {
+public class Sectormaps extends JPanel implements Scrollable{
     Random rft; //re-factor tractor
     Random TriangleRandom;
     int starsize = 7;
@@ -419,5 +419,58 @@ public class Sectormaps extends JPanel {
                 }
             }
         }
+    }
+
+    //Implementation of Scrollable
+    //based on example code https://docs.oracle.com/javase/tutorial/uiswing/examples/components/ScrollDemoProject/src/components/ScrollablePicture.java
+    //from this tutorial https://docs.oracle.com/javase/tutorial/uiswing/components/scrollpane.html
+    private int maxUnitIncrement = 1;
+
+    @Override
+    public Dimension getPreferredScrollableViewportSize() {
+        return new Dimension(200, 200); //to be adjusted
+    }
+
+    @Override
+    public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+        //Get the current position.
+        int currentPosition = 0;
+        if (orientation == SwingConstants.HORIZONTAL) {
+            currentPosition = visibleRect.x;
+        } else {
+            currentPosition = visibleRect.y;
+        }
+
+        //Return the number of pixels between currentPosition
+        //and the nearest tick mark in the indicated direction.
+        if (direction < 0) {
+            int newPosition = currentPosition -
+                    (currentPosition / maxUnitIncrement)
+                            * maxUnitIncrement;
+            return (newPosition == 0) ? maxUnitIncrement : newPosition;
+        } else {
+            return ((currentPosition / maxUnitIncrement) + 1)
+                    * maxUnitIncrement
+                    - currentPosition;
+        }
+    }
+
+    @Override
+    public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+        if (orientation == SwingConstants.HORIZONTAL) {
+            return visibleRect.width - maxUnitIncrement;
+        } else {
+            return visibleRect.height - maxUnitIncrement;
+        }
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportWidth() {
+        return false;
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportHeight() {
+        return false;
     }
 }
