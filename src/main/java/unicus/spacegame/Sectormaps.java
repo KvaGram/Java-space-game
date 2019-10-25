@@ -195,7 +195,10 @@ public class Sectormaps extends JPanel {
         int y = (int) proto_y;
         return new int[]{x,y};
     }
-    public void toggleGrid() { showGrid = !showGrid;}
+    public void toggleGrid() {
+        showGrid = !showGrid;
+        repaint();
+    }
 
     public Sectormaps(){
         this(new Random());
@@ -263,6 +266,17 @@ public class Sectormaps extends JPanel {
     // The following get-methods were added to avoid exposing internal variables.
     // When splitting the view and model, make sure these functions go to the correct place.
     // - Lars.
+
+    /**
+     * (stub)
+     * Gets stars connected by hyperlane to this star.
+     * @param subsection sub-section of target star
+     * @param index index of target star
+     * @return list of connected stars by [0] subsection [1] index
+     */
+    public int[][] getConnectedStars(int subsection, int index){
+        return new int[0][0];
+    }
 
     /**
      * @return Pixel size of stars

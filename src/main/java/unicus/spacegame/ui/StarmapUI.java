@@ -5,6 +5,8 @@ import unicus.spacegame.Sectormaps;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
@@ -25,15 +27,15 @@ public class StarmapUI extends JPanel {
     Point mousePoint;
     ArrayList<StarTarget> starTargets;
 
+    JButton toggleGrid;
+
 
     public StarmapUI(long seed){
-        this.setLayout(new BoxLayout(this, 0));
+        //this.setLayout(new BoxLayout(this, 1));
         map = new Sectormaps(seed);
-
+        toggleGrid = new JButton("Toggle grid");
         scrollPane = new JScrollPane(map, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         mousePoint = new Point();
-
-
 
         MouseAdapter ma = new MouseAdapter(){
             @Override
@@ -54,6 +56,12 @@ public class StarmapUI extends JPanel {
                 System.out.println("No star found. :(");
             }
         };
+        map.addMouseListener(ma);
+        map.addMouseMotionListener(ma);
+
+        toggleGrid.addActionListener(arg0 -> {
+            map.toggleGrid();
+        });
 
         //sets clickable zones for stars
         starTargets = new ArrayList<StarTarget>();
@@ -63,11 +71,13 @@ public class StarmapUI extends JPanel {
             }
         }
 
-        map.addMouseListener(ma);
-        map.addMouseMotionListener(ma);
 
         this.add(scrollPane);
-        scrollPane.getViewport().setSize(3000, 3000);
+        this.add(toggleGrid);
+        scrollPane.setBounds(0, 50, 200, 200);
+        toggleGrid.setBounds(0, 0, 75, 50);
+
+        setPreferredSize(new Dimension(200, 250));
     }
 
 
