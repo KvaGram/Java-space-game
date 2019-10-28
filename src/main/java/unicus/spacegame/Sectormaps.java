@@ -108,9 +108,9 @@ class Sectormaps extends JPanel {
         double a = Math.atan2((p2[1]-p1[1]),(p2[0]-p1[0]));
         double b = Math.atan2((p3[1]-p1[1]),(p3[0]-p1[0]));
         double c = Math.atan2((p3[1]-p2[1]),(p3[0]-p2[0]));
-        double ab = Math.abs(a-b);
-        double ac = Math.abs(a-c);
-        double bc = Math.abs(b-c);
+        double ab = Math.abs(a-b) % Math.PI;
+        double ac = Math.abs(a-c) % Math.PI;
+        double bc = Math.abs(b-c) % Math.PI;
         return (ab < theta) || (ac < theta) || (bc < theta); /*carefully compacted*/
     }
     /** Iterates over the stars in a sector to determine whether any triplet of them forms an overly linear angle smaller than theta.
