@@ -503,40 +503,7 @@ public class Sectormaps extends JPanel implements Scrollable {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        //Draw hyperlanes
-        g.setColor(new Color(20,100,40));
-        //Within sectors
-        for (int i=0; i < secs_stars_coords.length; i++ ) {
-            int[][] localsector = secs_stars_coords[i];
-            if (localsector.length == 1) {
-                //Pass
-            } else if (localsector.length == 2) {
-                g.drawLine(localsector[0][0], localsector[0][1], localsector[1][0], localsector[1][1]);
-            } else if (localsector.length == 3) {
-                g.drawLine(localsector[0][0], localsector[0][1], localsector[1][0], localsector[1][1]);
-                g.drawLine(localsector[0][0], localsector[0][1], localsector[2][0], localsector[2][1]);
-                g.drawLine(localsector[1][0], localsector[1][1], localsector[2][0], localsector[2][1]);
-            } else if (localsector.length >= 4) {
-                int hub = new Random(localsector[0][2]).nextInt(localsector.length); //uses the lars seed but does not consume it
-                for (int v = 0; v < localsector.length; v++) {
-                    if (v != hub) {
-                        g.drawLine(localsector[v][0], localsector[v][1], localsector[hub][0], localsector[hub][1]);
-                    }
-                }
-            }
-        }
-        //Across sectors
-        for (int i = 1; i < secs_stars_coords.length; i++) {
-            if (i%x_secs != 0){ //do not wrap across end of line
-                int[][] crossSectorPair = getClosestPair(secs_stars_coords[i-1],secs_stars_coords[i]);
-                g.drawLine(crossSectorPair[0][0],crossSectorPair[0][1],crossSectorPair[1][0],crossSectorPair[1][1]);
-            }
-            int colrowsum = (i%x_secs)+(i/x_secs);
-            if (i >= x_secs && (colrowsum%2 == 1)) { //Roughly every 2nd sector should be linked to vertical above sector
-                int[][] crossSectorPair = getClosestPair(secs_stars_coords[i-x_secs],secs_stars_coords[i]);
-                g.drawLine(crossSectorPair[0][0],crossSectorPair[0][1],crossSectorPair[1][0],crossSectorPair[1][1]);
-            }
-        }
+
         //Draw hyperlanes but from star connection data instead
         g.setColor((new Color(100, 70, 20)));
         for (StarData[] sector: starObjects) {
