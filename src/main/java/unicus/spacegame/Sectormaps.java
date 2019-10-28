@@ -495,10 +495,10 @@ public class Sectormaps extends JPanel implements Scrollable {
 
     /**
      * Gets star from array of stars.
-     * @param subsection
-     * @param index
-     * @return
-     * @throws ArrayIndexOutOfBoundsException
+     * @param subsection The subsector the star is to be found in
+     * @param index The number of the star within the subsector
+     * @return starData The star located at that position and index
+     * @throws ArrayIndexOutOfBoundsException if first argument is higher than number of subsectors, or second argument higher than number of stars in the subsector specified by first argument
      */
     public StarData getStar(int subsection, int index) throws ArrayIndexOutOfBoundsException {
         return starObjects[subsection][index];
