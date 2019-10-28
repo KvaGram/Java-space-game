@@ -1,6 +1,7 @@
 package unicus.spacegame.ui;
 
 import unicus.spacegame.Sectormaps;
+import unicus.spacegame.StarData;
 
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
@@ -49,7 +50,7 @@ public class StarmapUI extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 for (StarTarget st : starTargets){
                     if(st.contains(mousePoint)) {
-                        int[] d = map.getStarData(st.subSector, st.index);
+                        StarData d = map.getStar(st.subSector, st.index);
                         //System.out.println("Found star! : x " + d[0] +" y "+ d[1] +" seed "+ d[2]);
                         fireStarTravel(d, st.subSector, st.index);
                         return;
@@ -93,7 +94,7 @@ public class StarmapUI extends JPanel {
     public void ARemoveStarListener(StarEventListener listener)    {
         StarEventListeners.remove(StarEventListener.class, listener);
     }
-    protected void fireStarTravel(int[] starData, int subsection, int index){
+    protected void fireStarTravel(StarData starData, int subsection, int index){
         Object[] listeners = StarEventListeners.getListenerList();
         // loop through each listener and pass on the event if needed
         int numListeners = listeners.length;

@@ -94,11 +94,13 @@ public class Demo1 extends JPanel {
 
         StarEventListener starEventListener = new StarEventListener() {
             @Override
-            public void onTravelToStar(int[] starData, int subsection, int index) {
+            public void onTravelToStar(StarData starData, int subsection, int index) {
                 //todo: starSysView.setSystem(starData);
 
+
+
                 //todo: validate that player can travel to this star.
-                System.out.println(String.format("Traveling to system subsec %1s index %2s with seed %3s, located at x%4s y%5s", subsection, index, starData[2], starData[0], starData[1]));
+                System.out.println(String.format("Traveling to system subsec %1s index %2s with seed %3s, located at x%4s y%5s", subsection, index, starData.seed, starData.location.x, starData.location.y));
 
                 gameData.currentStar = starMapView.getMap().getStar(subsection, index);
                 starMapView.getMap().setShipLocation(gameData.currentStar);
