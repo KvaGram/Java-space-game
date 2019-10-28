@@ -12,6 +12,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -349,7 +350,6 @@ public class Sectormaps extends JPanel implements Scrollable {
         for (int i=0; i<secs_stars_coords.length; i++) {
             starObjects[i] = new StarData[secs_stars_coords[i].length];
             for (int j=0; j<secs_stars_coords[i].length; j++) {
-                int ij = i+(j*x_secs); // linear number of sector, for array indexing
                 int seedseed = secs_stars_coords[i][j][0]*10000 + secs_stars_coords[i][j][1];
                 Random lars = new Random(seedseed);
                 int seed = lars.nextInt();
@@ -535,6 +535,15 @@ public class Sectormaps extends JPanel implements Scrollable {
             if (i >= x_secs && (colrowsum%2 == 1)) { //Roughly every 2nd sector should be linked to vertical above sector
                 int[][] crossSectorPair = getClosestPair(secs_stars_coords[i-x_secs],secs_stars_coords[i]);
                 g.drawLine(crossSectorPair[0][0],crossSectorPair[0][1],crossSectorPair[1][0],crossSectorPair[1][1]);
+            }
+        }
+        //Draw hyperlanes but from star connection data instead
+        g.setColor((new Color(100, 70, 20)));
+        for (int i=0; i<starObjects.length; i++) {
+            for (StarData star: starObjects[i]) {
+                for (StarData target: star.connections) {
+                    g.drawLine(star.location.x, star.location.y, target.location.x, target.location.y);
+                }
             }
         }
 
