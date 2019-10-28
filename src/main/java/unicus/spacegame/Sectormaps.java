@@ -37,7 +37,7 @@ public class Sectormaps extends JPanel implements Scrollable {
 
     boolean showGrid = true;
     boolean showShip = false;
-    Point shipLocation = new Point(0,0);
+    StarData shipLocation;
 
     //size of spaceship icon. locked to starsize
     int shipW = starsize * 2;
@@ -249,10 +249,10 @@ public class Sectormaps extends JPanel implements Scrollable {
     }
 
     /**
-     * Sets visual location of the spaceship on the sectormap.
+     * Sets refrence to the star the spaceship in on the sectormap.
      * @param shipLocation
      */
-    public void setShipLocation(Point shipLocation) {
+    public void setShipLocation(StarData shipLocation) {
         showShip = true;
         this.shipLocation = shipLocation;
         repaint();
@@ -575,7 +575,7 @@ public class Sectormaps extends JPanel implements Scrollable {
             }
         }
         if (this.showShip){
-            g.drawImage(shipSprite, shipLocation.x - shipW/2, shipLocation.y - shipH/2, shipSpriteObserver);
+            g.drawImage(shipSprite, shipLocation.location.x - shipW/2, shipLocation.location.y - shipH/2, shipSpriteObserver);
         }
     }
 

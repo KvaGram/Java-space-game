@@ -99,16 +99,16 @@ public class Demo1 extends JPanel {
 
                 //todo: validate that player can travel to this star.
                 System.out.println(String.format("Traveling to system subsec %1s index %2s with seed %3s, located at x%4s y%5s", subsection, index, starData[2], starData[0], starData[1]));
-                
+
                 gameData.currentStar = starMapView.getMap().getStar(subsection, index);
-                starMapView.getMap().setShipLocation(gameData.getCurrentLocation());
+                starMapView.getMap().setShipLocation(gameData.currentStar);
             }
         };
         starMapView.AddStarListener(starEventListener);
 
         gameData = new GameData(starMapView.getMap().getStar(0, 0));
 
-        starMapView.getMap().setShipLocation(gameData.getCurrentLocation());
+        starMapView.getMap().setShipLocation(gameData.currentStar);
 
 
         this.add(gamePane);//, 0);
