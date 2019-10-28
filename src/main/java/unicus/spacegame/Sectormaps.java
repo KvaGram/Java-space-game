@@ -36,6 +36,10 @@ public class Sectormaps extends JPanel implements Scrollable{
     boolean showShip = false;
     Point shipLocation = new Point(0,0);
 
+    //size of spaceship icon. locked to starsize
+    int shipW = starsize * 2;
+    int shipH = starsize * 3;
+
     Image shipSprite;
     ImageObserver shipSpriteObserver;
 
@@ -266,8 +270,6 @@ public class Sectormaps extends JPanel implements Scrollable{
          *
          *  - Lars
          */
-        int shipW = starsize * 5;
-        int shipH = starsize * 8;
 
         try {
             //try loading file.
@@ -497,7 +499,7 @@ public class Sectormaps extends JPanel implements Scrollable{
             }
         }
         if (this.showShip){
-            g.drawImage(shipSprite, shipLocation.x, shipLocation.y, shipSpriteObserver);
+            g.drawImage(shipSprite, shipLocation.x - shipW/2, shipLocation.y - shipH/2, shipSpriteObserver);
         }
     }
 

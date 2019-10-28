@@ -37,8 +37,6 @@ public class StarmapUI extends JPanel {
         scrollPane = new JScrollPane(map, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         mousePoint = new Point();
 
-        //test show ship
-        map.setShipLocation(new Point(500, 500));
 
         MouseAdapter ma = new MouseAdapter(){
             @Override
@@ -52,7 +50,7 @@ public class StarmapUI extends JPanel {
                 for (StarTarget st : starTargets){
                     if(st.contains(mousePoint)) {
                         int[] d = map.getStarData(st.subSector, st.index);
-                        System.out.println("Found star! : x " + d[0] +" y "+ d[1] +" seed "+ d[2]);
+                        //System.out.println("Found star! : x " + d[0] +" y "+ d[1] +" seed "+ d[2]);
                         fireStarTravel(d, st.subSector, st.index);
                         return;
                     }
@@ -84,7 +82,9 @@ public class StarmapUI extends JPanel {
         setPreferredSize(new Dimension(200, 250));
     }
 
-
+    public Sectormaps getMap(){
+        return map;
+    }
     //Event system based on tutorial https://www.javaworld.com/article/2077351/events-and-listeners.html
     private EventListenerList StarEventListeners = new EventListenerList();
     public void AddStarListener(StarEventListener listener)    {

@@ -31,8 +31,7 @@ public class Demo1 extends JPanel {
     private final static String starMapTabName  = "Star-sector map view";
     private final static String starShipTabName = "Star-ship view";
 
-
-
+    GameData gameData;
 
 
     public Demo1()
@@ -98,15 +97,39 @@ public class Demo1 extends JPanel {
             public void onTravelToStar(int[] starData, int subsection, int index) {
                 //todo: starSysView.setSystem(starData);
 
+                //todo: validate that player can travel to this star.
                 System.out.println(String.format("Traveling to system subsec %1s index %2s with seed %3s, located at x%4s y%5s", subsection, index, starData[2], starData[0], starData[1]));
+
+                gameData.currentSubSec = subsection;
+                gameData.currentIndex = index;
+                starMapView.getMap().setShipLocation(gameData.getCurrentLocation());
             }
         };
         starMapView.AddStarListener(starEventListener);
+
+        gameData = new GameData();
+        gameData.currentIndex = 0;
+        gameData.currentSubSec = 0;
+        starMapView.getMap().setShipLocation(gameData.getCurrentLocation());
+
 
         this.add(gamePane);//, 0);
         this.remove(setupPanel);
 
     }
+    class GameData {
+        //todo: replace with StarData currentStar
+        public int currentSubSec;
+        public int currentIndex;
+
+        public Point getCurrentLocation(){
+            return starMapView.getMap().getStarPoint(currentSubSec, currentIndex);
+        }
+
+
+
+    }
+
 
     public static void main(String[] args) {
         Demo1 demo = new Demo1();
