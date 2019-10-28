@@ -12,10 +12,12 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
-public class Sectormaps extends JPanel implements Scrollable{
+
+public class Sectormaps extends JPanel implements Scrollable {
     Random rft; //re-factor tractor
     Random TriangleRandom;
     int starsize = 7;
@@ -31,6 +33,7 @@ public class Sectormaps extends JPanel implements Scrollable{
     int y_secs = 4;
     int t_secs = x_secs * y_secs;
     int[][][] secs_stars_coords = new int[t_secs][][]; //[n][m][] is {x,y,seed for Lars}.
+    StarData[][] starObjects;
 
     boolean showGrid = true;
     boolean showShip = false;
@@ -175,6 +178,24 @@ public class Sectormaps extends JPanel implements Scrollable{
         }
         return result;
     }
+    /** see getClosestPair but returns StarData instead of int[] coords] */
+    public StarData[] getClosestStarDataPair(StarData[] sector1, StarData[] sector2) {
+        StarData[] result = new StarData[2];
+        result[0] = sector1[0];
+        result[1] = sector2[0];
+        double shortest = Math.sqrt(Math.pow((sector1[0].location.x-sector2[0].location.x),2) + Math.pow((sector1[0].location.y-sector2[0].location.y),2));
+        for (int i=0; i<sector1.length; i++) {
+            for (int j=0; j<sector2.length; j++) {
+                double hyp = Math.sqrt(Math.pow((sector1[i].location.x-sector2[j].location.x),2) + Math.pow((sector1[i].location.y-sector2[j].location.y),2));
+                if (hyp < shortest) {
+                    shortest = hyp;
+                    result[0] = sector1[i];
+                    result[1] = sector2[j];
+                }
+            }
+        }
+        return result;
+    }
     /** Returns a point firmly inside the triangle coordinates given as argument. Complicated math is involved.
      * Uses a slight buffer to avoid points being picked right on the edge.
      * Buffer size is a function variable, not a parameter, for consistency.
@@ -294,8 +315,9 @@ public class Sectormaps extends JPanel implements Scrollable{
 
         rft = new Random(sourceRand.nextLong());
         TriangleRandom = new Random(sourceRand.nextLong());
+        starObjects = new StarData[t_secs][];
 
-        //Create stars in secs_stars_coords[][][].
+        //Create stars in secs_stars_coords[][][]. Should be refactored to separate method.
         for (int i=0; i<x_secs; i++) {
             for (int j=0; j<y_secs; j++) {
                 int ij = i+(j*x_secs); // linear number of sector, for array indexing
@@ -323,13 +345,56 @@ public class Sectormaps extends JPanel implements Scrollable{
         }
         //Make seeds for Lars
         for (int i=0; i<secs_stars_coords.length; i++) {
+            starObjects[i] = new StarData[secs_stars_coords[i].length];
             for (int j=0; j<secs_stars_coords[i].length; j++) {
+                int ij = i+(j*x_secs); // linear number of sector, for array indexing
                 int seedseed = secs_stars_coords[i][j][0]*10000 + secs_stars_coords[i][j][1];
                 Random lars = new Random(seedseed);
                 int seed = lars.nextInt();
                 int[] coords_plus_seed = Arrays.copyOf(secs_stars_coords[i][j], secs_stars_coords[i][j].length+1);
                 coords_plus_seed[2] = seed;
                 secs_stars_coords[i][j] = coords_plus_seed.clone();
+                starObjects[i][j] = new StarData(i, j, seed, new Point(secs_stars_coords[i][j][0], secs_stars_coords[i][j][1]));
+            }
+        }
+        //figure out which stars are connected to which others in sector
+        for (int i=0; i < starObjects.length; i++ ) {
+            StarData[] localSector = starObjects[i];
+            if (localSector.length == 1) {
+                //Pass
+            } else if (localSector.length == 2) {
+                localSector[0].connections.add(localSector[1]);
+                localSector[1].connections.add(localSector[0]);
+            } else if (localSector.length == 3) {
+                for (int j=0; j<3; j++) {
+                    for (int k=0; k<3; k++) {
+                        if (j != k) {
+                            localSector[j].connections.add(localSector[k]);
+                        }
+                    }
+                }
+            } else if (localSector.length >= 4) {
+                int hub = new Random(localSector[0].seed).nextInt(localSector.length); //uses the lars seed but does not consume it
+                for (int v = 0; v < localSector.length; v++) {
+                    if (v != hub) {
+                        localSector[v].connections.add(localSector[hub]);
+                        localSector[hub].connections.add(localSector[v]);
+                    }
+                }
+            }
+        }
+        //Connections across sectors
+        for (int i = 1; i < starObjects.length; i++) {
+            if (i%x_secs != 0){ //do not wrap across end of line
+                StarData[] crossSectorPair = getClosestStarDataPair(starObjects[i-1],starObjects[i]);
+                crossSectorPair[0].connections.add(crossSectorPair[1]);
+                crossSectorPair[1].connections.add(crossSectorPair[0]);
+            }
+            int colrowsum = (i%x_secs)+(i/x_secs);
+            if (i >= x_secs && (colrowsum%2 == 1)) { //Roughly every 2nd sector should be linked to vertical above sector
+                StarData[] crossSectorPair = getClosestStarDataPair(starObjects[i-x_secs],starObjects[i]);
+                crossSectorPair[0].connections.add(crossSectorPair[1]);
+                crossSectorPair[1].connections.add(crossSectorPair[0]);
             }
         }
         //Sets pixel size of panel, for use with scrolledPanes and layout managers.
@@ -351,8 +416,8 @@ public class Sectormaps extends JPanel implements Scrollable{
      * @param index index of target star
      * @return list of connected stars by [0] subsection [1] index
      */
-    public int[][] getConnectedStars(int subsection, int index){
-        return new int[0][0];
+    public ArrayList<StarData> getConnectedStars(int subsection, int index){
+        return starObjects[subsection][index].connections;
     }
 
     /**
@@ -439,7 +504,7 @@ public class Sectormaps extends JPanel implements Scrollable{
                 g.drawLine(localsector[0][0], localsector[0][1], localsector[2][0], localsector[2][1]);
                 g.drawLine(localsector[1][0], localsector[1][1], localsector[2][0], localsector[2][1]);
             } else if (localsector.length >= 4) {
-                int hub = new Random(localsector[0][2]).nextInt(localsector.length); //uses the lars seed
+                int hub = new Random(localsector[0][2]).nextInt(localsector.length); //uses the lars seed but does not consume it
                 for (int v = 0; v < localsector.length; v++) {
                     if (v != hub) {
                         g.drawLine(localsector[v][0], localsector[v][1], localsector[hub][0], localsector[hub][1]);

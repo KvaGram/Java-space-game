@@ -6,11 +6,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="javaspacegame" />
         <module name="Java-space-game" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="Java-space-game" target="1.13" />
+      <module name="javaspacegame" target="1.13" />
     </bytecodeTargetLevel>
   </component>
 </project>
