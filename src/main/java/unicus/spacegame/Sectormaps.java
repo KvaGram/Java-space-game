@@ -505,11 +505,19 @@ public class Sectormaps extends JPanel implements Scrollable {
 
 
         //Draw hyperlanes but from star connection data instead
-        g.setColor((new Color(100, 70, 20)));
+
         for (StarData[] sector: starObjects) {
             for (StarData star: sector) {
+                boolean isShipLocation = star == shipLocation;
                 for (StarData neighbor: star.connections) {
-                    g.drawLine(star.location.x, star.location.y, neighbor.location.x, neighbor.location.y);
+                    isShipLocation = isShipLocation || neighbor == shipLocation;
+                    if(isShipLocation){
+                        g.setColor((new Color(60, 70, 220)));
+                        g.drawLine(star.location.x, star.location.y, neighbor.location.x, neighbor.location.y);
+                    }else {
+                        g.setColor((new Color(100, 70, 20)));
+                        g.drawLine(star.location.x, star.location.y, neighbor.location.x, neighbor.location.y);
+                    }
                 }
             }
         }
