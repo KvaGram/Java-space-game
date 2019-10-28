@@ -20,7 +20,7 @@ import java.util.Random;
 public class Sectormaps extends JPanel implements Scrollable {
     Random rft; //re-factor tractor
     Random TriangleRandom;
-    int starsize = 7;
+    int starsize = 12;
     int ystart = 20;
     int yheight = 200;
     int xstart = 20;
