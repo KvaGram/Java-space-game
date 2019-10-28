@@ -248,6 +248,7 @@ public class Sectormaps extends JPanel implements Scrollable {
         repaint();
     }
 
+    /** Randomly generates stars and connections between them to populate sectors */
     public void initializeStarsAndLanes() {
         //Create stars in secs_stars_coords[][][].
         for (int i=0; i<x_secs; i++) {
