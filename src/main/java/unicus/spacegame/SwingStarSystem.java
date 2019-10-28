@@ -98,6 +98,12 @@ public class SwingStarSystem extends JLayeredPane implements ActionListener {
         btnDoMine.setEnabled(GetNumMinable() >= 1);
     }
 
+    public void setStar(StarData currentStar) {
+        //Generates a starsystem from seed.
+        Random r = new Random(currentStar.seed);
+        newPlanets(r);
+    }
+
     /**
      * View is an internal class that extends JPanel.
      * It renders the current star system

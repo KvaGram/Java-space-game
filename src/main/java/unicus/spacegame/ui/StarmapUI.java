@@ -117,7 +117,7 @@ public class StarmapUI extends JPanel {
             this.index = index;
 
             Point p = map.getStarPoint(subSector, index);
-            int s = map.getStarsize();
+            int s = map.getStarsize() * 2;
             rect = new Rectangle(p.x-s/2, p.y-s/2, s, s);
         }
         public boolean contains(Point p){

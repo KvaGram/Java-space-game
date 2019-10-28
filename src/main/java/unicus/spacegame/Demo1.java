@@ -10,6 +10,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -96,21 +97,26 @@ public class Demo1 extends JPanel {
             @Override
             public void onTravelToStar(StarData starData, int subsection, int index) {
                 //todo: starSysView.setSystem(starData);
+                ArrayList<StarData> conns = starMapView.getMap().getConnectedStars(subsection, index);
 
-
-
-                //todo: validate that player can travel to this star.
-                System.out.println(String.format("Traveling to system subsec %1s index %2s with seed %3s, located at x%4s y%5s", subsection, index, starData.seed, starData.location.x, starData.location.y));
-
-                gameData.currentStar = starMapView.getMap().getStar(subsection, index);
-                starMapView.getMap().setShipLocation(gameData.currentStar);
+                //note: Check if target star has a connection to current star.
+                if(conns.contains(gameData.currentStar)) {
+                    //todo: validate that player can travel to this star.
+                    System.out.println(String.format("Traveling to system subsec %1s index %2s with seed %3s, located at x%4s y%5s", subsection, index, starData.seed, starData.location.x, starData.location.y));
+                    gameData.currentStar = starMapView.getMap().getStar(subsection, index);
+                    starMapView.getMap().setShipLocation(gameData.currentStar);
+                    starSysView.setStar(gameData.currentStar);
+                }
+                else{
+                    System.out.println(String.format("Cannot reach system subsec %1s index %2s with seed %3s, located at x%4s y%5s", subsection, index, starData.seed, starData.location.x, starData.location.y));
+                }
             }
         };
         starMapView.AddStarListener(starEventListener);
 
         gameData = new GameData(starMapView.getMap().getStar(0, 0));
-
         starMapView.getMap().setShipLocation(gameData.currentStar);
+        starSysView.setStar(gameData.currentStar);
 
 
         this.add(gamePane);//, 0);
