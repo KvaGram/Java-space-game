@@ -1,12 +1,17 @@
 
 package unicus.spacegame;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 //I don't know why I need to import these next two separately
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -26,8 +31,13 @@ public class Sectormaps extends JPanel implements Scrollable{
     int y_secs = 4;
     int t_secs = x_secs * y_secs;
     int[][][] secs_stars_coords = new int[t_secs][][]; //[n][m][] is {x,y,seed for Lars}.
-    boolean showGrid = true;
 
+    boolean showGrid = true;
+    boolean showShip = false;
+    Point shipLocation = new Point(0,0);
+
+    Image shipSprite;
+    ImageObserver shipSpriteObserver;
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Map Frame");
@@ -195,8 +205,39 @@ public class Sectormaps extends JPanel implements Scrollable{
         int y = (int) proto_y;
         return new int[]{x,y};
     }
+
+    /**
+     * Toggles sub-sector grid on/off
+     */
     public void toggleGrid() {
         showGrid = !showGrid;
+        repaint();
+    }
+
+    /**
+     * Sets sub-sector grid.
+     * @param value
+     */
+    public void setShowGrid(boolean value) {
+        showGrid = value;
+        repaint();
+    }
+
+    /**
+     * Sets visual location of the spaceship on the sectormap.
+     * @param shipLocation
+     */
+    public void setShipLocation(Point shipLocation) {
+        showShip = true;
+        this.shipLocation = shipLocation;
+        repaint();
+    }
+
+    /**
+     * Hides the spaceship from view.
+     */
+    public void hideShip() {
+        showShip = false;
         repaint();
     }
 
@@ -210,6 +251,42 @@ public class Sectormaps extends JPanel implements Scrollable{
         //initial background
         this.setOpaque(true);
         this.setBackground(Color.black);
+
+        /**
+         * This is the spaceship icon.
+         * It has to be in this class, as it needs to be drawn with the map.
+         *
+         * Note the added properties above:
+         *     boolean showGrid
+         *     boolean showShip
+         *     Point shipLocation
+         *
+         *     Image shipSprite
+         *     ImageObserver shipSpriteObserver
+         *
+         *  - Lars
+         */
+        int shipW = starsize * 5;
+        int shipH = starsize * 8;
+
+        try {
+            //try loading file.
+            shipSprite = ImageIO.read(new File("src/main/resources/spaceshipicon.png")).getScaledInstance(shipW, shipH, Image.SCALE_SMOOTH);
+        } catch (IOException err) {
+            //paint backup icon.
+            System.out.println(err);
+            shipSprite = new BufferedImage(shipW, shipH, BufferedImage.TYPE_INT_RGB);
+            Graphics g = shipSprite.getGraphics();
+            g.setColor(Color.red);
+            g.drawOval(0, 0, shipW, shipH);
+        }
+        ImageObserver shipSpriteObserver = new ImageObserver() {
+            @Override
+            public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
+                return true; //Note: not 100% sure what this is needed for (animation maybe?). Should try to figure it out.
+            }
+        };
+
 
         //  (old hardcoded random initializers)
         //rft = new Random(41356);
@@ -418,6 +495,9 @@ public class Sectormaps extends JPanel implements Scrollable{
                     }
                 }
             }
+        }
+        if (this.showShip){
+            g.drawImage(shipSprite, shipLocation.x, shipLocation.y, shipSpriteObserver);
         }
     }
 

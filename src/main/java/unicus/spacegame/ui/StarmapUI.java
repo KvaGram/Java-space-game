@@ -37,6 +37,9 @@ public class StarmapUI extends JPanel {
         scrollPane = new JScrollPane(map, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         mousePoint = new Point();
 
+        //test show ship
+        map.setShipLocation(new Point(500, 500));
+
         MouseAdapter ma = new MouseAdapter(){
             @Override
             public void mouseMoved(MouseEvent e) {
