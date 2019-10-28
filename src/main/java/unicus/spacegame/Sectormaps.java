@@ -477,7 +477,7 @@ public class Sectormaps extends JPanel implements Scrollable {
         return (long)stardata[2];
     }
 
-    /**
+    /** (note: obsolete!)
      * Gets data array of a star from secs_stars_coords
      * @param subsection
      * @param index
@@ -486,6 +486,17 @@ public class Sectormaps extends JPanel implements Scrollable {
      */
     public int[] getStarData(int subsection, int index) throws ArrayIndexOutOfBoundsException {
         return secs_stars_coords[subsection][index];
+    }
+
+    /**
+     * Gets star from array of stars.
+     * @param subsection
+     * @param index
+     * @return
+     * @throws ArrayIndexOutOfBoundsException
+     */
+    public StarData getStar(int subsection, int index) throws ArrayIndexOutOfBoundsException {
+        return starObjects[subsection][index];
     }
 
     @Override

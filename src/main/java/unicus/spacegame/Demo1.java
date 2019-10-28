@@ -99,17 +99,15 @@ public class Demo1 extends JPanel {
 
                 //todo: validate that player can travel to this star.
                 System.out.println(String.format("Traveling to system subsec %1s index %2s with seed %3s, located at x%4s y%5s", subsection, index, starData[2], starData[0], starData[1]));
-
-                gameData.currentSubSec = subsection;
-                gameData.currentIndex = index;
+                
+                gameData.currentStar = starMapView.getMap().getStar(subsection, index);
                 starMapView.getMap().setShipLocation(gameData.getCurrentLocation());
             }
         };
         starMapView.AddStarListener(starEventListener);
 
-        gameData = new GameData();
-        gameData.currentIndex = 0;
-        gameData.currentSubSec = 0;
+        gameData = new GameData(starMapView.getMap().getStar(0, 0));
+
         starMapView.getMap().setShipLocation(gameData.getCurrentLocation());
 
 
@@ -119,15 +117,14 @@ public class Demo1 extends JPanel {
     }
     class GameData {
         //todo: replace with StarData currentStar
-        public int currentSubSec;
-        public int currentIndex;
-
-        public Point getCurrentLocation(){
-            return starMapView.getMap().getStarPoint(currentSubSec, currentIndex);
+        public StarData currentStar;
+        public GameData(StarData startingStar){
+            currentStar = startingStar;
         }
 
-
-
+        public Point getCurrentLocation(){
+            return currentStar.location;
+        }
     }
 
 
