@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Java-space-game.iml" filepath="$PROJECT_DIR$/.idea/Java-space-game.iml" />
+      <module fileurl="file://$PROJECT_DIR$/javaspacegame.iml" filepath="$PROJECT_DIR$/javaspacegame.iml" />
     </modules>
   </component>
 </project>
