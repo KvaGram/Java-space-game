@@ -123,9 +123,6 @@ public class StarmapUI extends JPanel {
         public boolean contains(Point p){
             return rect.contains(p);
         }
-        public long getSeed(){
-            return map.getStarSeed(subSector, index);
-        }
     }
 
     public static void main(String[] args) {
