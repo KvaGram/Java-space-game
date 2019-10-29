@@ -1,4 +1,4 @@
-package unicus.spacegame;
+package unicus.spacegame.ui;
 
 //import org.jetbrains.annotations.Nullable;
 
@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import unicus.spacegame.NameGenerator;
+import unicus.spacegame.StarData;
 import static java.lang.System.out;
 
 /**
@@ -29,11 +31,16 @@ public class SwingStarSystem extends JLayeredPane implements ActionListener {
     //Contains the background graphics of the star system.
     SpaceView spaceViewLayer;
     JPanel buttonLayer;
+    JPanel infoOverlay;
 
     JButton btnNewSystem;
     JButton btnDoTrade;
     JButton btnDoRaid;
     JButton btnDoMine;
+
+    JLabel systemNameText;
+
+    String systemName;
 
     final float TAU = 6.283185307179586f;
 
@@ -42,9 +49,14 @@ public class SwingStarSystem extends JLayeredPane implements ActionListener {
         spaceViewLayer = new SpaceView();
         buttonLayer = new JPanel();
         buttonLayer.setOpaque(false);
-        //buttonLayer = new SpaceView();
+
+        infoOverlay = new JPanel();
+        infoOverlay.setOpaque(false);
+
+
         spaceViewLayer.setBounds(0, 0, 900, 720);
         buttonLayer.setBounds(0, 620, 900, 100);
+        infoOverlay.setBounds(0, 0, 900, 720);
 
         setPreferredSize(new Dimension(900, 720));
         setBorder(BorderFactory.createTitledBorder("Hello world"));
@@ -57,6 +69,11 @@ public class SwingStarSystem extends JLayeredPane implements ActionListener {
         btnDoRaid    = new JButton("Raid tradeShips");
         btnDoMine    = new JButton("Mine asteroids");
 
+        Font font = new Font("Times", Font.BOLD, 30);
+        systemNameText = new JLabel(systemName, JLabel.CENTER);
+        systemNameText.setForeground(new Color(50, 250, 250));
+        systemNameText.setFont(font);
+
         btnNewSystem.addActionListener(this);
         btnDoTrade.addActionListener(this);
         btnDoRaid.addActionListener(this);
@@ -67,9 +84,13 @@ public class SwingStarSystem extends JLayeredPane implements ActionListener {
         buttonLayer.add(btnDoRaid);
         buttonLayer.add(btnDoMine);
 
+        infoOverlay.add(systemNameText);
 
-        this.add(spaceViewLayer, 100);
-        this.add(buttonLayer, 0);
+
+
+        this.add(spaceViewLayer, new Integer(0));
+        this.add(infoOverlay, new Integer(10));
+        this.add(buttonLayer, new Integer(20));
 
     }
 
@@ -221,6 +242,9 @@ public class SwingStarSystem extends JLayeredPane implements ActionListener {
            }
        }
        planets = newPlanetsList.toArray(new Base_Planet[newPlanetsList.size()]);
+
+       systemName = NameGenerator.makeWord("CVV VCVV", rand).toUpperCase();
+       systemNameText.setText(systemName);
        setButtonsActive();
        repaint();
     }

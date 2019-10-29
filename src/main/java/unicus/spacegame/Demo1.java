@@ -4,6 +4,7 @@ import unicus.spacegame.spaceship.Spaceship;
 import unicus.spacegame.ui.ShipViewUI;
 import unicus.spacegame.ui.StarEventListener;
 import unicus.spacegame.ui.StarmapUI;
+import unicus.spacegame.ui.SwingStarSystem;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
