@@ -67,7 +67,7 @@ public class Main {
             ta.append("But it's not implemented yet.\n");
         });
         b_image.addActionListener(arg0 -> {
-            ImageIcon spaceimage = new ImageIcon("spaceshipicon.png");
+            ImageIcon spaceimage = new ImageIcon(Main.class.getResource("ui/spaceshipicon.png"));
             JLabel lbl = new JLabel(spaceimage);
             JOptionPane.showMessageDialog(null, lbl, "ImageDialog",
                     JOptionPane.PLAIN_MESSAGE, null);

@@ -1,0 +1,45 @@
+Status for integrering av moduler for Demo1.
+
+SwingStarSystem
+	- Mangler metode for å sette system seed
+	- Ingen split mellom datamodel og visning
+Sectormaps
+	- Ingen split mellom datamodel og visning
+	- Ingen måte å makere systemer
+	- Ingen måte å sette seed (?).
+	- Koblinger mellom stjerner låst i tegnefunksjon. Ingen lett måte å hente dette.
+ShipViewUI
+	- Ingen problemer så langt
+	
+Generelt problem:
+	Alle tre kompoenter har sitt egent navn-system. Klassenavn må få felles standard.
+	Alle tre bruker sin egen skjermoppløsning, og tar ulik plass på skjermen.
+		En aspect ratio bør standardiseres for testen.
+
+
+Status så langt:
+En start-skjerm lar bruker/spiller sette seed før spillet starter.
+Seed brukes nå for å sette generering av et skip.
+
+Alle tre modulene kan vises, men eksisterer nå hver for seg.
+
+oppdatering:
+
+Når det gjelder tilpassing av Sectormaps så var det en del utfordringer.
+Først og fremst, så kan kartet være vilkårlig stort, så det virker riktig å wrappe det i en JScrolledPane.
+Problemet med det, er at en JScrolledPane er designet for å brukes med komponenter som er riktig laget per standard.
+En standard vi enda ikke helt forstår.
+Så resultatet ble at scroll-panelet ikke ble scrollbart.
+
+Etterhvert ble løsningen funnet ved å sette PreferredSize på Sectormaps komponenten.
+Dette virket som om det løste problemet.
+
+Wrapper funksjonen kan etterhvert bygges om til en fullverdig kontroller klasse.
+Den har nå en mouselistener og mousemotionlistener som gjør det mulig å klippe på stjerner,
+og med det hente ut seed-verdien som trengs for StarSystem komponenten.
+
+oppdatering:
+
+Løsningen med å sette PreferredSize førte til et nytt problem, hvor scrollpane-et var låst til størrelsen.
+Løsningen på det problemet, var å implementere Scrollable i Sectormaps.
+Implementasjonen var basert på demokode, men det virket nesten helt magisk.

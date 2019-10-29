@@ -1,19 +1,27 @@
 
 package unicus.spacegame;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 //I don't know why I need to import these next two separately
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
+import java.io.File;
+import java.io.IOException;
+import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
-class Sectormaps extends JPanel {
+
+public class Sectormaps extends JPanel implements Scrollable {
     Random rft; //re-factor tractor
     Random TriangleRandom;
-    int starsize = 7;
+    int starsize = 12;
     int ystart = 20;
     int yheight = 200;
     int xstart = 20;
@@ -26,8 +34,18 @@ class Sectormaps extends JPanel {
     int y_secs = 4;
     int t_secs = x_secs * y_secs;
     int[][][] secs_stars_coords = new int[t_secs][][]; //[n][m][] is {x,y,seed for Lars}.
-    boolean showGrid = true;
+    StarData[][] starObjects;
 
+    boolean showGrid = true;
+    boolean showShip = false;
+    StarData shipLocation;
+
+    //size of spaceship icon. locked to starsize
+    int shipW = starsize * 2;
+    int shipH = starsize * 3;
+
+    Image shipSprite;
+    ImageObserver shipSpriteObserver;
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Map Frame");
@@ -52,7 +70,6 @@ class Sectormaps extends JPanel {
                 map.repaint();
             }
         });
-
         frame.setVisible(true);
     }
 
@@ -108,9 +125,9 @@ class Sectormaps extends JPanel {
         double a = Math.atan2((p2[1]-p1[1]),(p2[0]-p1[0]));
         double b = Math.atan2((p3[1]-p1[1]),(p3[0]-p1[0]));
         double c = Math.atan2((p3[1]-p2[1]),(p3[0]-p2[0]));
-        double ab = Math.abs(a-b);
-        double ac = Math.abs(a-c);
-        double bc = Math.abs(b-c);
+        double ab = Math.abs(a-b) % Math.PI;
+        double ac = Math.abs(a-c) % Math.PI;
+        double bc = Math.abs(b-c) % Math.PI;
         return (ab < theta) || (ac < theta) || (bc < theta); /*carefully compacted*/
     }
     /** Iterates over the stars in a sector to determine whether any triplet of them forms an overly linear angle smaller than theta.
@@ -166,6 +183,24 @@ class Sectormaps extends JPanel {
         }
         return result;
     }
+    /** see getClosestPair but returns StarData instead of int[] coords] */
+    public StarData[] getClosestStarDataPair(StarData[] sector1, StarData[] sector2) {
+        StarData[] result = new StarData[2];
+        result[0] = sector1[0];
+        result[1] = sector2[0];
+        double shortest = Math.sqrt(Math.pow((sector1[0].location.x-sector2[0].location.x),2) + Math.pow((sector1[0].location.y-sector2[0].location.y),2));
+        for (int i=0; i<sector1.length; i++) {
+            for (int j=0; j<sector2.length; j++) {
+                double hyp = Math.sqrt(Math.pow((sector1[i].location.x-sector2[j].location.x),2) + Math.pow((sector1[i].location.y-sector2[j].location.y),2));
+                if (hyp < shortest) {
+                    shortest = hyp;
+                    result[0] = sector1[i];
+                    result[1] = sector2[j];
+                }
+            }
+        }
+        return result;
+    }
     /** Returns a point firmly inside the triangle coordinates given as argument. Complicated math is involved.
      * Uses a slight buffer to avoid points being picked right on the edge.
      * Buffer size is a function variable, not a parameter, for consistency.
@@ -196,17 +231,96 @@ class Sectormaps extends JPanel {
         int y = (int) proto_y;
         return new int[]{x,y};
     }
-    public void toggleGrid() { showGrid = !showGrid;}
 
+    /**
+     * Toggles sub-sector grid on/off
+     */
+    public void toggleGrid() {
+        showGrid = !showGrid;
+        repaint();
+    }
 
-    public Sectormaps() {
+    /**
+     * Sets sub-sector grid.
+     * @param value
+     */
+    public void setShowGrid(boolean value) {
+        showGrid = value;
+        repaint();
+    }
+
+    /**
+     * Sets refrence to the star the spaceship in on the sectormap.
+     * @param shipLocation
+     */
+    public void setShipLocation(StarData shipLocation) {
+        showShip = true;
+        this.shipLocation = shipLocation;
+        repaint();
+    }
+
+    /**
+     * Hides the spaceship from view.
+     */
+    public void hideShip() {
+        showShip = false;
+        repaint();
+    }
+
+    public Sectormaps(){
+        this(new Random());
+    }
+    public Sectormaps(long seed){
+        this(new Random(seed));
+    }
+    public Sectormaps(Random sourceRand) {
         //initial background
         this.setOpaque(true);
         this.setBackground(Color.black);
-        rft = new Random(41356);
-        TriangleRandom = new Random(333);
 
-        //Create stars in secs_stars_coords[][][].
+        /**
+         * This is the spaceship icon.
+         * It has to be in this class, as it needs to be drawn with the map.
+         *
+         * Note the added properties above:
+         *     boolean showGrid
+         *     boolean showShip
+         *     Point shipLocation
+         *
+         *     Image shipSprite
+         *     ImageObserver shipSpriteObserver
+         *
+         *  - Lars
+         */
+
+        try {
+            //try loading file.
+            shipSprite = ImageIO.read(getClass().getResource("ui/spaceshipicon.png")).getScaledInstance(shipW, shipH, Image.SCALE_SMOOTH);
+        } catch (IOException err) {
+            //paint backup icon.
+            System.out.println(err);
+            shipSprite = new BufferedImage(shipW, shipH, BufferedImage.TYPE_INT_RGB);
+            Graphics g = shipSprite.getGraphics();
+            g.setColor(Color.red);
+            g.drawOval(0, 0, shipW, shipH);
+        }
+        ImageObserver shipSpriteObserver = new ImageObserver() {
+            @Override
+            public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
+                return true; //Note: not 100% sure what this is needed for (animation maybe?). Should try to figure it out.
+            }
+        };
+
+
+        //  (old hardcoded random initializers)
+        //rft = new Random(41356);
+        //TriangleRandom = new Random(333);
+
+        rft = new Random(sourceRand.nextLong());
+        TriangleRandom = new Random(sourceRand.nextLong());
+        starObjects = new StarData[t_secs][];
+
+        //Create stars in secs_stars_coords[][][]. Should be refactored to separate method.
         for (int i=0; i<x_secs; i++) {
             for (int j=0; j<y_secs; j++) {
                 int ij = i+(j*x_secs); // linear number of sector, for array indexing
@@ -234,6 +348,7 @@ class Sectormaps extends JPanel {
         }
         //Make seeds for Lars
         for (int i=0; i<secs_stars_coords.length; i++) {
+            starObjects[i] = new StarData[secs_stars_coords[i].length];
             for (int j=0; j<secs_stars_coords[i].length; j++) {
                 int seedseed = secs_stars_coords[i][j][0]*10000 + secs_stars_coords[i][j][1];
                 Random lars = new Random(seedseed);
@@ -241,46 +356,169 @@ class Sectormaps extends JPanel {
                 int[] coords_plus_seed = Arrays.copyOf(secs_stars_coords[i][j], secs_stars_coords[i][j].length+1);
                 coords_plus_seed[2] = seed;
                 secs_stars_coords[i][j] = coords_plus_seed.clone();
+                starObjects[i][j] = new StarData(i, j, seed, new Point(secs_stars_coords[i][j][0], secs_stars_coords[i][j][1]));
             }
         }
+        //figure out which stars are connected to which others in sector
+        for (int i=0; i < starObjects.length; i++ ) {
+            StarData[] localSector = starObjects[i];
+            if (localSector.length == 1) {
+                //Pass
+            } else if (localSector.length == 2) {
+                localSector[0].connections.add(localSector[1]);
+                localSector[1].connections.add(localSector[0]);
+            } else if (localSector.length == 3) {
+                for (int j=0; j<3; j++) {
+                    for (int k=0; k<3; k++) {
+                        if (j != k) {
+                            localSector[j].connections.add(localSector[k]);
+                        }
+                    }
+                }
+            } else if (localSector.length >= 4) {
+                int hub = new Random(localSector[0].seed).nextInt(localSector.length); //uses the lars seed but does not consume it
+                for (int v = 0; v < localSector.length; v++) {
+                    if (v != hub) {
+                        localSector[v].connections.add(localSector[hub]);
+                        localSector[hub].connections.add(localSector[v]);
+                    }
+                }
+            }
+        }
+        //Connections across sectors
+        for (int i = 1; i < starObjects.length; i++) {
+            if (i%x_secs != 0){ //do not wrap across end of line
+                StarData[] crossSectorPair = getClosestStarDataPair(starObjects[i-1],starObjects[i]);
+                crossSectorPair[0].connections.add(crossSectorPair[1]);
+                crossSectorPair[1].connections.add(crossSectorPair[0]);
+            }
+            int colrowsum = (i%x_secs)+(i/x_secs);
+            if (i >= x_secs && (colrowsum%2 == 1)) { //Roughly every 2nd sector should be linked to vertical above sector
+                StarData[] crossSectorPair = getClosestStarDataPair(starObjects[i-x_secs],starObjects[i]);
+                crossSectorPair[0].connections.add(crossSectorPair[1]);
+                crossSectorPair[1].connections.add(crossSectorPair[0]);
+            }
+        }
+        //Sets pixel size of panel, for use with scrolledPanes and layout managers.
+        //NOTE: If number of or size of sectors change in runtime, remember to update this.
+        // Set using number of sectors times sector height and width + start x and y + 20px padding at the end of both axis.
+        // - Lars
+        this.setPreferredSize(new Dimension(xwidth * x_secs + xstart + 20,yheight * y_secs + ystart + 20));
+    }
+
+    //NOTE:
+    // The following get-methods were added to avoid exposing internal variables.
+    // When splitting the view and model, make sure these functions go to the correct place.
+    // - Lars.
+
+    /**
+     * (stub)
+     * Gets stars connected by hyperlane to this star.
+     * @param subsection sub-section of target star
+     * @param index index of target star
+     * @return list of connected stars by [0] subsection [1] index
+     */
+    public ArrayList<StarData> getConnectedStars(int subsection, int index){
+        return starObjects[subsection][index].connections;
+    }
+
+    /**
+     * @return Pixel size of stars
+     */
+    public int getStarsize(){
+        return starsize;
+    }
+
+    /**
+     * @return Number of sub-sectors.
+     */
+    public int getNumSubSectors() {
+        return secs_stars_coords.length;
+    }
+
+    /**
+     * @param subSector The sub-sector to search
+     * @return number os stars in sub-sector
+     * @throws ArrayIndexOutOfBoundsException will throw an error if you request an invalid sub-sector index.
+     */
+    public int getNumStarsBySector(int subSector) throws ArrayIndexOutOfBoundsException {
+        return  secs_stars_coords[subSector].length;
+    }
+
+    /**
+     * gets X and Y coordinates of star from secs_stars_coords
+     * @param subsection
+     * @param index
+     * @return
+     */
+    public Point getStarPoint(int subsection, int index){
+        int[] stardata;
+        try {
+            stardata = getStarData(subsection, index);
+        } catch (ArrayIndexOutOfBoundsException err) {
+            return new Point();
+        }
+        return new Point(stardata[0], stardata[1]);
+    }
+
+    /**
+     * gets seed value of star from secs_stars_coords
+     * @param subsection
+     * @param index
+     * @return
+     */
+    public long getStarSeed(int subsection, int index){
+        int[] stardata;
+        try {
+            stardata = getStarData(subsection, index);
+        } catch (ArrayIndexOutOfBoundsException err) {
+            return 0;
+        }
+        return (long)stardata[2];
+    }
+
+    /** (note: obsolete!)
+     * Gets data array of a star from secs_stars_coords
+     * @param subsection
+     * @param index
+     * @return
+     * @throws ArrayIndexOutOfBoundsException
+     */
+    public int[] getStarData(int subsection, int index) throws ArrayIndexOutOfBoundsException {
+        return secs_stars_coords[subsection][index];
+    }
+
+    /**
+     * Gets star from array of stars.
+     * @param subsection
+     * @param index
+     * @return
+     * @throws ArrayIndexOutOfBoundsException
+     */
+    public StarData getStar(int subsection, int index) throws ArrayIndexOutOfBoundsException {
+        return starObjects[subsection][index];
     }
 
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        //Draw hyperlanes
-        g.setColor(new Color(20,100,40));
-        //Within sectors
-        for (int i=1; i < secs_stars_coords.length; i++ ) {
-            int[][] localsector = secs_stars_coords[i];
-            if (localsector.length == 1) {
-                //Pass
-            } else if (localsector.length == 2) {
-                g.drawLine(localsector[0][0], localsector[0][1], localsector[1][0], localsector[1][1]);
-            } else if (localsector.length == 3) {
-                g.drawLine(localsector[0][0], localsector[0][1], localsector[1][0], localsector[1][1]);
-                g.drawLine(localsector[0][0], localsector[0][1], localsector[2][0], localsector[2][1]);
-                g.drawLine(localsector[1][0], localsector[1][1], localsector[2][0], localsector[2][1]);
-            } else if (localsector.length >= 4) {
-                int hub = new Random(localsector[0][2]).nextInt(localsector.length); //uses the lars seed
-                for (int v = 0; v < localsector.length; v++) {
-                    if (v != hub) {
-                        g.drawLine(localsector[v][0], localsector[v][1], localsector[hub][0], localsector[hub][1]);
+
+        //Draw hyperlanes but from star connection data instead
+
+        for (StarData[] sector: starObjects) {
+            for (StarData star: sector) {
+                boolean isShipLocation = star == shipLocation;
+                for (StarData neighbor: star.connections) {
+                    isShipLocation = isShipLocation || neighbor == shipLocation;
+                    if(isShipLocation){
+                        g.setColor((new Color(60, 70, 220)));
+                        g.drawLine(star.location.x, star.location.y, neighbor.location.x, neighbor.location.y);
+                    }else {
+                        g.setColor((new Color(100, 70, 20)));
+                        g.drawLine(star.location.x, star.location.y, neighbor.location.x, neighbor.location.y);
                     }
                 }
-            }
-        }
-        //Across sectors
-        for (int i = 1; i < secs_stars_coords.length; i++) {
-            if (i%x_secs != 0){ //do not wrap across end of line
-                int[][] crossSectorPair = getClosestPair(secs_stars_coords[i-1],secs_stars_coords[i]);
-                g.drawLine(crossSectorPair[0][0],crossSectorPair[0][1],crossSectorPair[1][0],crossSectorPair[1][1]);
-            }
-            int colrowsum = (i%x_secs)+(i/x_secs);
-            if (i >= x_secs && (colrowsum%2 == 1)) { //Roughly every 2nd sector should be linked to vertical above sector
-                int[][] crossSectorPair = getClosestPair(secs_stars_coords[i-x_secs],secs_stars_coords[i]);
-                g.drawLine(crossSectorPair[0][0],crossSectorPair[0][1],crossSectorPair[1][0],crossSectorPair[1][1]);
             }
         }
 
@@ -320,5 +558,61 @@ class Sectormaps extends JPanel {
                 }
             }
         }
+        if (this.showShip){
+            g.drawImage(shipSprite, shipLocation.location.x - shipW/2, shipLocation.location.y - shipH/2, shipSpriteObserver);
+        }
+    }
+
+    //Implementation of Scrollable
+    //based on example code https://docs.oracle.com/javase/tutorial/uiswing/examples/components/ScrollDemoProject/src/components/ScrollablePicture.java
+    //from this tutorial https://docs.oracle.com/javase/tutorial/uiswing/components/scrollpane.html
+    private int maxUnitIncrement = 1;
+
+    @Override
+    public Dimension getPreferredScrollableViewportSize() {
+        return new Dimension(200, 200); //to be adjusted
+    }
+
+    @Override
+    public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+        //Get the current position.
+        int currentPosition = 0;
+        if (orientation == SwingConstants.HORIZONTAL) {
+            currentPosition = visibleRect.x;
+        } else {
+            currentPosition = visibleRect.y;
+        }
+
+        //Return the number of pixels between currentPosition
+        //and the nearest tick mark in the indicated direction.
+        if (direction < 0) {
+            int newPosition = currentPosition -
+                    (currentPosition / maxUnitIncrement)
+                            * maxUnitIncrement;
+            return (newPosition == 0) ? maxUnitIncrement : newPosition;
+        } else {
+            return ((currentPosition / maxUnitIncrement) + 1)
+                    * maxUnitIncrement
+                    - currentPosition;
+        }
+    }
+
+    @Override
+    public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+        if (orientation == SwingConstants.HORIZONTAL) {
+            return visibleRect.width - maxUnitIncrement;
+        } else {
+            return visibleRect.height - maxUnitIncrement;
+        }
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportWidth() {
+        return false;
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportHeight() {
+        return false;
     }
 }
