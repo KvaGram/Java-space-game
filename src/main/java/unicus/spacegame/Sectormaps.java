@@ -295,7 +295,7 @@ public class Sectormaps extends JPanel implements Scrollable {
 
         try {
             //try loading file.
-            shipSprite = ImageIO.read(new File("src/main/resources/spaceshipicon.png")).getScaledInstance(shipW, shipH, Image.SCALE_SMOOTH);
+            shipSprite = ImageIO.read(getClass().getResource("ui/spaceshipicon.png")).getScaledInstance(shipW, shipH, Image.SCALE_SMOOTH);
         } catch (IOException err) {
             //paint backup icon.
             System.out.println(err);

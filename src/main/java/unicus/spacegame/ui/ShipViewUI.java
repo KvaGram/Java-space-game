@@ -33,7 +33,8 @@ public class ShipViewUI extends JLayeredPane implements ActionListener {
         System.out.println("Working Directory = " +
                 System.getProperty("user.dir"));
 
-        spaceshipBgFile = new ImageIcon("src/main/resources/spaceship_bg.jpg");
+
+        spaceshipBgFile = new ImageIcon( getClass().getResource("spaceship_bg.jpg"));
         spaceshipBg = new ImageLabel("");
         spaceshipBg.setIcon(spaceshipBgFile);
         spaceshipGUI = new SpaceshipGUI(spaceship);

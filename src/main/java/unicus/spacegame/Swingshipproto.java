@@ -58,7 +58,7 @@ public class Swingshipproto {
         shipUiLayer.setBounds(0, 0, 1200, 800);
 
         //Create the background layer
-        ImageIcon shuttleimage = new ImageIcon("resources/shuttlesideview.png");
+        ImageIcon shuttleimage = new ImageIcon(Swingshipproto.class.getResource("ui/shuttlesideview.png"));
         JLabel bgLayer = new JLabel(shuttleimage);
         //Set bounds manually (not normally recommended)
         //This sets the panel to use the whole frame screen
