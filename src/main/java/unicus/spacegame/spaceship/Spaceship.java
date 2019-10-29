@@ -170,7 +170,7 @@ public class Spaceship {
 
     public ArrayList<Integer> GetBuildableSections(Point loc) {
         ArrayList<Integer> list = new ArrayList<Integer>();
-        if(loc.y < 0)
+        if(loc.x < 0)
             return list;
         SectionType sectionType = sectionTypes[loc.x];
         SectionType[] sTypes    = SectionType.values();
