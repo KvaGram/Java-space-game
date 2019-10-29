@@ -53,13 +53,10 @@ public class SwingStarSystem extends JLayeredPane implements ActionListener {
         infoOverlay = new JPanel();
         infoOverlay.setOpaque(false);
 
-
-        spaceViewLayer.setBounds(0, 0, 900, 720);
-        buttonLayer.setBounds(0, 620, 900, 100);
-        infoOverlay.setBounds(0, 0, 900, 720);
-
         setPreferredSize(new Dimension(900, 720));
-        setBorder(BorderFactory.createTitledBorder("Hello world"));
+        updateChildBounds();
+
+        //setBorder(BorderFactory.createTitledBorder("Hello world"));
 
         //buttonLayer.setLayout(new BoxLayout(buttonLayer, BoxLayout.X_AXIS));
 
@@ -79,7 +76,7 @@ public class SwingStarSystem extends JLayeredPane implements ActionListener {
         btnDoRaid.addActionListener(this);
         btnDoMine.addActionListener(this);
 
-        buttonLayer.add(btnNewSystem);
+        //buttonLayer.add(btnNewSystem); //Disabled for now.
         buttonLayer.add(btnDoTrade);
         buttonLayer.add(btnDoRaid);
         buttonLayer.add(btnDoMine);
@@ -92,6 +89,19 @@ public class SwingStarSystem extends JLayeredPane implements ActionListener {
         this.add(infoOverlay, new Integer(10));
         this.add(buttonLayer, new Integer(20));
 
+    }
+    public void updateChildBounds()
+    {
+        Rectangle b = getBounds();
+        spaceViewLayer.setBounds(0, 0, b.width, b.height);
+        buttonLayer.setBounds(0, b.height - 100, b.width, 100);
+        infoOverlay.setBounds(0, 0, b.width, 100);
+        repaint();
+    }
+
+    public void setBounds(int x, int y, int width, int height){
+        super.setBounds(x, y, width, height);
+        updateChildBounds();
     }
 
     @Override
