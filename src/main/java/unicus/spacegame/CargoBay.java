@@ -103,6 +103,7 @@ public class CargoBay {
                 break;
             case "Spread":
                 System.out.println("Spreading it all around...");
+                reorderCargoSpread();
                 break;
         }
     }
@@ -111,7 +112,7 @@ public class CargoBay {
         int[] cargoAmounts = CountTotalCargo();
         //remove it all
         for (CargoModule m: cargos) {
-            for (String cargotype: m.CARGO_NAMES) {
+            for (String cargotype: CargoModule.CARGO_NAMES) {
                 m.RemoveCargo(m.contents.get(cargotype), cargotype, true);
             }
         }
@@ -122,7 +123,7 @@ public class CargoBay {
                 int chunk = Math.min(cargoAmounts[i], cargos[j].getSpace());
                 if (chunk == 0) { j++; }
                 else {
-                    cargos[j].AddCargo(chunk, cargos[j].CARGO_NAMES[i], false);
+                    cargos[j].AddCargo(chunk, CargoModule.CARGO_NAMES[i], false);
                     cargoAmounts[i] -= chunk;
                 }
             }
@@ -133,15 +134,15 @@ public class CargoBay {
         int roundUpSum = 0;
         int cm = CargoModule.CARGO_CAPACITY_PER_MODULE;
         //Determine if we have space to sort things separately
-        for (int i=0; i<cargoAmounts.length; i++) {
-            roundUpSum += (cargoAmounts[i]+cm-1)/cm;
+        for (int cargoAmount : cargoAmounts) {
+            roundUpSum += (cargoAmount + cm - 1) / cm;
         }
         if (roundUpSum > cargos.length) {
+            System.out.println("Wasn't space to sort completely separately. Falling back to compact sort.");
             reorderCargoCompactly();
-            System.out.println("Wasn't space to sort completely separately");
         } else {
             for (CargoModule m: cargos) {
-                for (String cargotype : m.CARGO_NAMES) {
+                for (String cargotype : CargoModule.CARGO_NAMES) {
                     m.RemoveCargo(m.contents.get(cargotype), cargotype, true);
                 }
             }
@@ -152,6 +153,31 @@ public class CargoBay {
                         cargoAmounts[i] -= chunk;
                         cargos[j].AddCargo(chunk, CargoModule.CARGO_NAMES[i], false);
                     }
+                }
+            }
+        }
+    }
+    public void reorderCargoSpread() {
+        //first carry out old cargo
+        int[] cargoAmounts = CountTotalCargo();
+        for (CargoModule m: cargos) {
+            for (String cargotype: CargoModule.CARGO_NAMES) {
+                m.RemoveCargo(m.contents.get(cargotype), cargotype, true);
+            }
+        }
+        //then put back in new order
+        int totalCargo = 0;
+        for (int c: cargoAmounts) {totalCargo += c;}
+        int i=0;
+        while (totalCargo > 0) {
+            for (CargoModule unit: cargos) {
+                while (i < cargoAmounts.length && cargoAmounts[i] == 0) {
+                    i++;
+                }
+                if (i < cargoAmounts.length) {
+                    totalCargo -= 1;
+                    cargoAmounts[i] -= 1;
+                    unit.AddCargo(1, CargoModule.CARGO_NAMES[i], true);
                 }
             }
         }
