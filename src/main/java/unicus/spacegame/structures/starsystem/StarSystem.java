@@ -34,22 +34,22 @@ public class StarSystem {
         planets.add(planet);
         return planet;
     }
-    public BasicSpaceObject addPlanet(ObjectType type, ObjectSize size, BasicSpaceObject parent, int orbit, float rot){
-        return addPlanet(new BasicSpaceObject(type, size, parent, orbit, rot));
+    public BasicSpaceObject addPlanet(ObjectType type, ObjectSize size, long seed, BasicSpaceObject parent, int orbit, float rot){
+        return addPlanet(new BasicSpaceObject(type, size, seed, parent, orbit, rot));
     }
     public BasicSpaceObject addLifePlanet(BasicSpaceObject planet) {
         lifePlanets.add(planet);
         return planet;
     }
-    public BasicSpaceObject addLifePlanet(ObjectType type, ObjectSize size, BasicSpaceObject parent, int orbit, float rot){
-        return addLifePlanet(new BasicSpaceObject(type, size, parent, orbit, rot));
+    public BasicSpaceObject addLifePlanet(ObjectType type, ObjectSize size, long seed, BasicSpaceObject parent, int orbit, float rot){
+        return addLifePlanet(new BasicSpaceObject(type, size, seed, parent, orbit, rot));
     }
     public BasicSpaceObject addAsteroid(BasicSpaceObject asteroid) {
         asteroids.add(asteroid);
         return asteroid;
     }
-    public BasicSpaceObject addAsteroid(ObjectType type, ObjectSize size, BasicSpaceObject parent, int orbit, float rot){
-        return addAsteroid(new BasicSpaceObject(type, size, parent, orbit, rot));
+    public BasicSpaceObject addAsteroid(ObjectType type, ObjectSize size, long seed, BasicSpaceObject parent, int orbit, float rot){
+        return addAsteroid(new BasicSpaceObject(type, size, seed, parent, orbit, rot));
     }
 
     public BasicSpaceObject setCenter(BasicSpaceObject centerObject){
@@ -58,8 +58,8 @@ public class StarSystem {
     }
 
 
-    public BasicSpaceObject setCenter(ObjectType type, ObjectSize size){
-        return setCenter(new BasicSpaceObject(type, size));
+    public BasicSpaceObject setCenter(ObjectType type, ObjectSize size, long seed){
+        return setCenter(new BasicSpaceObject(type, size, seed));
     }
 
 
