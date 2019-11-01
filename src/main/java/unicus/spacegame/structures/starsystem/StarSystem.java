@@ -34,13 +34,34 @@ public class StarSystem {
         planets.add(planet);
         return planet;
     }
+    public BasicSpaceObject addPlanet(ObjectType type, ObjectSize size, BasicSpaceObject parent, int orbit, float rot){
+        return addPlanet(new BasicSpaceObject(type, size, parent, orbit, rot));
+    }
     public BasicSpaceObject addLifePlanet(BasicSpaceObject planet) {
         lifePlanets.add(planet);
         return planet;
     }
+    public BasicSpaceObject addLifePlanet(ObjectType type, ObjectSize size, BasicSpaceObject parent, int orbit, float rot){
+        return addLifePlanet(new BasicSpaceObject(type, size, parent, orbit, rot));
+    }
     public BasicSpaceObject addAsteroid(BasicSpaceObject asteroid) {
         asteroids.add(asteroid);
         return asteroid;
-
     }
+    public BasicSpaceObject addAsteroid(ObjectType type, ObjectSize size, BasicSpaceObject parent, int orbit, float rot){
+        return addAsteroid(new BasicSpaceObject(type, size, parent, orbit, rot));
+    }
+
+    public BasicSpaceObject setCenter(BasicSpaceObject centerObject){
+        center = centerObject;
+        return centerObject;
+    }
+
+
+    public BasicSpaceObject setCenter(ObjectType type, ObjectSize size){
+        return setCenter(new BasicSpaceObject(type, size));
+    }
+
+
+
 }

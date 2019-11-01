@@ -12,10 +12,40 @@ import java.util.Random;
  * A Giant planet may be larger than a tiny gas-planet though.
  */
 public enum ObjectSize {
-    none, tiny, small, moderate, large, xlarge, giant;
+    NONE, TINY, SMALL, MODERATE, LARGE, XLARGE, GIANT;
 
-    public static ObjectSize Random(Random r) {
-        ObjectSize[] vals = ObjectSize.values();
-        return vals[r.nextInt(vals.length)];
+//    public static ObjectSize Random(Random r) {
+//        ObjectSize[] vals = ObjectSize.values();
+//        return vals[r.nextInt(vals.length)];
+//    }
+    /**
+     *
+     * @return An objectsize larger than Tiny, and smaller than Giant
+     */
+    private static final ObjectSize[] random1 = {SMALL, MODERATE, LARGE, XLARGE};
+    public static ObjectSize Random1(Random r) {
+        return random1[r.nextInt(random1.length)];
     }
+
+    /**
+     * Get smaller value, greater than NONE
+     * @return
+     */
+    public ObjectSize Smaller() {
+        ObjectSize[] vals = values();
+        return vals[Math.max(1, this.ordinal()-1)];
+    }
+
+    /**
+     * Get larger value, up to GIANT
+     * @return
+     */
+    public ObjectSize Larger() {
+        ObjectSize[] vals = values();
+        return vals[Math.min(vals.length-1, this.ordinal()-1)];
+    }
+
+    //add more specific types of random
+    //prevent none to be picked.
+    //prevent none and tiny to be picked.
 }
