@@ -75,7 +75,7 @@ public class CargoBay {
         }
     }
     private int[] CountTotalCargo() {
-        int[] result = new int[cargos[0].CARGO_TYPECOUNT]; //warning: fails if there is no cargo module
+        int[] result = new int[CargoModule.CARGO_TYPECOUNT];
         for (CargoModule cargo : cargos) {
             int[] temp = cargo.CountLocalCargo();
             for (int i=0; i<result.length; i++) {
