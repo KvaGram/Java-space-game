@@ -1,9 +1,13 @@
 package unicus.spacegame.structures.starsystem;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+
 public class BasicSpaceObject {
     ObjectType type;
     ObjectSize size;
     long renderSeed;
+    ArrayList<BasicSpaceObject> children;
 
     BasicSpaceObject parent;
     int orbitIndex;
@@ -14,6 +18,7 @@ public class BasicSpaceObject {
         this.size = size;
         this.renderSeed = seed;
         //TODO: use seed to generate properties, THEN generate renderSeed.
+        this.children = new ArrayList<>();
 
         parent = this;
         orbitIndex = 0;
@@ -25,10 +30,15 @@ public class BasicSpaceObject {
         this.size = size;
         this.renderSeed = seed;
         //TODO: use seed to generate properties, THEN generate renderSeed.
+        this.children = new ArrayList<>();
 
         this.parent = parent;
         this.orbitIndex = orbit;
         this.orbitRotation = rot;
+
+        //Make sure the parent know this child exist.
+        if(parent != null && parent != this)
+            parent.children.add(this);
     }
 
 
@@ -61,5 +71,14 @@ public class BasicSpaceObject {
 
     public ObjectType getType() {
         return type;
+    }
+
+    public long getRenderSeed(){
+        return renderSeed;
+    }
+
+    public BasicSpaceObject[] getChildren(){
+        children.sort(Comparator.comparingInt(o -> o.orbitIndex));
+        return (BasicSpaceObject[]) children.toArray();
     }
 }
