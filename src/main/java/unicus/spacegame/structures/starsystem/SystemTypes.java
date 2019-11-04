@@ -5,14 +5,14 @@ import java.util.*;
 //NOTE: all uses of BasicSpaceObject are placeholders.
 //They will be replaced by proper types as they are developed.
 
-enum StarSystemTemplates {
+enum SystemTypes {
     /**
      * This is a near clone of the Sol system.
      * Little is left to chance compared to an full recreation.
      */
     solClone{
         @Override
-        public void pass1(StarSystem s, Random r) {
+        public void GeneratePlanets(BaseStarSystem s, Random r) {
             int orbit = 0;
             BasicSpaceObject p;
             BasicSpaceObject c;
@@ -73,7 +73,12 @@ enum StarSystemTemplates {
      */
     solLike {
         @Override
-        public void pass1(StarSystem s, Random r) {
+        public void InitiateData(BaseStarSystem s, Random r) {
+
+        }
+
+        @Override
+        public void GeneratePlanets(BaseStarSystem s, Random r) {
             //The star, each planet and each belt uses one random each.
             Stack<Random> randoms = new Stack<>();
             for(int i = 0; i < 11; i++)
@@ -135,7 +140,8 @@ enum StarSystemTemplates {
         }
     };
 
-    //Pass1 generates the planets
-    public abstract void pass1(StarSystem s, Random r);
+    public abstract void InitiateData(BaseStarSystem s, Random r);
+    public abstract void GeneratePlanets(BaseStarSystem s, Random r);
+
     private static final float TAU = 6.283185307179586f;
 }

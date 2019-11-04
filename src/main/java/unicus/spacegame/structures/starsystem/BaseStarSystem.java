@@ -3,31 +3,73 @@ package unicus.spacegame.structures.starsystem;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class StarSystem {
-    boolean lockGeneration;
-    StarSystemTemplates template;
+/*
+TODO: Change up the StarSystem structure and generation
+Change the former StarSystemTemplates into just a plain enum (SystemTypes).
+Turn class StarSystem into an abstract base class
+Move factory code from the SystemTypes enum to super-classes of BaseStarSystem.
+Consider moving list of planets, asteroids and life-planets to an inner class.
+ */
+
+public abstract class BaseStarSystem {
+    private final String name;
+    boolean generated;
     ArrayList<BasicSpaceObject> planets;
     ArrayList<BasicSpaceObject> asteroids;
     ArrayList<BasicSpaceObject> lifePlanets;
-    BasicSpaceObject center;
+     BasicSpaceObject center;
+
+    private final long systemSeed;
+    protected Random   systemRand;
+
+    public static BaseStarSystem makeSystem(long seed, SystemTypes type) {
+        switch(type) {
+            default:
+                return new SolLikeSystem(seed);
+        }
+    }
 
 
+    /**
+     * Initiates the star system.
+     * @param seed seed value for generating system
+     * @param name name of the star system.
+     */
+    public BaseStarSystem(long seed, String name){
+        //sets the seed, name, random-instance and planet-lists.
+        this.systemSeed = seed;
+        this.name = name;
+        resetRand();
+        clearPlanets();
+    }
+    public String getName() {
+        return name;
+    }
 
 
-    public StarSystem(StarSystemTemplates template){
+    public void resetRand() {
+        systemRand = new Random(systemSeed);
+    }
+    public void clearPlanets() {
+
+        this.planets = new ArrayList<>();
+        this.asteroids = new ArrayList<>();
+        this.lifePlanets = new ArrayList<>();
+        this.center = null;
+        generated = false;
+    }
+    public void generatePlanets() {
+        if(generated)
+            clearPlanets();
+        //random is reset to ensure consistency.
+        resetRand();
         this.planets = new ArrayList<>();
         this.asteroids = new ArrayList<>();
         this.lifePlanets = new ArrayList<>();
 
-        this.template = template;
-        lockGeneration = false;
+        template.GeneratePlanets(this, systemRand);
     }
 
-    public void pass1(){
-        if(lockGeneration)
-            return;
-        template.pass1(this, new Random()); //new random is temporary
-    }
 
 
     public BasicSpaceObject addPlanet(BasicSpaceObject planet) {
