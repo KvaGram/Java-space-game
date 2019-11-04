@@ -45,6 +45,12 @@ public enum ObjectSize {
         return vals[Math.min(vals.length-1, this.ordinal()-1)];
     }
 
+    public boolean smallerThan(ObjectSize other) {
+        return this.ordinal() < other.ordinal();
+    }
+    public boolean largerThen(ObjectSize other) {
+        return this.ordinal() > other.ordinal();
+    }
     //add more specific types of random
     //prevent none to be picked.
     //prevent none and tiny to be picked.
