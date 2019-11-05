@@ -11,9 +11,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import unicus.spacegame.NameGenerator;
 import unicus.spacegame.StarData;
+import unicus.spacegame.utilities.NameGenerator;
+
 import static java.lang.System.out;
+import static unicus.spacegame.utilities.Constants.*;
 
 /**
  * Prototype screen for displaying a star system.
@@ -41,8 +43,6 @@ public class SwingStarSystem extends JLayeredPane implements ActionListener {
     JLabel systemNameText;
 
     String systemName;
-
-    final float TAU = 6.283185307179586f;
 
     public SwingStarSystem(){
         planets = new Base_Planet[0]; //placeholder empty system
@@ -216,13 +216,13 @@ public class SwingStarSystem extends JLayeredPane implements ActionListener {
                lifeCreated++;
            }
            int size = rand.nextInt(20) + 5;
-           float orbitR = rand.nextFloat() * TAU;
+           float orbitR = rand.nextFloat() * TAUf;
            Planet planet = new Planet(type, randomPlanetColor(rand, type), size, orbitD, orbitR, star);
            newPlanetsList.add(planet);
            nextSafeOrbit = orbitD + size + 10;
 
            // - Creating moons
-           float m_orbitR = rand.nextFloat() * TAU;
+           float m_orbitR = rand.nextFloat() * TAUf;
            int m_size = Math.min(rand.nextInt(10) + 2, (int) (size * 0.6));
            int m_orbitD = size + m_size + rand.nextInt(5);
 
@@ -344,7 +344,6 @@ enum PlanetType {
  * By design, only the centerpeice of a system (normally a star) can be created without a parent orbital
  */
 abstract class Base_Planet {
-    final public double TAU = Math.PI * 2;
     Base_Planet parent;
     PlanetType type;
     public Base_Planet(PlanetType type, Base_Planet parent){

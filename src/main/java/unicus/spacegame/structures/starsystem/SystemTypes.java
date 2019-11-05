@@ -2,6 +2,8 @@ package unicus.spacegame.structures.starsystem;
 
 import java.util.*;
 
+import static unicus.spacegame.utilities.Constants.TAUf;
+
 //NOTE: all uses of BasicSpaceObject are placeholders.
 //They will be replaced by proper types as they are developed.
 
@@ -114,7 +116,7 @@ enum SystemTypes {
             orbit++;
             pr = randoms.pop();
             for (int i = 0; i < numAsteroid1; i++) {
-                float rot = pr.nextFloat() * TAU;
+                float rot = pr.nextFloat() * TAUf;
                 s.addAsteroid(ObjectType.asteroid, ObjectSize.Random1(pr).Smaller(), pr.nextLong(), s.center, orbit, rot);
             }
             for(int i = 0; i < numOuter; i++){
@@ -126,7 +128,7 @@ enum SystemTypes {
                     if (pr.nextFloat() > 0.7f) //if this is a moon
                         s.addPlanet(ObjectType.planet, ObjectSize.Random1(pr), pr.nextLong(), p, j+1, 0.0f);
                     else{
-                        float rot = pr.nextFloat() * TAU;
+                        float rot = pr.nextFloat() * TAUf;
                         s.addAsteroid(ObjectType.asteroid, ObjectSize.Random1(pr).Smaller().Smaller(), pr.nextLong(), p, j+1, rot);
                     }
                 }
@@ -134,7 +136,7 @@ enum SystemTypes {
             orbit++;
             pr = randoms.pop();
             for (int i = 0; i < numAsteroid2; i++) {
-                float rot = pr.nextFloat() * TAU;
+                float rot = pr.nextFloat() * TAUf;
                 s.addAsteroid(ObjectType.asteroid, ObjectSize.Random1(pr).Smaller(), pr.nextLong(), s.center, orbit, rot);
             }
         }
@@ -142,6 +144,4 @@ enum SystemTypes {
 
     public abstract void InitiateData(BaseStarSystem s, Random r);
     public abstract void GeneratePlanets(BaseStarSystem s, Random r);
-
-    private static final float TAU = 6.283185307179586f;
 }
