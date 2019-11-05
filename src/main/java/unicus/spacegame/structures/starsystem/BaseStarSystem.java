@@ -45,7 +45,26 @@ public abstract class BaseStarSystem {
         clearPlanets();
     }
     public abstract String getName();
+    public BasicSpaceObject[] getAllObjects() {
+        int size = lifePlanets.size() + planets.size() + asteroids.size() + 1;
 
+        BasicSpaceObject[] result = new BasicSpaceObject[size];
+        result[0] = center;
+        int j = 1;
+        for (BasicSpaceObject obj: lifePlanets) {
+            result[j] = obj;
+            j++;
+        }
+        for (BasicSpaceObject obj: planets) {
+            result[j] = obj;
+            j++;
+        }
+        for (BasicSpaceObject obj: asteroids) {
+            result[j] = obj;
+            j++;
+        }
+        return result;
+    }
 
     public void resetRand() {
         systemRand = new Random(systemSeed);
@@ -102,5 +121,7 @@ public abstract class BaseStarSystem {
     }
 
 
-
+    public BasicSpaceObject getCenter() {
+        return center;
+    }
 }

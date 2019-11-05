@@ -120,7 +120,7 @@ public class BasicSpaceObject {
      * @param orbitIndex The orbit to get distance for.
      * @return A radius of game-units.
      */
-    protected int getOrbitDistance(int orbitIndex) {
+    public int getOrbitDistance(int orbitIndex) {
         //at the index of 0, we are at this object itself.
         if (orbitIndex == 0)
             return generatedLocalSize;

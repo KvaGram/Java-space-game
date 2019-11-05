@@ -5,39 +5,28 @@ import unicus.spacegame.structures.starsystem.BasicSpaceObject;
 import java.awt.*;
 
 public class SpaceObjectView {
-    BasicSpaceObject model;
-    SystemView master;
-    int[] pixelRadiusOrbits;
-    int pixelSize;
-    BasicSpaceObject[] modelChildren;
+    private BasicSpaceObject object;
+    public Rectangle rect;
 
-    public SpaceObjectView(BasicSpaceObject model, SystemView master){
-        this.model = model;
-        this.master = master;
-        update();
-    }
-    public void update()
-    {
-        modelChildren = model.getChildren();
-
-
+    SpaceObjectView(BasicSpaceObject object) {
+        this.object = object;
+        this.rect = new Rectangle();
     }
 
-
-    public void RenderObject(Graphics2D g) {
-
-    }
-    public void RenderOrbit(Graphics2D g) {
-
+    public boolean contains(Point p) {
+        return rect.contains(p);
     }
 
-
-
-    public int getOrbitPixels(){
-        return 0;
+    public void updateRect(float scale, Point offset) {
+        rect.x = (int)((offset.x + object.getGeneratedLocation().x)*scale);
+        rect.y = (int)((offset.y + object.getGeneratedLocation().y)*scale);
+        rect.height = (int) (object.getLocalSize() * scale);
+        rect.width  = (int) (object.getLocalSize() * scale);
     }
-    public  int getSizePixels(){
-        return 0;
+    public void paintObject(Graphics2D g) {
+
+        g.setColor(Color.yellow);
+        g.drawOval(rect.x, rect.y, rect.width, rect.height);
     }
 
 }
