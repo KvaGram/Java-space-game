@@ -16,14 +16,11 @@ public class SolLikeSystem extends BaseStarSystem {
     private int numOuter;
     private int numAsteroid2;
 
-    private String starName;
+    protected String starName;
 
     public SolLikeSystem(long seed) {
         super(seed);
-        starName = NameGenerator.makeWord("CVC", seed);
-
-
-
+        starName = NameGenerator.makeWord("CVVC", seed);
         numInner = 2 + systemRand.nextInt(3);
         lifePlanet = systemRand.nextInt(numInner);
         numAsteroid1 = 20 + systemRand.nextInt(50);
