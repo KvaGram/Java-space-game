@@ -83,6 +83,8 @@ public abstract class BaseStarSystem {
             clearPlanets();
         resetRand();
         generatePlanetsInternal();
+        generated = true;
+        center.update();
     }
     protected abstract void generatePlanetsInternal();
 
@@ -123,5 +125,9 @@ public abstract class BaseStarSystem {
 
     public BasicSpaceObject getCenter() {
         return center;
+    }
+
+    public boolean isGenerated() {
+        return generated;
     }
 }
