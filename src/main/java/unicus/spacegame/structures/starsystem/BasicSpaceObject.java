@@ -12,10 +12,10 @@ public class BasicSpaceObject {
     ObjectSize size;
 
     //generated values, set in update internal
-    int generatedLocalSize;
-    int generatedFullSize;
-    Point generatedLocation;
-    int orbitDistance;
+    protected int generatedLocalSize;
+    protected int generatedFullSize;
+    protected Point generatedLocation;
+    protected int orbitDistance;
 
     Point offset;
     long planetSeed;
@@ -155,57 +155,6 @@ public class BasicSpaceObject {
     }
 
 
-    /**
-     * Generates the orbit-distance of each object orbiting this object.
-     * @param orbitIndex The orbit to get distance for.
-     * @return A radius of game-units.
-     */
-    public int getChildOrbitDistance(int orbitIndex) {
-
-        //at the index of 0, we are at this object itself.
-        if (orbitIndex == 0)
-            return 0;
-
-
-
-
-
-        //There could be more than one object that share the orbit.
-        //The orbit distance is based on the largest one.
-        BasicSpaceObject prevLargest = getLargestChildByOrbit(orbitIndex - 1);
-
-        BasicSpaceObject thisLargest = getLargestChildByOrbit(orbitIndex);
-        //return the full size of the largest object in the orbit, plus 20% as safe space
-        //added to the distance of the previous orbit index (recursively towards index 0).
-
-        int extraSpace = 0;
-        if(prevLargest != null ){
-        }
-
-        return (int)(thisLargest.generatedFullSize * 3) + getChildOrbitDistance(orbitIndex -1);
-
-
-    }
-
-    /**
-     *
-     * @param orbitIndex
-     * @return The chile with largest full size in given orbit.
-     */
-    public BasicSpaceObject getLargestChildByOrbit(int orbitIndex) {
-        ArrayList<BasicSpaceObject> children = getChildrenInOrbit(orbitIndex);
-        if(children.isEmpty())
-            return null;
-        BasicSpaceObject largest = children.get(0);
-        for(int i = 1; i < children.size(); i++) {
-            BasicSpaceObject other = children.get(i);
-            if(other.generatedFullSize > largest.generatedFullSize)
-                largest = other;
-        }
-        return largest;
-    }
-
-
     public boolean addChild(BasicSpaceObject child)
     {
         return children.add(child);
@@ -214,18 +163,6 @@ public class BasicSpaceObject {
     {
         return children.remove(child);
     }
-    public ArrayList<BasicSpaceObject> getChildrenInOrbit(int orbitIndex){
-        return children.stream().filter(c -> c.orbitIndex == orbitIndex).collect(Collectors.toCollection(ArrayList::new));
-    }
-    public int getHighestOrbit() {
-        int result = 0;
-        for(BasicSpaceObject c : children)
-            result = Math.max(result, c.orbitIndex);
-        return result;
-    }
-
-
-
 
     public String getTooltip(){
         String str = "Basic space object\n for development only!\n type " + type.name() + "\nsize " + size.name();
@@ -261,12 +198,6 @@ public class BasicSpaceObject {
     public long getPlanetSeed(){
         return planetSeed;
     }
-
-    public BasicSpaceObject[] getChildren(){
-        children.sort(Comparator.comparingInt(o -> o.orbitIndex));
-        return children.toArray(new BasicSpaceObject[children.size()]);
-    }
-
 
     /**
      * Get the world-unit radius size of this object.
