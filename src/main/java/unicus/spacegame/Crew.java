@@ -15,21 +15,31 @@ public class Crew {
         frame.setSize(800, 400);
         JTextArea j_text = new JTextArea("Example of Crew overview. \n");
         JPanel j_buttonpanel = new JPanel();
+        //Create crew for testing
+        ArrayList<Crewman> crewmen = new ArrayList<Crewman>();
+        Crewman John = new Crewman("John Smith");
+        crewmen.add(new Crewman("Ole Nordmann"));
+
         //Buttons
         JButton b_recruit = new JButton("Recruit");
         j_buttonpanel.add(b_recruit);
-        b_recruit.addActionListener(arg0 -> j_text.append("Crewman recruited. Placeholder.\n"));
+        b_recruit.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                j_text.append("New crew.\n");
+                crewmen.add(new Crewman());
+            }
+        });
+
         JButton b_train = new JButton("Train");
         j_buttonpanel.add(b_train);
         b_train.addActionListener(arg0 -> j_text.append("Crewman trained. Placeholder.\n"));
         JButton b_inspect = new JButton("Inspect");
         j_buttonpanel.add(b_inspect);
-        b_inspect.addActionListener(arg0 -> j_text.append("Crew data: Placeholder.\n"));
+        b_inspect.addActionListener(arg0 -> {
+            j_text.append("Crew data: Placeholder.\n");
+            System.out.print(crewmen);
+        });
 
-        //Create crew for testing
-        ArrayList<Crewman> crewmen = new ArrayList<Crewman>();
-        Crewman John = new Crewman("John Smith");
-        crewmen.add(new Crewman("Ole Nordmann"));
 
         //final visibility arrangement
         frame.getContentPane().add(BorderLayout.SOUTH, j_buttonpanel);
