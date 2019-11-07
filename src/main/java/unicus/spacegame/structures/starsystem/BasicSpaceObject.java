@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class BasicSpaceObject {
@@ -17,7 +18,7 @@ public class BasicSpaceObject {
     int orbitDistance;
 
     Point offset;
-    long renderSeed;
+    long planetSeed;
     ArrayList<BasicSpaceObject> children;
 
     BasicSpaceObject parent;
@@ -28,7 +29,7 @@ public class BasicSpaceObject {
     public BasicSpaceObject(ObjectType type, ObjectSize size, long seed) {
         this.type = type;
         this.size = size;
-        this.renderSeed = seed;
+        this.planetSeed = seed;
         //TODO: use seed to generate properties, THEN generate renderSeed.
         this.children = new ArrayList<>();
 
@@ -45,7 +46,7 @@ public class BasicSpaceObject {
     public BasicSpaceObject(ObjectType type, ObjectSize size, long seed, BasicSpaceObject parent, int orbit, float rot) {
         this.type = type;
         this.size = size;
-        this.renderSeed = seed;
+        this.planetSeed = seed;
         //TODO: use seed to generate properties, THEN generate renderSeed.
         this.children = new ArrayList<>();
 
@@ -74,6 +75,7 @@ public class BasicSpaceObject {
     public Point getParentLocation(){
         return parent.getGeneratedLocation();
     }
+    public int getOrbitDistance() { return orbitDistance; }
 
     public Boolean isRoot() {
         return (parent == this || parent == null);
@@ -88,20 +90,61 @@ public class BasicSpaceObject {
             updateInternal();
     }
     protected void updateInternal() {
+        Random r = new Random(planetSeed);
         //Local size is fetched using getLocalSize.
         //In this base class, getLocalSize is a 2D lookup-table on ObjectType and ObjectSize.
         generatedLocalSize = getLocalSize();
 
-        if(isRoot()) {
-            //If this object is a root, then the location equals the offset.
-            //The offset is normally 0,0.
-            generatedLocation = offset;
-        }
+        //If this object has no children, then the full size equals the local size.
+        if(children.isEmpty())
+            generatedFullSize = generatedLocalSize;
         else {
-            //If the object is not a root, then the location is based on the
-            //orbital distance to its parent, and its current rotation around it.
-            //Relative to the parent location.
+            for (BasicSpaceObject c : children) {
+                c.updateInternal();
+            }
+            /**
+             * Sort child objects first by orbit index (closest to furthest)
+             * then sort by generated full size (largest to smallest)
+             */
+            Comparator<BasicSpaceObject> childsorter = Comparator.comparingInt(o -> o.orbitIndex);
+            childsorter.thenComparingInt(o -> o.generatedFullSize).reversed();
+            children.sort(childsorter);
 
+            int highest = children.get(children.size() - 1).orbitIndex;
+
+
+            generatedFullSize = (int)(generatedLocalSize * 1.2);
+
+            BasicSpaceObject prevChild = null;
+            BasicSpaceObject currentChild;
+
+            int currentOrbit = 0;
+            int orbitD = 0;
+            for (int i = 0; i < children.size(); i++) {
+                currentChild = children.get(i);
+                //In the case of co-orbiting objects, set the co-orbiting object's orbit distance to be the same.
+                //Since the list of children are sorted by size, any co-orbiting object(s) is of same size or smaller,
+                //So the orbit distance does not need to be re-adjusted.
+                if(prevChild != null && (prevChild.orbitIndex == currentChild.orbitIndex)) {
+                    currentChild.orbitDistance = orbitD;
+                    prevChild = currentChild;
+                    continue;
+                }
+                //The child orbit distance is the current full size of parent object, plus a random distance based on the size of the child object
+                orbitD = generatedFullSize + r.nextInt(currentChild.generatedFullSize/3);
+                currentChild.orbitDistance = orbitD;
+                //The generated full size is set to the current child's orbit distance plus size
+                generatedFullSize = orbitD + currentChild.generatedFullSize;
+                prevChild = currentChild;
+            }
+        }
+        //Set the world location of the object
+        if(isRoot()) {
+            //For the root object, the location is just the offset (typically not set, thus (0,0)).
+            generatedLocation = offset;
+        } else {
+            //For a child object, the location is a cos/sin on the orbit rotation multiplied by orbit distance,
+            //added to the parent location.
             int x = parent.generatedLocation.x;
             int y = parent.generatedLocation.y;
             x += (int)(Math.cos(orbitRotation) * orbitDistance );
@@ -109,54 +152,8 @@ public class BasicSpaceObject {
             generatedLocation.x = x;
             generatedLocation.y = y;
         }
-        //In order to generate the full size,
-        //the full size of the child objects needs to be generated first.
-        //So this is where this function is called for the children
-
-
-        if (children.size() == 0) {
-            //If the object has no children, then full size equals local size.
-            generatedFullSize = generatedLocalSize;
-        }
-        else {
-            /***
-             * TODO: FIX ORBIT DISTANCE SYSTEM!!!
-             * The problem lies in finding the appropriate distance between objects, when the size is not yet known.
-             * I think I need to have the full size of the previous orbit objects, the current and the next in order
-             * to make a proper calculation.
-             *
-             * This conflicts with the function that sets location, as it requires orbit distance.
-             * I think a rather large change in the logic and structure are needed.
-             *
-             */
-
-
-            //The object has children.
-            //Make sure the children are sorted by orbit index.
-            children.sort(Comparator.comparingInt(o -> o.orbitIndex));
-            //Calculate the distance between each orbit.
-            int highestOrbit = getHighestOrbit();
-            int currentOrbitDistance = (int) (generatedLocalSize * 1.5);
-            for (int i = 1; i <= highestOrbit; i++) {
-
-                ArrayList<BasicSpaceObject> cInOrbit = getChildrenInOrbit(i);
-                Collections.max(cInOrbit, Comparator.comparingInt(c -> c.generatedLocalSize));
-                getLargestChildByOrbit(i);
-            }
-
-
-            //The object has children.
-            //The full size of the children must be calculated first.
-            //So, the child objects are updated here.
-            for(BasicSpaceObject c : children)
-                c.updateInternal();
-
-            //gets the largest child of the highest orbit.
-            BasicSpaceObject topChild = getLargestChildByOrbit(getHighestOrbit());
-            //the full size of this object is the local size, plus the top child's full size plus the distance between.
-            generatedFullSize = generatedLocalSize + topChild.generatedFullSize + getChildOrbitDistance(topChild.orbitIndex);
-        }
     }
+
 
     /**
      * Generates the orbit-distance of each object orbiting this object.
@@ -164,30 +161,30 @@ public class BasicSpaceObject {
      * @return A radius of game-units.
      */
     public int getChildOrbitDistance(int orbitIndex) {
-        return 1000 * orbitIndex;
 
-//        //at the index of 0, we are at this object itself.
-//        if (orbitIndex == 0)
-//            return generatedLocalSize;
-//        //There could be more than one object that share the orbit.
-//        //The orbit distance is based on the largest one.
-//        BasicSpaceObject prevLargest = getLargestChildByOrbit(orbitIndex - 1);
-//
-//        BasicSpaceObject thisLargest = getLargestChildByOrbit(orbitIndex);
-//        //return the full size of the largest object in the orbit, plus 20% as safe space
-//        //added to the distance of the previous orbit index (recursively towards index 0).
-//
-//        int extraSpace = 0;
-//        if(prevLargest != null ){
-//        }
-//
-//        return (int)(thisLargest.generatedFullSize * 3) + getChildOrbitDistance(orbitIndex -1);
-//
+        //at the index of 0, we are at this object itself.
+        if (orbitIndex == 0)
+            return 0;
 
-    }
-    public int getOrbitDistance()
-    {
-        return orbitDistance;
+
+
+
+
+        //There could be more than one object that share the orbit.
+        //The orbit distance is based on the largest one.
+        BasicSpaceObject prevLargest = getLargestChildByOrbit(orbitIndex - 1);
+
+        BasicSpaceObject thisLargest = getLargestChildByOrbit(orbitIndex);
+        //return the full size of the largest object in the orbit, plus 20% as safe space
+        //added to the distance of the previous orbit index (recursively towards index 0).
+
+        int extraSpace = 0;
+        if(prevLargest != null ){
+        }
+
+        return (int)(thisLargest.generatedFullSize * 3) + getChildOrbitDistance(orbitIndex -1);
+
+
     }
 
     /**
@@ -261,8 +258,8 @@ public class BasicSpaceObject {
         return type;
     }
 
-    public long getRenderSeed(){
-        return renderSeed;
+    public long getPlanetSeed(){
+        return planetSeed;
     }
 
     public BasicSpaceObject[] getChildren(){
