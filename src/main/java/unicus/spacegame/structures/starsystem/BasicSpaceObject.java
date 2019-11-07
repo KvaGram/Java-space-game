@@ -2,10 +2,8 @@ package unicus.spacegame.structures.starsystem;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 public class BasicSpaceObject {
     ObjectType type;
@@ -166,7 +164,7 @@ public class BasicSpaceObject {
 
     public String getTooltip(){
         String str = "Basic space object\n for development only!\n type " + type.name() + "\nsize " + size.name();
-        if(isRoot() || parent.type == ObjectType.none){
+        if(isRoot() || parent.type == ObjectType.NONE){
             str += "\nIt is not orbiting anything.";
         } else {
             str += "\nIt is orbiting a  " + parent.type + ".";
@@ -205,40 +203,40 @@ public class BasicSpaceObject {
      */
     public int getLocalSize() {
         switch (type) {
-            case star:
+            case STAR:
                 if (size.smallerThan(ObjectSize.MODERATE))
                     return 250;
                 else if (size.smallerThan(ObjectSize.XLARGE))
                     return 300;
                 else
                     return 500;
-            case gasPlanet:
+            case GAS_PLANET:
                 if (size.smallerThan(ObjectSize.MODERATE))
                     return 100;
                 else if (size.smallerThan(ObjectSize.XLARGE))
                     return 200;
                 else
                     return 300;
-            case lifePlanet:
-            case planet:
+            case LIFE_PLANET:
+            case PLANET:
                 if (size.smallerThan(ObjectSize.MODERATE))
                     return 40;
                 else if (size.smallerThan(ObjectSize.XLARGE))
                     return 100;
                 else
                     return 150;
-            case asteroid:
+            case ASTEROID:
                 if (size.smallerThan(ObjectSize.MODERATE))
                     return 10;
                 else if (size.smallerThan(ObjectSize.XLARGE))
                     return 30;
                 else
                     return 50;
-            case spaceStation:
-            case satellite:
-            case debris:
+            case SPACE_STATION:
+            case SATELLITE:
+            case DEBRIS:
                 return 10;
-            case none:
+            case NONE:
             default:
                 return 0;
         }

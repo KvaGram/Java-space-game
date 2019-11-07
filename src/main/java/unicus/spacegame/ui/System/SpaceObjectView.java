@@ -1,7 +1,6 @@
 package unicus.spacegame.ui.System;
 
 import unicus.spacegame.structures.starsystem.BasicSpaceObject;
-import unicus.spacegame.structures.starsystem.ObjectType;
 
 import java.awt.*;
 
@@ -20,11 +19,11 @@ public class SpaceObjectView {
         location = new Point();
         pLocation = new Point();
         switch(object.getType()){
-            case lifePlanet:
+            case LIFE_PLANET:
                 orbitColor = new Color(0,70,0);
                 planetTint = new Color(0,170,0);
                 break;
-            case asteroid:
+            case ASTEROID:
                 orbitColor = new Color(0,0,200);
                 planetTint = new Color(50, 50,200);
 

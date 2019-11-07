@@ -41,50 +41,50 @@ public class SolCloneSystem extends BaseStarSystem {
         BasicSpaceObject p;
         BasicSpaceObject c;
         //Sol
-        c = setCenter(ObjectType.star, ObjectSize.SMALL, r.nextLong());
+        c = setCenter(ObjectType.STAR, ObjectSize.SMALL, r.nextLong());
         orbit = 1;
         //Mercury
-        p = addPlanet(ObjectType.planet, ObjectSize.SMALL, r.nextLong(), c, orbit, 0.0f);
+        p = addPlanet(ObjectType.PLANET, ObjectSize.SMALL, r.nextLong(), c, orbit, 0.0f);
         orbit = 2;
         //Venus
-        p = addPlanet(ObjectType.planet, ObjectSize.MODERATE, r.nextLong(), c, orbit, 0.0f);
+        p = addPlanet(ObjectType.PLANET, ObjectSize.MODERATE, r.nextLong(), c, orbit, 0.0f);
         orbit = 3;
         //Earth
-        p = addLifePlanet(ObjectType.lifePlanet, ObjectSize.MODERATE, r.nextLong(), c, orbit, 0.0f);
+        p = addLifePlanet(ObjectType.LIFE_PLANET, ObjectSize.MODERATE, r.nextLong(), c, orbit, 0.0f);
         orbit = 4;
         //Mars
-        p = addPlanet(ObjectType.planet, ObjectSize.SMALL, r.nextLong(), c, orbit, 0.0f);
+        p = addPlanet(ObjectType.PLANET, ObjectSize.SMALL, r.nextLong(), c, orbit, 0.0f);
         orbit = 5;
         //The Asteroid Belt
         for(int a=0; a < 30; a++){
             float rot = r.nextFloat() *  TAUf;
-            addAsteroid(ObjectType.asteroid, ObjectSize.Random1(r), r.nextLong(), p, orbit, rot);
+            addAsteroid(ObjectType.ASTEROID, ObjectSize.Random1(r), r.nextLong(), p, orbit, rot);
         }
         orbit = 6;
         //Jupiter
-        p = addPlanet(ObjectType.gasPlanet, ObjectSize.LARGE, r.nextLong(), c, orbit, 0.0f);
+        p = addPlanet(ObjectType.GAS_PLANET, ObjectSize.LARGE, r.nextLong(), c, orbit, 0.0f);
         orbit = 7;
         //Saturn
-        p = addPlanet(ObjectType.gasPlanet, ObjectSize.LARGE, r.nextLong(), c, orbit, 0.0f);
+        p = addPlanet(ObjectType.GAS_PLANET, ObjectSize.LARGE, r.nextLong(), c, orbit, 0.0f);
         for(int b=1; b <= 2; b++){ //Saturn is given two rings
             for(int a=0; a < 30; a++){
                 float rot = r.nextFloat() *  TAUf;
-                addAsteroid(ObjectType.asteroid, ObjectSize.SMALL, r.nextLong(), c, b, rot);
+                addAsteroid(ObjectType.ASTEROID, ObjectSize.SMALL, r.nextLong(), c, b, rot);
             }
         }
         orbit = 8;
         //Uranus
-        p = addPlanet(ObjectType.gasPlanet, ObjectSize.SMALL, r.nextLong(), c, orbit, 0.0f);
+        p = addPlanet(ObjectType.GAS_PLANET, ObjectSize.SMALL, r.nextLong(), c, orbit, 0.0f);
 
         orbit = 9;
         //Neptune
-        p = addPlanet(ObjectType.gasPlanet, ObjectSize.SMALL, r.nextLong(), c, orbit, 0.0f);
+        p = addPlanet(ObjectType.GAS_PLANET, ObjectSize.SMALL, r.nextLong(), c, orbit, 0.0f);
 
         orbit = 10;
         //oort
         for(int a=0; a < 40; a++){
             float rot = r.nextFloat() *  TAUf;
-            addAsteroid(ObjectType.asteroid, ObjectSize.Random1(r), r.nextLong(), c, orbit, rot);
+            addAsteroid(ObjectType.ASTEROID, ObjectSize.Random1(r), r.nextLong(), c, orbit, rot);
         }
     }
 }

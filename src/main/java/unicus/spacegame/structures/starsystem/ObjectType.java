@@ -5,5 +5,5 @@ package unicus.spacegame.structures.starsystem;
  * Used with ObjectSize to determine how the object is rendered.
  */
 public enum ObjectType {
-    none, debris, satellite, spaceStation, asteroid, planet, lifePlanet, gasPlanet, star
+    NONE, DEBRIS, SATELLITE, SPACE_STATION, ASTEROID, PLANET, LIFE_PLANET, GAS_PLANET, STAR
 }
