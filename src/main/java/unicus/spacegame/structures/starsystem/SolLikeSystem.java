@@ -11,9 +11,9 @@ import static unicus.spacegame.utilities.Constants.TAUf;
 public class SolLikeSystem extends BaseStarSystem {
     private int numInner;
     private int lifePlanet;
-    private int numAsteroid1;
+    //private int numAsteroid1;
     private int numOuter;
-    private int numAsteroid2;
+    //private int numAsteroid2;
 
     protected String starName;
 
@@ -22,9 +22,9 @@ public class SolLikeSystem extends BaseStarSystem {
         starName = NameGenerator.makeWord("CVVC", seed);
         numInner = 2 + systemRand.nextInt(3);
         lifePlanet = systemRand.nextInt(numInner);
-        numAsteroid1 = 20 + systemRand.nextInt(50);
+        //numAsteroid1 = 20 + systemRand.nextInt(50);
         numOuter = 1 + systemRand.nextInt(4);
-        numAsteroid2 = 10 + systemRand.nextInt(40);
+        //numAsteroid2 = 10 + systemRand.nextInt(40);
 
         for (int i = 0; i < lifePlanet; i++)
             lifeData.add(new LifeData(systemRand.nextLong()));
@@ -77,11 +77,8 @@ public class SolLikeSystem extends BaseStarSystem {
         }
         orbit++;
         pr = randoms.pop();
-        System.out.println("Making " + numAsteroid1 + " asteroids");
-        for (int i = 0; i < numAsteroid1; i++) {
-            float rot = pr.nextFloat() * TAUf;
-            addAsteroid(ObjectType.ASTEROID, ObjectSize.Random1(pr).Smaller(), pr.nextLong(), center, orbit, rot);
-        }
+        System.out.println("Making asteroid belt");
+        addJunkField(JunkFieldShape.BELT, new JunkContents[]{JunkContents.ASTEROIDS}, pr.nextLong(), TAUf, ObjectSize.LARGE, c, orbit, 0);
         for(int i = 0; i < numOuter; i++){
             orbit++;
             pr = randoms.pop();
@@ -95,21 +92,15 @@ public class SolLikeSystem extends BaseStarSystem {
                 }
                 else {
                     int numAsteroids = pr.nextInt(10);
-                    System.out.println("Making " + numAsteroids + " asteroids");
-                    for (int k = 0; k < numAsteroids; k++) {
-                        float rot = pr.nextFloat() * TAUf;
-                        addAsteroid(ObjectType.ASTEROID, ObjectSize.Random1(pr).Smaller().Smaller(), pr.nextLong(), p, j+1, rot);
-                    }
+                    System.out.println("Making asteroid ring system");
+                    addJunkField(JunkFieldShape.BELT, new JunkContents[]{JunkContents.ASTEROIDS}, pr.nextLong(), TAUf, ObjectSize.SMALL, p, j, 0);
                 }
             }
         }
         orbit++;
         pr = randoms.pop();
-        System.out.println("Making " + numAsteroid2 + " asteroids");
-        for (int i = 0; i < numAsteroid2; i++) {
-            float rot = pr.nextFloat() * TAUf;
-            addAsteroid(ObjectType.ASTEROID, ObjectSize.Random1(pr).Smaller(), pr.nextLong(), center, orbit, rot);
-        }
+        System.out.println("Making asteroid belt");
+        addJunkField(JunkFieldShape.BELT, new JunkContents[]{JunkContents.ASTEROIDS}, pr.nextLong(), TAUf, ObjectSize.LARGE, c, orbit, 0);
 
 
 

@@ -16,7 +16,7 @@ Consider moving list of planets, asteroids and life-planets to an inner class.
 public abstract class BaseStarSystem {
     boolean generated;
     ArrayList<BasicSpaceObject> planets;
-    ArrayList<BasicSpaceObject> asteroids;
+    ArrayList<SpaceJunkField> junkFields;
     ArrayList<BasicSpaceObject> lifePlanets;
     BasicSpaceObject center;
 
@@ -46,7 +46,7 @@ public abstract class BaseStarSystem {
     }
     public abstract String getName();
     public BasicSpaceObject[] getAllObjects() {
-        int size = lifePlanets.size() + planets.size() + asteroids.size() + 1;
+        int size = lifePlanets.size() + planets.size() + junkFields.size() + 1;
 
         BasicSpaceObject[] result = new BasicSpaceObject[size];
         result[0] = center;
@@ -59,7 +59,7 @@ public abstract class BaseStarSystem {
             result[j] = obj;
             j++;
         }
-        for (BasicSpaceObject obj: asteroids) {
+        for (BasicSpaceObject obj: junkFields) {
             result[j] = obj;
             j++;
         }
@@ -71,7 +71,7 @@ public abstract class BaseStarSystem {
     }
     public void clearPlanets() {
         this.planets = new ArrayList<>();
-        this.asteroids = new ArrayList<>();
+        this.junkFields = new ArrayList<>();
         this.lifePlanets = new ArrayList<>();
         this.center = null;
         generated = false;
@@ -104,12 +104,12 @@ public abstract class BaseStarSystem {
     protected BasicSpaceObject addLifePlanet(ObjectType type, ObjectSize size, long seed, BasicSpaceObject parent, int orbit, float rot){
         return addLifePlanet(new BasicSpaceObject(type, size, seed, parent, orbit, rot));
     }
-    protected BasicSpaceObject addAsteroid(BasicSpaceObject asteroid) {
-        asteroids.add(asteroid);
-        return asteroid;
+    protected BasicSpaceObject addJunkField(SpaceJunkField junkField) {
+        junkFields.add(junkField);
+        return junkField;
     }
-    protected BasicSpaceObject addAsteroid(ObjectType type, ObjectSize size, long seed, BasicSpaceObject parent, int orbit, float rot){
-        return addAsteroid(new BasicSpaceObject(type, size, seed, parent, orbit, rot));
+    protected BasicSpaceObject addJunkField(JunkFieldShape shape, JunkContents[] contents, long seed, float radianLength, ObjectSize size, BasicSpaceObject parent, int orbit, float rot){
+        return addJunkField(new SpaceJunkField(shape, contents, seed, radianLength, size, parent, orbit, rot));
     }
 
     protected BasicSpaceObject setCenter(BasicSpaceObject centerObject){

@@ -37,6 +37,7 @@ public class SolCloneSystem extends BaseStarSystem {
     protected void generatePlanetsInternal() {
         //r is shorthand for systemRand.
         Random r = systemRand;
+        float rot = 0; //current rotation
         int orbit = 0;
         BasicSpaceObject p;
         BasicSpaceObject c;
@@ -44,47 +45,52 @@ public class SolCloneSystem extends BaseStarSystem {
         c = setCenter(ObjectType.STAR, ObjectSize.SMALL, r.nextLong());
         orbit = 1;
         //Mercury
-        p = addPlanet(ObjectType.PLANET, ObjectSize.SMALL, r.nextLong(), c, orbit, 0.0f);
+        rot = r.nextFloat() * TAUf;
+        p = addPlanet(ObjectType.PLANET, ObjectSize.SMALL, r.nextLong(), c, orbit, rot);
         orbit = 2;
         //Venus
-        p = addPlanet(ObjectType.PLANET, ObjectSize.MODERATE, r.nextLong(), c, orbit, 0.0f);
+        rot = r.nextFloat() * TAUf;
+        p = addPlanet(ObjectType.PLANET, ObjectSize.MODERATE, r.nextLong(), c, orbit, rot);
         orbit = 3;
         //Earth
-        p = addLifePlanet(ObjectType.LIFE_PLANET, ObjectSize.MODERATE, r.nextLong(), c, orbit, 0.0f);
+        rot = r.nextFloat() * TAUf;
+        p = addLifePlanet(ObjectType.LIFE_PLANET, ObjectSize.MODERATE, r.nextLong(), c, orbit, rot);
         orbit = 4;
         //Mars
-        p = addPlanet(ObjectType.PLANET, ObjectSize.SMALL, r.nextLong(), c, orbit, 0.0f);
+        rot = r.nextFloat() * TAUf;
+        p = addPlanet(ObjectType.PLANET, ObjectSize.SMALL, r.nextLong(), c, orbit, rot);
         orbit = 5;
         //The Asteroid Belt
-        for(int a=0; a < 30; a++){
-            float rot = r.nextFloat() *  TAUf;
-            addAsteroid(ObjectType.ASTEROID, ObjectSize.Random1(r), r.nextLong(), p, orbit, rot);
-        }
+        addJunkField(JunkFieldShape.BELT, new JunkContents[]{JunkContents.ASTEROIDS}, r.nextLong(), TAUf, ObjectSize.LARGE, c, orbit, 0);
         orbit = 6;
         //Jupiter
-        p = addPlanet(ObjectType.GAS_PLANET, ObjectSize.LARGE, r.nextLong(), c, orbit, 0.0f);
+        rot = r.nextFloat() * TAUf;
+        p = addPlanet(ObjectType.GAS_PLANET, ObjectSize.LARGE, r.nextLong(), c, orbit, rot);
+        //Trojans, Hilda, Greeks asteroid fields
+        for (int i = 0; i < 3; i++) {
+            rot += 0.25f * TAUf;
+            if (rot > TAUf)
+                rot -= TAUf;
+            addJunkField(JunkFieldShape.CLUSTER, new JunkContents[]{JunkContents.ASTEROIDS}, r.nextLong(), TAUf, ObjectSize.MODERATE, p, orbit, 0);
+        }
         orbit = 7;
         //Saturn
-        p = addPlanet(ObjectType.GAS_PLANET, ObjectSize.LARGE, r.nextLong(), c, orbit, 0.0f);
-        for(int b=1; b <= 2; b++){ //Saturn is given two rings
-            for(int a=0; a < 30; a++){
-                float rot = r.nextFloat() *  TAUf;
-                addAsteroid(ObjectType.ASTEROID, ObjectSize.SMALL, r.nextLong(), c, b, rot);
-            }
+        p = addPlanet(ObjectType.GAS_PLANET, ObjectSize.LARGE, r.nextLong(), c, orbit, rot);
+        for(int i=1; i <= 2; i++){ //Saturn is given two rings
+            addJunkField(JunkFieldShape.BELT, new JunkContents[]{JunkContents.ASTEROIDS}, r.nextLong(), TAUf, ObjectSize.SMALL, p, i, 0);
         }
         orbit = 8;
         //Uranus
-        p = addPlanet(ObjectType.GAS_PLANET, ObjectSize.SMALL, r.nextLong(), c, orbit, 0.0f);
+        rot = r.nextFloat() * TAUf;
+        p = addPlanet(ObjectType.GAS_PLANET, ObjectSize.SMALL, r.nextLong(), c, orbit, rot);
 
         orbit = 9;
         //Neptune
-        p = addPlanet(ObjectType.GAS_PLANET, ObjectSize.SMALL, r.nextLong(), c, orbit, 0.0f);
+        rot = r.nextFloat() * TAUf;
+        p = addPlanet(ObjectType.GAS_PLANET, ObjectSize.SMALL, r.nextLong(), c, orbit, rot);
 
         orbit = 10;
         //oort
-        for(int a=0; a < 40; a++){
-            float rot = r.nextFloat() *  TAUf;
-            addAsteroid(ObjectType.ASTEROID, ObjectSize.Random1(r), r.nextLong(), c, orbit, rot);
-        }
+        addJunkField(JunkFieldShape.BELT, new JunkContents[]{JunkContents.ASTEROIDS}, r.nextLong(), TAUf, ObjectSize.SMALL, c, orbit, 0);
     }
 }
