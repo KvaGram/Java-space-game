@@ -23,11 +23,9 @@ public class Crew {
         //Buttons
         JButton b_recruit = new JButton("Recruit");
         j_buttonpanel.add(b_recruit);
-        b_recruit.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                j_text.append("New crew.\n");
-                crewmen.add(new Crewman());
-            }
+        b_recruit.addActionListener(arg0 -> {
+            j_text.append("Got new crewman.\n");
+            crewmen.add(new Crewman());
         });
 
         JButton b_train = new JButton("Train");
@@ -36,8 +34,11 @@ public class Crew {
         JButton b_inspect = new JButton("Inspect");
         j_buttonpanel.add(b_inspect);
         b_inspect.addActionListener(arg0 -> {
-            j_text.append("Crew data: Placeholder.\n");
-            System.out.print(crewmen);
+            j_text.append("Crew data: barebones.\n");
+            for (Crewman N: crewmen ) {
+                j_text.append(N.name+", age "+N.age+". ");
+            }
+            j_text.append("\n");
         });
 
 
@@ -93,6 +94,9 @@ class Crewman {
     public void ageUp() {
         this.age += 1;
     }
+    public void ageUp(double amount) {
+        this.age += amount;
+    }
     public void changeStress(int amount) {
         this.stress += amount;
     }
@@ -107,6 +111,6 @@ class Crewman {
             case "research":
                 this.trainResearch();
                 break;
-        }
+        } //cases are an ugly approach.
     }
 }
