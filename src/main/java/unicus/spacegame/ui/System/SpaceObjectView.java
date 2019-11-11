@@ -23,7 +23,7 @@ public class SpaceObjectView {
                 orbitColor = new Color(0,70,0);
                 planetTint = new Color(0,170,0);
                 break;
-            case ASTEROID:
+            case JUNK_FIELD:
                 orbitColor = new Color(0,0,200);
                 planetTint = new Color(50, 50,200);
 

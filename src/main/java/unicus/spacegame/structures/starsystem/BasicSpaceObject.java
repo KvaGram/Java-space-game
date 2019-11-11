@@ -225,7 +225,27 @@ public class BasicSpaceObject {
                     return 100;
                 else
                     return 150;
-            case ASTEROID:
+            case JUNK_FIELD:
+                switch (size) {
+                    case NONE:
+                        return 0;
+                    case TINY:
+                        return 10;
+                    case SMALL:
+                        return 30;
+                    case MODERATE:
+                        //noinspection DuplicateBranchesInSwitch
+                        return 50;
+                    case LARGE:
+                        return 80;
+                    case GIANT:
+                        return 120;
+                    case XLARGE:
+                        return 300;
+                    default:
+                        return 50;
+                }
+            case ROUGE_ASTEROID:
                 if (size.smallerThan(ObjectSize.MODERATE))
                     return 10;
                 else if (size.smallerThan(ObjectSize.XLARGE))
@@ -234,8 +254,6 @@ public class BasicSpaceObject {
                     return 50;
             case SPACE_STATION:
             case SATELLITE:
-            case DEBRIS:
-                return 10;
             case NONE:
             default:
                 return 0;
