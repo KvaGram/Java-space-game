@@ -7,12 +7,12 @@ import java.awt.*;
 
 public class SpaceObjectView {
     private BasicSpaceObject object;
-    private Rectangle rect;
-    private Point location; //location in panel(screen)-space
-    private Point pLocation; //parent location in panel(screen)-space
+    protected Rectangle rect;
+    protected Point location; //location in panel(screen)-space
+    protected Point pLocation; //parent location in panel(screen)-space
     private int orbitRad; //radius distance from parent in panel(screen)-space
-    private Color orbitColor;
-    private Color planetTint;
+    protected Color orbitColor;
+    protected Color planetTint;
 
     SpaceObjectView(BasicSpaceObject object) {
         this.object = object;
@@ -78,13 +78,12 @@ public class SpaceObjectView {
     public void paintObject(Graphics2D g) {
 
         g.setColor(planetTint);
-        g.fillOval(rect.x, rect.y, rect.width, rect.height);
+        //TODO: undo debug change
+        //g.fillOval(rect.x, rect.y, rect.width, rect.height);
+        g.drawOval(rect.x, rect.y, rect.width, rect.height);
     }
 
     public void paintObjectOrbit(Graphics2D g) {
-        //todo: make softer code for ignoring orbits for some objects. (blacklist maybe?)
-//        if(object.getType() == ObjectType.asteroid)
-//            return;
         g.setColor(orbitColor);
         g.drawOval(pLocation.x-orbitRad, pLocation.y-orbitRad, orbitRad*2, orbitRad*2);
 

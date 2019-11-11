@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Random;
 
+//TODO: There is a HUGE bug somewhere related to generated location. must fix.
+
 public class BasicSpaceObject {
     ObjectType type;
     ObjectSize size;
@@ -145,8 +147,8 @@ public class BasicSpaceObject {
             //added to the parent location.
             int x = parent.generatedLocation.x;
             int y = parent.generatedLocation.y;
-            x += (int)(Math.cos(orbitRotation) * orbitDistance );
-            y += (int)(Math.sin(orbitRotation) * orbitDistance );
+            x += (int)((Math.cos(orbitRotation) * orbitDistance ));
+            y += (int)((Math.sin(orbitRotation) * orbitDistance ));
             generatedLocation.x = x;
             generatedLocation.y = y;
         }
