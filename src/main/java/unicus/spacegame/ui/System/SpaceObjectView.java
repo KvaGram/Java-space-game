@@ -1,6 +1,7 @@
 package unicus.spacegame.ui.System;
 
 import unicus.spacegame.structures.starsystem.BasicSpaceObject;
+import unicus.spacegame.structures.starsystem.SpaceJunkField;
 
 import java.awt.*;
 
@@ -32,6 +33,22 @@ public class SpaceObjectView {
                 planetTint = Color.red;
         }
 
+
+    }
+
+    public static SpaceObjectView CreateViewFor(BasicSpaceObject object) {
+        try {
+            switch (object.getType()) {
+                case JUNK_FIELD:
+                    return new JunkFieldView((SpaceJunkField)object);
+                default:
+                    return new SpaceObjectView(object);
+            }
+
+        } catch (ClassCastException err) {
+            System.out.println(err);
+            return new SpaceObjectView(object);
+        }
 
     }
 
@@ -73,26 +90,3 @@ public class SpaceObjectView {
 
     }
 }
-
-
-/*
-    public void drawOrbits(Graphics2D g, BasicSpaceObject object) {
-        //TODO: scale and offset to fit component
-        Point loc = object.getGeneratedLocation();
-
-        int x = loc.x + offset.x;
-        int y = loc.y + offset.y;
-        x = (int) (x * scale);
-        y = (int) (y * scale);
-
-        for (int i = 1; i < object.getHighestOrbit(); i++) {
-            if (object.getLargestChildByOrbit(i).getType() == ObjectType.asteroid)
-                continue;
-            int radius = (int) (object.getOrbitDistance(i) * scale );
-            g.drawOval(x-radius, y-radius, radius*2, radius*2);
-        }
-        for (BasicSpaceObject child : object.getChildren()) {
-            //drawOrbits(g, child);
-        }
-    }
- */

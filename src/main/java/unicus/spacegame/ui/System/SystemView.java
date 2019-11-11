@@ -32,7 +32,7 @@ public class SystemView extends JComponent {
         BasicSpaceObject[] objList = system.getAllObjects();
         objectViews = new SpaceObjectView[objList.length];
         for (int i = 0, objListLength = objList.length; i < objListLength; i++)
-            objectViews[i] = new SpaceObjectView(objList[i]);
+            objectViews[i] = SpaceObjectView.CreateViewFor(objList[i]);
         updateObjects();
     }
 
