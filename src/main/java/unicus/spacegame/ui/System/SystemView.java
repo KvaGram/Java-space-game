@@ -92,6 +92,12 @@ public class SystemView extends JComponent {
         for (SpaceObjectView obj:objectViews) {
             obj.paintObject(g);
         }
+        //show mouse-over rectangles
+        for (SpaceObjectView obj:objectViews) {
+            g.setColor(Color.yellow);
+            g.drawRect(obj.rect.x, obj.rect.y, obj.rect.width, obj.rect.height);
+        }
+
     }
     public static void main(String[] args) {
         BaseStarSystem starSystem = new SolLikeSystem(0);
