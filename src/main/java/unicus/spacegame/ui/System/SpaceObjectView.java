@@ -10,7 +10,7 @@ public class SpaceObjectView {
     protected Rectangle rect;
     protected Point location; //location in panel(screen)-space
     protected Point pLocation; //parent location in panel(screen)-space
-    private int orbitRad; //radius distance from parent in panel(screen)-space
+    protected int orbitRad; //radius distance from parent in panel(screen)-space
     protected Color orbitColor;
     protected Color planetTint;
 
@@ -27,7 +27,7 @@ public class SpaceObjectView {
             case JUNK_FIELD:
                 orbitColor = new Color(0,0,200);
                 planetTint = new Color(50, 50,200);
-
+                break;
             default:
                 orbitColor = Color.gray;
                 planetTint = Color.red;
