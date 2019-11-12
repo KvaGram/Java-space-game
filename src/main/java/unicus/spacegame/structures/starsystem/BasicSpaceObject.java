@@ -86,8 +86,10 @@ public class BasicSpaceObject {
      * Call only from root objects.
      */
     public void update() {
-        if(isRoot())
+        if(isRoot()) {
             updateInternal();
+            updateLocation();
+        }
     }
     protected void updateInternal() {
         Random r = new Random(planetSeed);
@@ -138,6 +140,8 @@ public class BasicSpaceObject {
                 prevChild = currentChild;
             }
         }
+    }
+    protected void updateLocation() {
         //Set the world location of the object
         if(isRoot()) {
             //For the root object, the location is just the offset (typically not set, thus (0,0)).
@@ -149,8 +153,13 @@ public class BasicSpaceObject {
             int y = parent.generatedLocation.y;
             x += (int)((Math.cos(orbitRotation) * orbitDistance ));
             y += (int)((Math.sin(orbitRotation) * orbitDistance ));
+            x += offset.x;
+            y += offset.y;
             generatedLocation.x = x;
             generatedLocation.y = y;
+        }
+        for (BasicSpaceObject b:children) {
+            b.updateLocation();
         }
     }
 

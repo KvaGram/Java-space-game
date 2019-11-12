@@ -78,9 +78,9 @@ public class SpaceObjectView {
     public void paintObject(Graphics2D g) {
 
         g.setColor(planetTint);
-        //TODO: undo debug change
-        //g.fillOval(rect.x, rect.y, rect.width, rect.height);
-        g.drawOval(rect.x, rect.y, rect.width, rect.height);
+        g.fillOval(rect.x, rect.y, rect.width, rect.height);
+        //below is for testing. Ignore or remove.
+        //g.drawOval(rect.x, rect.y, rect.width, rect.height);
     }
 
     public void paintObjectOrbit(Graphics2D g) {
