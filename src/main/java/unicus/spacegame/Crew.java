@@ -15,6 +15,7 @@ public class Crew {
         frame.setSize(800, 400);
         JTextArea j_text = new JTextArea("Example of Crew overview. \n");
         JPanel j_buttonpanel = new JPanel();
+
         //Create crew for testing
         ArrayList<Crewman> crewmen = new ArrayList<Crewman>();
         Crewman John = new Crewman("John Smith");
@@ -27,7 +28,6 @@ public class Crew {
             j_text.append("Got new crewman.\n");
             crewmen.add(new Crewman());
         });
-
         JButton b_train = new JButton("Train");
         j_buttonpanel.add(b_train);
         b_train.addActionListener(arg0 -> j_text.append("Crewman trained. Placeholder.\n"));
@@ -40,7 +40,6 @@ public class Crew {
             }
             j_text.append("\n");
         });
-
 
         //final visibility arrangement
         frame.getContentPane().add(BorderLayout.SOUTH, j_buttonpanel);
@@ -102,9 +101,15 @@ class Crewman {
     }
     public void trainResearch() {
         this.research += 1;
+        if (research > 100) { research = 100; }
     }
-    public void nameRedshirt(String newname) {
+    //TODO: Train methods for other skills - or generalize
+    //Should training ever be reduced for an individual crewmember?
+    public void renameTo(String newname) {
         this.name = newname;
+    }
+    public void renameRandomly() {
+        this.name = makeSkiffyName();
     }
     public void trainSkill(String skill) {
         switch (skill.toLowerCase()) { //so function accepts both "research" and "Research"
