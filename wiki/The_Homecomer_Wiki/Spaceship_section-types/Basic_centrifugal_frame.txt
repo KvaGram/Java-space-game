@@ -1,0 +1,48 @@
+Content-Type: text/x-zim-wiki
+Wiki-Format: zim 0.4
+Creation-Date: 2019-11-24T00:37:57+01:00
+
+====== Basic centrifugal frame ======
+Created Sunday 24 November 2019
+
+Centrifugal frames generates gravity by extruding the connected modules outwards, and spin around the spinal axis of the ship.
+Beyond that, it uses the same basic mounting system as the [[Basic Frame]].
+
+The hydrolic and rotation systems require a bit of maintence every now and then.
+They also take up a bit of space, resulting in less space for modules.
+
+In combat and emergencies, the centrifuge stops spinneing, and the modules are retracted.
+This protects the sensitive mechanical parts from damage.
+
+
+
+
+**General properties**
+Gravity:							Light
+Module mounts:					3
+Reliability:							Medium
+
+**Running costs**
+Power:								5
+
+**Military properties**
+Weapon mounts: 					2  (left / right)
+Damage resistance: 				Low
+Combat rotation:					Yes
+
+**Cunstruction cost**
+Basic metals:			 			100
+Large Type A mechanics parts		10
+Large Type B mechanics parts		3
+Time: 								5 days
+
+**Repair cost**
+Basic metals:						50
+Large Type A mechanics parts		5
+Large Type B mechanics parts		2
+Time:								2 days
+
+**Maintenence**
+Basic metals:						10
+Large Type A mechanics parts		2
+Time:								instant

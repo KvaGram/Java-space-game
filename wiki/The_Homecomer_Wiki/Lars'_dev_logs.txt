@@ -1,0 +1,17 @@
+Content-Type: text/x-zim-wiki
+Wiki-Format: zim 0.4
+Creation-Date: 2019-11-23T21:36:42+01:00
+
+====== Lars' dev logs ======
+Created Saturday 23 November 2019
+
+**Saterday 2019 / 11 / 23**
+
+Together with the wiki, I have decided to start a dev log. 
+This will be brief summeries of what I am working on in the project, as well as notes.
+
+An empihifany was made regarding the combat system.
+Make it fully grid-based, and copy a bit from Puzzle Pirate's ship combat system.
+
+I have migrated some of the design notes on section-frames into this wiki.
+

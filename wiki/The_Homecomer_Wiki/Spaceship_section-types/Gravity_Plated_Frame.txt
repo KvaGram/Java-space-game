@@ -1,0 +1,42 @@
+Content-Type: text/x-zim-wiki
+Wiki-Format: zim 0.4
+Creation-Date: 2019-11-24T02:14:55+01:00
+
+====== Gravity Plated Frame ======
+Created Sunday 24 November 2019
+
+The gravity-plated frame has a set of powerful artificial gravity plates wrapping around its section of the spine.
+The plates generate a form of gravity that pulls anything towards them.
+The gravity-plates are an expensive high-tech alternative to the centrifuge.
+While this frame has slightly more volume-space for modules, the technology and materials needed to construct it is hard to come by. It also has a much higher power consumption-rate compared to the centrifuge.
+
+
+**General properties**
+Gravity:							full
+Module mounts:					4
+Reliability:							Medium
+
+**Military properties**
+Weapon mounts: 					4  (left / right/top/bottom)
+Damage resistance: 				Medium
+Combat rotation:					None
+
+**Running costs**
+Power:								15
+
+**Cunstruction cost**
+Basic metals:			 			100
+Large Type A mechanics parts		10
+Large Type B mechanics parts		3
+Time: 								5 days
+
+**Repair cost**
+Basic metals:						50
+Large Type A mechanics parts		5
+Large Type B mechanics parts		2
+Time:								2 days
+
+**Maintenence**
+Basic metals:						10
+Large Type A mechanics parts		2
+Time:								instant

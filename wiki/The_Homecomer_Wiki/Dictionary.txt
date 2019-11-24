@@ -1,0 +1,10 @@
+Content-Type: text/x-zim-wiki
+Wiki-Format: zim 0.4
+Creation-Date: 2019-11-24T01:02:29+01:00
+
+====== Dictionary ======
+Created Sunday 24 November 2019
+
+===== The Spine =====
+The spine of the spaceship is a long hardened corridor connecting the command senter / bridge in one end, and the engineering section in the other.
+Between the two, there are hard mounting-points for installing section frames

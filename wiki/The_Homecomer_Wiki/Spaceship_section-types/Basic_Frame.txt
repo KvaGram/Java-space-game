@@ -1,0 +1,36 @@
+Content-Type: text/x-zim-wiki
+Wiki-Format: zim 0.4
+Creation-Date: 2019-11-24T00:13:48+01:00
+
+====== Basic Frame ======
+Created Sunday 24 November 2019
+
+Basic frames are cheap to construct, maintain, and require no power to run, but lack gravity.
+The basic frame don't do anything beyond attaching modules to the spine.
+The basic frame takes up little space of the section, allowing more space for modules.
+
+**General properties**
+Gravity:							None
+Module mounts:					5
+Reliability:							High
+
+**Running costs**
+none
+
+**Military properties**
+Weapon mounts: 					2  (left / right)
+Damage resistance:				 	Low
+Combat rotation:					None
+
+**Cunstruction cost**
+Basic metals: 						100
+Time: 								5 days
+
+**Repair cost**
+Basic metals:						50
+Time:								2 days
+
+**Maintenence**
+Basic metals:						10
+Time:								instant
+

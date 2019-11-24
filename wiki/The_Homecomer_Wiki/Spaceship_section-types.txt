@@ -1,0 +1,9 @@
+Content-Type: text/x-zim-wiki
+Wiki-Format: zim 0.4
+Creation-Date: 2019-11-24T00:11:48+01:00
+
+====== Spaceship section-types ======
+Created Sunday 24 November 2019
+
+A section of a spaceship is a long part of the spine of the ship.
+On this section 

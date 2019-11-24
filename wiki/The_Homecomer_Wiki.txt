@@ -1,0 +1,27 @@
+Content-Type: text/x-zim-wiki
+Wiki-Format: zim 0.4
+Creation-Date: 2019-11-22T13:56:07+01:00
+
+====== The Homecomer Wiki ======
+Created Friday 22 November 2019
+
+Welcome to the Homecomer wiki. There is not much here yet.
+If you are reading this in a plain text editor, please close it, and reopen in Zim.
+If you don't have Zim, you can downlaod it here : https://zim-wiki.org/downloads.html
+
+The homecomer is a Spaceship management survival game.
+Your main goal is to manage the survival of a generational starship crew on a long journey.
+This goal will take many years to complete, maybe even centuries.
+
+Your crew needs to start families, raise children, teach their childeren how to take over the ship.
+Your crew needs to negotiate with aliens, fight them if neccesary.
+Your crew needs to gather resources from planets and asteroids.
+Your crew needs to find their way home to Earth.
+Your crew are you, and you are the crew.
+And shall the crew die, then you die.
+
+Welcome to The Homecomer (working title*)
+
+===== Main content =====
+[[+Lars' dev logs]]
+
