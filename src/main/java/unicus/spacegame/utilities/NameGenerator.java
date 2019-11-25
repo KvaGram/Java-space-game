@@ -1,4 +1,4 @@
-package unicus.spacegame;
+package unicus.spacegame.utilities;
 
 import java.util.Random;
 
