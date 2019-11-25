@@ -11,7 +11,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="Java-space-game" target="1.13" />
+      <module name="Java-space-game" target="13" />
       <module name="javaspacegame" target="1.13" />
     </bytecodeTargetLevel>
   </component>
