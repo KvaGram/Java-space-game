@@ -1,89 +1,130 @@
 package unicus.spacegame;
-//Usually you will require both swing and awt packages
-// even if you are working with just swings.
-import javax.swing.*;
-import java.awt.*;
 
+import org.lwjgl.glfw.*;
+import org.lwjgl.opengl.*;
+
+import org.lwjgl.Version;
+import static org.lwjgl.glfw.Callbacks.*;
+
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.system.MemoryUtil.*;
+import static java.lang.System.out;
+
+//Main class based on sample code
 public class Main {
+    private long windowHandle;
+    public void run() {
+        out.println("Starting LWJGL version " + Version.getVersion());
+
+        try {
+            init();
+            loop();
+
+            //release and destroy window
+            glfwFreeCallbacks(windowHandle);
+            glfwDestroyWindow(windowHandle);
+        } finally {
+            //From sample code, not sure yet what it does.
+            // from sample code: 'Terminate GLFW and release the GLFWerrorfun'
+            glfwTerminate();
+            glfwSetErrorCallback(null).free();
+        }
+    }
+    private void init() {
+        //sets errors to be printed to the error feed.
+        GLFWErrorCallback.createPrint(System.err).set();
+
+        //From sample code. Do not yet know what GLFW is. Clearly it is vital.
+        //This initiates GLFW. If it fails, the program should exit.
+        if(!glfwInit()) {
+            throw new IllegalStateException("Failed to initialize GLFW");
+        }
+        //Window configuration
+        //glfwDefaultWindowHints(); //default, not needed to specify.
+        glfwWindowHint(GLFW_VISIBLE, GL_TRUE);
+        glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+
+        //set pixel width and height
+        int WIDTH = 300;
+        int HEIGHT = 300;
+
+        // Create game window
+        // If the game window fails, the program should exit.
+        windowHandle = glfwCreateWindow(WIDTH, HEIGHT, "The Homecomer (pre-alpha)", 0, 0);
+        if (windowHandle == NULL) {
+            throw new RuntimeException("Creation of GLFW window failed");
+        }
+
+        //set up listener and callback for releasing esc-key.
+        glfwSetKeyCallback(windowHandle, (window, key, scancode, action, mods) -> {
+            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
+                glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
+            }
+        });
+
+        //Get data (size, index, address, display-data, etc.)
+        GLFWVidMode screenData = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        //center window on screen
+        glfwSetWindowPos(windowHandle,
+                (screenData.width() - WIDTH)/2,
+                (screenData.height() - HEIGHT)/2
+        );
+
+        // Make the OpenGL context current
+        glfwMakeContextCurrent(windowHandle);
+        // Enable v-sync
+        glfwSwapInterval(1);
+
+        // Make the window visible
+        glfwShowWindow(windowHandle);
+    }
+    private void loop() {
+        //important behind-the-scenes-thing I have no clue on what is doing
+        //apparently related to LWJGL
+        GL.createCapabilities();
+
+        //Sets color to clear the screen (grey)
+        glClearColor(.5f,.5f,.5f,0);
+
+        while(!glfwWindowShouldClose(windowHandle)) {
+            //Clear the screen. No idea what the mask is for.
+            //Is the buffer layered?
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            // setup viewing projection
+            glMatrixMode(GL_PROJECTION);
+            //setup matrix
+            glLoadIdentity();
+            //setup orthographic perspective
+            glOrtho(0.0, 10.0, 0.0, 10.0, -1.0, 1.0);   // setup a 10x10x2 viewing world
+
+            //space where you draw stuff
+            testDraw();
+
+            //Let the system/OpenGL know you are done drawing on this screen/buffer.
+            glfwSwapBuffers(windowHandle);
+
+            //Runs the event-driver.
+            glfwPollEvents();
+        }
+    }
+
+    private void testDraw() {
+
+        glColor3f(0.0f, 1.0f, 0.0f);
+        glBegin(GL_POLYGON);
+        glVertex3f(2.0f, 2.0f, 0.0f);
+        glVertex3f(8.0f, 2.0f, 0.0f);
+        glVertex3f(8.0f, 8.0f, 0.0f);
+        glVertex3f(2.0f, 8.0f, 0.0f);
+        glEnd();
+        glFlush();
+    }
+
 
     public static void main(String[] args) {
-
-        //Creating the Frame
-        JFrame frame = new JFrame("Chat Frame");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 400);
-
-        //Creating the MenuBar and adding components
-        JMenuBar mb = new JMenuBar();
-        JMenu m1 = new JMenu("FILE");
-        JMenu m2 = new JMenu("Help");
-        mb.add(m1);
-        mb.add(m2);
-        JMenuItem m1_1 = new JMenuItem("Open");
-        JMenuItem m1_2 = new JMenuItem("Save as");
-        m1.add(m1_1);
-        m1.add(m1_2);
-        JMenuItem m2_1 = new JMenuItem("About");
-        m2.add(m2_1);
-
-        //Creating the panel at bottom and adding components
-        JPanel panel = new JPanel(); // the panel is not visible in output
-        JLabel label = new JLabel("Hull Integrity: 100%");
-        JTextField tf = new JTextField(10); // is 10 characters wide
-        JButton b_mine = new JButton("Mine");
-        JButton b_reset = new JButton("Reset");
-        JButton b_raid = new JButton("Raid");
-        JButton b_travel = new JButton("Travel");
-        JButton b_image = new JButton("Image");
-        JButton b_starmap = new JButton("Stars");
-        panel.add(label); // Components Added using Flow Layout
-        panel.add(tf);
-        panel.add(b_mine);
-        panel.add(b_reset);
-        panel.add(b_raid);
-        panel.add(b_travel);
-        panel.add(b_image);
-        panel.add(b_starmap);
-
-        // Text Area at the Center
-        JTextArea ta = new JTextArea("Hello spaceworld!\n");
-
-        //Associating actions with the buttons
-        b_mine.addActionListener(arg0 -> {
-            ta.append("You mined 100 ore.\n");
-        });
-        b_reset.addActionListener(arg0 -> {
-            ta.append("Restoring...\n");
-            int hullint = 100;
-            label.setText("Hull Integrity: "+hullint+"%");
-        });
-        b_raid.addActionListener(arg0 -> {
-            ta.append("You got into a fight and your ship is damaged.\n");
-            int hullint = 50;
-            label.setText("Hull Integrity: "+hullint+"%");
-        });
-        b_travel.addActionListener(arg0 -> {
-            ta.append("This should take you to another star system.\n");
-            ta.append("But it's not implemented yet.\n");
-        });
-        b_image.addActionListener(arg0 -> {
-            ImageIcon spaceimage = new ImageIcon(Main.class.getResource("ui/spaceshipicon.png"));
-            JLabel lbl = new JLabel(spaceimage);
-            JOptionPane.showMessageDialog(null, lbl, "ImageDialog",
-                    JOptionPane.PLAIN_MESSAGE, null);
-        });
-        //The very complicated starmap generator
-        b_starmap.addActionListener(arg0 -> {
-            JFrame jstar = new JFrame("Starmap");
-            jstar.setSize(300,300);
-            jstar.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            //New JPanel details go here, then jstar.add(it)
-        });
-
-        //Adding Components to the frame.
-        frame.getContentPane().add(BorderLayout.SOUTH, panel);
-        frame.getContentPane().add(BorderLayout.NORTH, mb);
-        frame.getContentPane().add(BorderLayout.CENTER, ta);
-        frame.setVisible(true);
+        new Main().run();
     }
+
 }
