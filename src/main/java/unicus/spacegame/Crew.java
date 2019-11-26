@@ -1,11 +1,8 @@
 package unicus.spacegame;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Random;
-
 
 public class Crew {
     public static void main(String[] args) {
@@ -20,6 +17,9 @@ public class Crew {
         ArrayList<Crewman> crewmen = new ArrayList<Crewman>();
         Crewman John = new Crewman("John Smith");
         crewmen.add(new Crewman("Ole Nordmann"));
+
+        //Job tracker
+        CrewJob c = new CrewJob(new JobStub("default", 0), new Crewman());
 
         //Buttons
         JButton b_recruit = new JButton("Recruit");
@@ -53,9 +53,15 @@ class Crewman {
     static int ID_diplomacy = 1;
     static int ID_medical = 2;
     static int ID_teaching = 3;
+    static int ID_navigation = 4;
+    static int ID_engineering = 5;
+    static int ID_mining = 6;
+    static int ID_leadership = 7;
+    static int ID_gunnery = 8;
+    static int ID_boarding = 9;
     double age, stress, intelligence;
     boolean[] roles;
-    int research, diplomacy, medical, teaching, navigation, engineering, mining, leadership, gunnery, boarding;
+    int s_research, s_diplomacy, s_medical, s_teaching, s_navigation, s_engineering, s_mining, s_leadership, s_gunnery, s_boarding; //skills
     String name;
     Crewman() {
         this.name = makeSkiffyName();
@@ -100,10 +106,45 @@ class Crewman {
         this.stress += amount;
     }
     public void trainResearch() {
-        this.research += 1;
-        if (research > 100) { research = 100; }
+        this.s_research += 1;
+        if (s_research > 100) { s_research = 100; }
     }
-    //TODO: Train methods for other skills - or generalize
+    public void trainDiplomacy() {
+        this.s_diplomacy += 1;
+        if (s_diplomacy > 100) { s_diplomacy = 100; }
+    }
+    public void trainMedical() {
+        this.s_medical += 1;
+        if (s_medical > 100) { s_medical = 100; }
+    }
+    public void trainTeaching() {
+        this.s_teaching += 1;
+        if (s_teaching > 100) { s_teaching = 100; }
+    }
+    public void trainNavigation() {
+        this.s_navigation += 1;
+        if (s_navigation > 100) { s_navigation = 100; }
+    }
+    public void trainEngineering() {
+        this.s_engineering += 1;
+        if (s_engineering > 100) { s_engineering = 100; }
+    }
+    public void trainMining() {
+        this.s_mining += 1;
+        if (s_mining > 100) { s_mining = 100; }
+    }
+    public void trainLeadership() {
+        this.s_leadership += 1;
+        if (s_leadership > 100) { s_leadership = 100; }
+    }
+    public void trainGunnery() {
+        this.s_gunnery += 1;
+        if (s_gunnery > 100) { s_gunnery = 100; }
+    }
+    public void trainBoarding() {
+        this.s_boarding += 1;
+        if (s_boarding > 100) { s_boarding = 100; }
+    }
     //Should training ever be reduced for an individual crewmember?
     public void renameTo(String newname) {
         this.name = newname;
@@ -111,11 +152,62 @@ class Crewman {
     public void renameRandomly() {
         this.name = makeSkiffyName();
     }
-    public void trainSkill(String skill) {
+    public void trainSkillByName(String skill) {
         switch (skill.toLowerCase()) { //so function accepts both "research" and "Research"
             case "research":
-                this.trainResearch();
-                break;
-        } //cases are an ugly approach.
+                this.trainResearch(); break;
+            case "diplomacy":
+                this.trainDiplomacy(); break;
+            case "medical":
+                this.trainMedical(); break;
+            case "teaching":
+                this.trainTeaching(); break;
+            case "navigation":
+                this.trainNavigation(); break;
+            case "engineering":
+                this.trainEngineering(); break;
+            case "mining":
+                this.trainMining(); break;
+            case "leadership":
+                this.trainLeadership(); break;
+            case "gunnery":
+                this.trainGunnery(); break;
+            case "boarding":
+                this.trainBoarding(); break;
+        } //cases are an ugly approach. This is known.
+    }
+    public void trainSkillByID(int skillID) {
+
+    }
+}
+
+//create JobStub objects for: research, diplomacy, medical, teaching, navigation, engineering, mining, leadership, gunnery, boarding;
+class JobStub {
+    String name;
+    int ID;
+    public JobStub(String jobName, int jobID) {
+        this.name = jobName;
+        this.ID = jobID;
+    }
+}
+
+class CrewJob {
+    JobStub job;
+    Crewman crewman;
+
+    static ArrayList<CrewJob> jobRelations = new ArrayList<>();
+
+    public CrewJob(JobStub job, Crewman crewman){
+        this.job = job;
+        this.crewman = crewman;
+    }
+    public static boolean addCrewJob(CrewJob crewJob){
+        return jobRelations.add(crewJob);
+    }
+    public static boolean removeCrewJob(CrewJob crewJob){
+        return jobRelations.remove(crewJob);
+    }
+    public static ArrayList<CrewJob> GetJobRelations(){
+        return jobRelations;
     }
 }
