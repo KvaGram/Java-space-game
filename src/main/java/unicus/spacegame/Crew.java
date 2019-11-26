@@ -49,7 +49,8 @@ public class Crew {
 }
 
 class Crewman {
-    static int ID_research = 0; //in order to refer to roles[ID]. maybe hashmap<string, boolean> instead?
+    //IDs in order to be able to refer to skills by number as an alternative to name. A HashMap could perhaps be used instead.
+    static int ID_research = 0;
     static int ID_diplomacy = 1;
     static int ID_medical = 2;
     static int ID_teaching = 3;
@@ -61,18 +62,26 @@ class Crewman {
     static int ID_boarding = 9;
     double age, stress, intelligence;
     boolean[] roles;
-    int s_research, s_diplomacy, s_medical, s_teaching, s_navigation, s_engineering, s_mining, s_leadership, s_gunnery, s_boarding; //skills
+    //Skill values for each crewman. Currently capped at 100 in the skill increase function.
+    int s_research, s_diplomacy, s_medical, s_teaching, s_navigation, s_engineering, s_mining, s_leadership, s_gunnery, s_boarding;
     String name;
+    /** Creates a new crewman with randomly generated name, no stress, young adult age */
     Crewman() {
         this.name = makeSkiffyName();
         this.stress = 0;
         this.age = 20 + (new Random().nextInt(20)); //20-40
         this.intelligence = new Random().nextInt(100); //0-99
     }
+    /** Creates a new crewman with a specific name, otherwise as normal constructor */
     Crewman(String name) {
         this();
         this.name = name;
     }
+
+    /**
+     * Generates a vaguely sci-fi-sounding, English-pronounceable name such as "Hytwav", "Vukdyz" or "Bendor".
+     * @return Name string with consonant-vowel pattern CVCCVC
+     */
     public String makeSkiffyName() {
         String vowels = "aeiouy";
         String consonants = "bcdfghjklmnprstvwxz";
@@ -87,24 +96,37 @@ class Crewman {
         }
         return new String(protoname);
     }
+    /**
+     * Assigns a full set of roles to a crewman in the style (research=true, diplomacy=false, medical=false, etc)
+     * @param newRoles Which roles are to be active or inactive
+     */
     public void setRoles(boolean[] newRoles) {
         this.roles = newRoles;
     }
+    /**
+     * Assigns one new role to a crewman
+     * @param roleID Index of role to put crewman on
+     */
     public void giveRole(int roleID) {
         this.roles[roleID] = true;
     }
+    /**
+     * Removes one role from a crewman
+     * @param roleID Index of the role to take crewman off
+     */
     public void removeRole(int roleID) {
         this.roles[roleID] = false;
     }
-    public void ageUp() {
+    public void ageUp() { //Stock function to be called whenever a year passes
         this.age += 1;
     }
-    public void ageUp(double amount) {
+    public void ageUp(double amount) { //When incrementing crewmember's age by some specific amount
         this.age += amount;
     }
-    public void changeStress(int amount) {
+    public void changeStress(int amount) { //
         this.stress += amount;
     }
+    //Training methods at the moment are a flat 1 increase. Possible change: amount-to-increase argument.
     public void trainResearch() {
         this.s_research += 1;
         if (s_research > 100) { s_research = 100; }
@@ -146,7 +168,7 @@ class Crewman {
         if (s_boarding > 100) { s_boarding = 100; }
     }
     //Should training ever be reduced for an individual crewmember?
-    public void renameTo(String newname) {
+    public void renameTo(String newname) { //In case player doesn't like a randomly generated name, or wants to name the crew after Star Trek characters
         this.name = newname;
     }
     public void renameRandomly() {
@@ -177,7 +199,9 @@ class Crewman {
         } //cases are an ugly approach. This is known.
     }
     public void trainSkillByID(int skillID) {
-
+        String[] temp = {"research", "diplomacy", "medical", "teaching", "navigation", "engineering", "mining", "leadership", "gunnery", "boarding"};
+        String skillname = temp[skillID];
+        trainSkillByName(skillname);
     }
 }
 
