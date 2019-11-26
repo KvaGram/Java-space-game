@@ -48,29 +48,85 @@ public class Crew {
     }
 }
 
+/*
+* Skills-types put in an enum.
+* This makes it easier to change the list in the future
+* - Lars
+*/
+enum SkillTypes
+{
+    research,
+    diplomacy,
+    medical,
+    teaching,
+    navigation,
+    engineering,
+    mining,
+    leadership,
+    gunnery,
+    boarding;
+
+    // Static function for all of SkillTypes:
+
+    public static int GetIndexByType(SkillTypes type) {
+        return type.ordinal();
+    }
+    public static SkillTypes GetTypeByIndex(int index) {
+        return SkillTypes.values()[index];
+    }
+    public static SkillTypes GetTypeByString(String name) {
+        return SkillTypes.valueOf(name.toLowerCase().trim());
+    }
+    public static int GetIndexByString(String name) {
+        return GetIndexByType(GetTypeByString(name));
+    }
+    public static int GetNumSkills(){
+        return SkillTypes.values().length;
+    }
+
+    //Individual functions for each value:
+
+    public String getName(){
+        return this.toString();
+    }
+}
+
 class Crewman {
-    //IDs in order to be able to refer to skills by number as an alternative to name. A HashMap could perhaps be used instead.
-    static int ID_research = 0;
-    static int ID_diplomacy = 1;
-    static int ID_medical = 2;
-    static int ID_teaching = 3;
-    static int ID_navigation = 4;
-    static int ID_engineering = 5;
-    static int ID_mining = 6;
-    static int ID_leadership = 7;
-    static int ID_gunnery = 8;
-    static int ID_boarding = 9;
-    double age, stress, intelligence;
-    boolean[] roles;
+    /* changes:
+    *
+    * Skill values made into an array instead,
+    * and the static constants are replaced by enum SkillTypes.
+    * Note that if we keep skills capped at 100, we might consider storing the values as byte instead of int.
+    *
+    * boolean[] roles is obsolete, adn has been culled.
+    *
+    * culled setRoles, giveRole and removeRole.
+    *
+    * replaced skill-training functions with one single function running on skillValues.
+    * Added SKILL_CAP as an easy-to-change constant.
+    *
+    * rewrote trainSkillByName and trainSkillByID to redirect to trainSkill.
+    *
+    *  - Lars
+    * */
+
+    private static final int SKILL_CAP = 100;
+
     //Skill values for each crewman. Currently capped at 100 in the skill increase function.
-    int s_research, s_diplomacy, s_medical, s_teaching, s_navigation, s_engineering, s_mining, s_leadership, s_gunnery, s_boarding;
+    private int[] skillValues;
+    double age, stress, intelligence;
     String name;
+
+
     /** Creates a new crewman with randomly generated name, no stress, young adult age */
     Crewman() {
         this.name = makeSkiffyName();
         this.stress = 0;
         this.age = 20 + (new Random().nextInt(20)); //20-40
         this.intelligence = new Random().nextInt(100); //0-99
+        //initiate skillValue list, by number of skills in SkillTypes.
+        this.skillValues = new int[SkillTypes.GetNumSkills()];
+
     }
     /** Creates a new crewman with a specific name, otherwise as normal constructor */
     Crewman(String name) {
@@ -96,27 +152,15 @@ class Crewman {
         }
         return new String(protoname);
     }
-    /**
-     * Assigns a full set of roles to a crewman in the style (research=true, diplomacy=false, medical=false, etc)
-     * @param newRoles Which roles are to be active or inactive
-     */
-    public void setRoles(boolean[] newRoles) {
-        this.roles = newRoles;
-    }
-    /**
-     * Assigns one new role to a crewman
-     * @param roleID Index of role to put crewman on
-     */
-    public void giveRole(int roleID) {
-        this.roles[roleID] = true;
-    }
-    /**
-     * Removes one role from a crewman
-     * @param roleID Index of the role to take crewman off
-     */
-    public void removeRole(int roleID) {
-        this.roles[roleID] = false;
-    }
+
+
+    /*
+    NOTE: culled setRoles, giveRole and removeRole.
+    TODO: decide where and how jobs are set.
+
+     - Lars
+    * */
+
     public void ageUp() { //Stock function to be called whenever a year passes
         this.age += 1;
     }
@@ -126,47 +170,24 @@ class Crewman {
     public void changeStress(int amount) { //
         this.stress += amount;
     }
-    //Training methods at the moment are a flat 1 increase. Possible change: amount-to-increase argument.
-    public void trainResearch() {
-        this.s_research += 1;
-        if (s_research > 100) { s_research = 100; }
+
+    //Trains skill at index skillIndex by amount
+    public void trainSkill(int skillIndex, int amount) {
+        this.skillValues[skillIndex] += amount;
+        if (this.skillValues[skillIndex] > SKILL_CAP) {
+            this.skillValues[skillIndex] = SKILL_CAP;
+        }
     }
-    public void trainDiplomacy() {
-        this.s_diplomacy += 1;
-        if (s_diplomacy > 100) { s_diplomacy = 100; }
+    //Trains type skill by amount
+    public void trainSkill(SkillTypes type, int amount) {
+        trainSkill(SkillTypes.GetIndexByType(type), amount);
     }
-    public void trainMedical() {
-        this.s_medical += 1;
-        if (s_medical > 100) { s_medical = 100; }
+    //Trains type skill by 1
+    public void trainSkill(SkillTypes type) {
+        trainSkill(type, 1);
     }
-    public void trainTeaching() {
-        this.s_teaching += 1;
-        if (s_teaching > 100) { s_teaching = 100; }
-    }
-    public void trainNavigation() {
-        this.s_navigation += 1;
-        if (s_navigation > 100) { s_navigation = 100; }
-    }
-    public void trainEngineering() {
-        this.s_engineering += 1;
-        if (s_engineering > 100) { s_engineering = 100; }
-    }
-    public void trainMining() {
-        this.s_mining += 1;
-        if (s_mining > 100) { s_mining = 100; }
-    }
-    public void trainLeadership() {
-        this.s_leadership += 1;
-        if (s_leadership > 100) { s_leadership = 100; }
-    }
-    public void trainGunnery() {
-        this.s_gunnery += 1;
-        if (s_gunnery > 100) { s_gunnery = 100; }
-    }
-    public void trainBoarding() {
-        this.s_boarding += 1;
-        if (s_boarding > 100) { s_boarding = 100; }
-    }
+
+
     //Should training ever be reduced for an individual crewmember?
     public void renameTo(String newname) { //In case player doesn't like a randomly generated name, or wants to name the crew after Star Trek characters
         this.name = newname;
@@ -174,34 +195,16 @@ class Crewman {
     public void renameRandomly() {
         this.name = makeSkiffyName();
     }
-    public void trainSkillByName(String skill) {
-        switch (skill.toLowerCase()) { //so function accepts both "research" and "Research"
-            case "research":
-                this.trainResearch(); break;
-            case "diplomacy":
-                this.trainDiplomacy(); break;
-            case "medical":
-                this.trainMedical(); break;
-            case "teaching":
-                this.trainTeaching(); break;
-            case "navigation":
-                this.trainNavigation(); break;
-            case "engineering":
-                this.trainEngineering(); break;
-            case "mining":
-                this.trainMining(); break;
-            case "leadership":
-                this.trainLeadership(); break;
-            case "gunnery":
-                this.trainGunnery(); break;
-            case "boarding":
-                this.trainBoarding(); break;
-        } //cases are an ugly approach. This is known.
+
+    /*
+    NOTE: rewrote trainSkillByName and trainSkillByID to redirect to trainSkill.
+     */
+
+    public void trainSkillByName(String skillName) {
+        trainSkill(SkillTypes.GetIndexByString(skillName), 1);
     }
     public void trainSkillByID(int skillID) {
-        String[] temp = {"research", "diplomacy", "medical", "teaching", "navigation", "engineering", "mining", "leadership", "gunnery", "boarding"};
-        String skillname = temp[skillID];
-        trainSkillByName(skillname);
+        trainSkill(skillID, 1);
     }
 }
 
