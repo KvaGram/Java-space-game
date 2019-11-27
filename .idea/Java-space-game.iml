@@ -13,5 +13,18 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.5" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains:annotations:17.0.0" level="project" />
+    <orderEntry type="library" name="Maven: de.gurkenlabs:litiengine:0.4.17" level="project" />
+    <orderEntry type="library" name="Maven: net.java.jinput:jinput:2.0.9" level="project" />
+    <orderEntry type="library" name="Maven: net.java.jinput:jinput:natives-all:2.0.9" level="project" />
+    <orderEntry type="library" name="Maven: com.googlecode.soundlibs:jorbis:0.0.17.4" level="project" />
+    <orderEntry type="library" name="Maven: com.googlecode.soundlibs:tritonus-share:0.3.7.4" level="project" />
+    <orderEntry type="library" name="Maven: com.googlecode.soundlibs:vorbisspi:1.0.3.3" level="project" />
+    <orderEntry type="library" name="Maven: com.googlecode.soundlibs:mp3spi:1.9.5.4" level="project" />
+    <orderEntry type="library" name="Maven: com.googlecode.soundlibs:jlayer:1.0.1.4" level="project" />
+    <orderEntry type="library" name="Maven: com.code-disaster.steamworks4j:steamworks4j:1.8.0" level="project" />
+    <orderEntry type="library" name="Maven: javax.activation:javax.activation-api:1.2.0" level="project" />
+    <orderEntry type="library" name="Maven: javax.xml.bind:jaxb-api:2.4.0-b180830.0359" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-core:2.3.0.1" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-impl:2.3.2" level="project" />
   </component>
 </module>
