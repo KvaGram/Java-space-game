@@ -15,3 +15,13 @@ Make it fully grid-based, and copy a bit from Puzzle Pirate's ship combat system
 
 I have migrated some of the design notes on section-frames into this wiki.
 
+**Wednesday 2019 / 11 / 27**
+
+Last couple of days, I been trying to learn LWJGL 3.
+It is complicated, and I have to re-learn some things I have forgotten about OpenGL.
+Hopefully I don't have to write polygon-drawing codes and perspective matrecies from scratch.
+
+Yesterday I worked on Erik's code for crewmen. It had some flaws. Same type of flaws I would have made earlier in my life as a programmer.
+On the commute to work today, I was thinking about [[Job mechanics]], and how they would work.
+
+The job mechanics page has been written.

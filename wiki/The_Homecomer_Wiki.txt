@@ -22,6 +22,10 @@ And shall the crew die, then you die.
 
 Welcome to The Homecomer (working title*)
 
-===== Main content =====
+===== Content =====
+[[+Crew Mechanics]]
+	[[+Crew Mechanics:Aptitudes]]
+[[+Job mechanics]]
 [[+Lars' dev logs]]
-
+[[+Spaceship section-types|+]][[Spaceship section-types]]
+[[+Dictionary]]

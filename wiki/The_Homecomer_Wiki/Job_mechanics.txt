@@ -1,0 +1,39 @@
+Content-Type: text/x-zim-wiki
+Wiki-Format: zim 0.4
+Creation-Date: 2019-11-27T08:33:05+01:00
+
+====== Job mechanics ======
+Created Wednesday 27 November 2019
+
+**What is a job?**
+A job is a responsibility a [[Crewman]] have, usually shared with others.
+Jobs onboard the [[Homeship]] does not have set hours, and the crewmen may work whenever they see fit.
+A job could be anything from a service to labour, and may require different sets of [[Aptitudes.]]
+Jobs normally have a monthly workload. This workload is shared with the assigned crewmen.
+Unlike a [[Battlestation]], a crewman can, and should, have more than one job.
+
+**Where do the jobs exist?**
+Most jobs comes from modules, and the the work that needs doing in them.
+Temporary jobs may show up at times.
+Temporary jobs could be anything from careing for a child to working on a large upgrade or refit for the Homeship.
+Jobs can be set in the [[Crew Management]] window or in a [[Module Management]] window for the module where the job is.
+
+**Workloads and worklists**
+Every job has a workload. The workload may be determined on a set amount, or it could be based on a tasklist.
+A tasklist may be automatically generated each month, or set by the player.
+Automatic tasklist are jobs involving service or maintenence. The number of tasks for those jobs depends of the clients needing service, and facilities requireing maintenence.
+Tasklists set by a player, could be research, cunstruction, manufacturing, etc..
+
+
+**Work produced**
+A crewman assigned to a job will provide work.
+The amount of work they produce is based on their [[Stress|Lingering Stress,]] [[Crew Traits|Traits]] and [[Crew Mechanics:Aptitudes|Aptitude]] skill-level.
+If the work produced in total for a job is less than the monthly workload, the module may suffer effeciency penalties.
+Likewise if the work produced is excessive, the module may have a bonus.
+
+**Stress**
+A crewman will recive stress from working a job.
+The amount of stress recived from a job is based on the workload, and modified by [[Crew Traits]].
+
+
+

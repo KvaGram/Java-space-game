@@ -1,0 +1,8 @@
+Content-Type: text/x-zim-wiki
+Wiki-Format: zim 0.4
+Creation-Date: 2019-11-27T12:36:42+01:00
+
+====== Crew Mechanics ======
+Created Wednesday 27 November 2019
+
+(todo)

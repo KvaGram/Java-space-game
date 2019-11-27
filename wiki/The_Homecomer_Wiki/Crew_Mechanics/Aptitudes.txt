@@ -1,0 +1,9 @@
+Content-Type: text/x-zim-wiki
+Wiki-Format: zim 0.4
+Creation-Date: 2019-11-27T09:15:10+01:00
+
+====== Aptitudes ======
+Created Wednesday 27 November 2019
+
+An aptitude is a physical ability, trained skill, expertice, talent etc. of a creman.
+An aptitude skill-level determines how well a crewman does a job that requires it. 
