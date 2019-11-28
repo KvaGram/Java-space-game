@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="liliengine" pattern="lib:de.gurkenlabs.litiengine.*" />
+</component>

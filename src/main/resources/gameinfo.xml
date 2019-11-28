@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gameinfo>
+    <name>My Testgame</name>
+    <subTitle>Made with LITIengine!</subTitle>
+    <description>A game, that was implemented with the LITIengine.</description>
+    <website>https://litiengine.com</website>
+    <version>v0.0.0-prealpha</version>
+    <company>unicus.no</company>
+    <developer>Lars Erik Grambo</developer>
+</gameinfo>
