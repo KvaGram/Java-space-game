@@ -70,43 +70,62 @@ public class Demo2 implements IUpdateable {
 
     }
 }
-abstract class GameController implements IUpdateable{
+abstract class BaseGameScreen extends Screen implements IUpdateable{
     private boolean active = false;
-    private String screenName;
 
-    public GameController (String screenName){
-        this.screenName = screenName;
-        controllers = ArrayUtils.add(controllers, this);
+    public BaseGameScreen(String screenName){
+        super(screenName);
+        gameScreens = ArrayUtils.add(gameScreens, this);
     }
 
     public void setAsActive() {
-        GameController.setActive(this);
+        BaseGameScreen.setActive(this);
     }
     protected abstract void onClose();
     protected abstract void onOpen();
 
-    private static GameController[] controllers = new GameController[0];
-    private static GameController currentController() {
-        for (GameController gc : controllers) {
+    private static BaseGameScreen[] gameScreens = new BaseGameScreen[0];
+    private static BaseGameScreen currentScreen() {
+        for (BaseGameScreen gc : gameScreens) {
             if (gc.active)
                 return gc;
         }
         return null;
     }
-    private static void setActive(GameController ac){
-        GameController cc = currentController();
-        if(cc == ac)
+    private static void setActive(BaseGameScreen as){
+        BaseGameScreen cs = currentScreen();
+        if(cs == as)
             return;
-        if(cc != null){
-            cc.active = false;
-            Game.loop().detach(cc);
-            cc.onClose();
+        if(cs != null){
+            cs.active = false;
+            Game.loop().detach(cs);
+            cs.onClose();
         }
-        Game.screens().display(ac.screenName);
-        ac.active = true;
-        ac.onOpen();
-        Game.loop().attach(ac);
+        as.active = true;
+        Game.screens().display(as);
+        as.onOpen();
+        Game.loop().attach(as);
 
+    }
+
+    @Override
+    public void prepare()
+    {
+        //Intercept the preparation of this screen to confirm
+        // that this is the active screen. Failing that, set it so.
+        BaseGameScreen cs = currentScreen();
+        if(cs != this) {
+            if(cs != null) {
+                cs.active = false;
+                Game.loop().detach(cs);
+                cs.onClose();
+            }
+            this.active = true;
+            this.onOpen();
+            Game.loop().attach(this);
+        }
+        //resume the UI preparation
+        super.prepare();
     }
 }
 
@@ -127,8 +146,7 @@ class SituationScreen extends Screen {
     }
 }
 
-class ShipRefitController extends GameController {
-
+class ShipRefitController extends BaseGameScreen {
     public ShipRefitController(String screenName, Spaceship spaceship) {
         super(screenName);
 
@@ -153,6 +171,12 @@ class ShipRefitController extends GameController {
     public void update() {
 
     }
+
+    @Override
+    public void render(final Graphics2D g) {
+        super.render(g);
+        //...
+    }
 }
 
 /**
@@ -162,10 +186,5 @@ class ShipRefitScreen extends Screen {
 
     public ShipRefitScreen(String screenName) {
         super(screenName);
-    }
-    @Override
-    public void render(final Graphics2D g) {
-        super.render(g);
-        //...
     }
 }
