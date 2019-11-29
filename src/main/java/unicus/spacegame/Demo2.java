@@ -70,30 +70,30 @@ public class Demo2 implements IUpdateable {
 
     }
 }
-abstract class BaseGameScreen extends Screen implements IUpdateable{
+abstract class ControlScreen extends Screen implements IUpdateable{
     private boolean active = false;
 
-    public BaseGameScreen(String screenName){
+    public ControlScreen(String screenName){
         super(screenName);
         gameScreens = ArrayUtils.add(gameScreens, this);
     }
 
     public void setAsActive() {
-        BaseGameScreen.setActive(this);
+        ControlScreen.setActive(this);
     }
     protected abstract void onClose();
     protected abstract void onOpen();
 
-    private static BaseGameScreen[] gameScreens = new BaseGameScreen[0];
-    private static BaseGameScreen currentScreen() {
-        for (BaseGameScreen gc : gameScreens) {
+    private static ControlScreen[] gameScreens = new ControlScreen[0];
+    private static ControlScreen currentScreen() {
+        for (ControlScreen gc : gameScreens) {
             if (gc.active)
                 return gc;
         }
         return null;
     }
-    private static void setActive(BaseGameScreen as){
-        BaseGameScreen cs = currentScreen();
+    private static void setActive(ControlScreen as){
+        ControlScreen cs = currentScreen();
         if(cs == as)
             return;
         if(cs != null){
@@ -113,7 +113,7 @@ abstract class BaseGameScreen extends Screen implements IUpdateable{
     {
         //Intercept the preparation of this screen to confirm
         // that this is the active screen. Failing that, set it so.
-        BaseGameScreen cs = currentScreen();
+        ControlScreen cs = currentScreen();
         if(cs != this) {
             if(cs != null) {
                 cs.active = false;
@@ -146,11 +146,16 @@ class SituationScreen extends Screen {
     }
 }
 
-class ShipRefitController extends BaseGameScreen {
+class ShipRefitController extends ControlScreen {
+    private Spaceship homeShip;
+
     public ShipRefitController(String screenName, Spaceship spaceship) {
         super(screenName);
 
+        this.homeShip = spaceship;
     }
+
+
 
     @Override
     protected void onClose() {
@@ -177,14 +182,17 @@ class ShipRefitController extends BaseGameScreen {
         super.render(g);
         //...
     }
+
+
+
+    void addBuildWeaponTask( int sectionID, int weaponSlot, WeaponType weaponType) {
+        RefitTask task = new RefitTask(100, RefitType.BuildWeapon, sectionID, weaponSlot, weaponType.toInt());
+    }
+
+
+
 }
 
 /**
  * The ship refit screen is an interface to select changes to The Homeship
  */
-class ShipRefitScreen extends Screen {
-
-    public ShipRefitScreen(String screenName) {
-        super(screenName);
-    }
-}

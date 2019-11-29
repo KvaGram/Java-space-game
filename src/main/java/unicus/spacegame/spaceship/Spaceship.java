@@ -14,6 +14,7 @@ public class Spaceship {
     //lists the type of sections currently installed. 0 is near bridge, other end near engineering.
     public SectionType[] sectionTypes;
     public ShipModule[][] modules;
+    public ShipWeapon[][] weaponTypes;
 
     /**
      * Creates a length long spaceship, naked down to the framework.
@@ -137,14 +138,7 @@ public class Spaceship {
         return ship;
     }
 
-    /**
-     * Test-creates a spaceship, then prints the structure to console.
-     * @param args
-     */
-    public static void main(String[] args) {
-        Spaceship ship = Spaceship.GenerateStart1(new Random(0), 2, 10, 0.0f, 1.0f);
-        System.out.println(ship.toString());
-    }
+
 
     public ArrayList<Integer> GetBuildableModules(Point loc) {
         ArrayList<Integer> list = new ArrayList<Integer>();
@@ -181,4 +175,217 @@ public class Spaceship {
         }
         return list;
     }
+
+    public boolean CanRemoveModule(int sectionID, int moduleID, StringBuffer message) {
+        if (validateModuleSlot(sectionID, moduleID)){
+            message.append("Illegal selection! How did you manage this? HOW!? (this is a bug, please report it)");
+            return false;
+        }
+        return false;
+    }
+    public boolean CanRemoveSection(int sectionID, StringBuffer message) {
+        if (!validateSectionID(sectionID)) {
+            message.append("Illegal selection! How did you manage this? HOW!? (this is a bug, please report it)");
+            return false;
+        }
+        if(sectionTypes[sectionID] == SectionType.None) {
+            message.append("This section is already stripped.");
+            return false;
+        }
+        int failedModules = 0;
+        int emptyModules = 0;
+        ShipModule[] moduleList = modules[sectionID];
+        for (int i = 0, moduleLength = moduleList.length; i < moduleLength; i++) {
+            if(moduleList[i].moduleType == ModuleType.Empty) {
+                emptyModules++;
+                continue;
+            }
+            StringBuffer sub = new StringBuffer();
+            if(!CanRemoveModule(sectionID, i, sub)){
+                failedModules++;
+            }
+            message.append("\n module number " + i + sub);
+        }
+        if(failedModules > 0) {
+            message.insert(0, "This section cannot be stripped." +
+                    "\n " + failedModules + " modules cannot be removed.");
+            return false;
+        }
+        if(emptyModules == moduleList.length) {
+            message.insert(0, "This section be be stripped. You would reclaim X resources");
+            return true;
+        }
+        message.insert(0, "This section be be stripped. You would reclaim X resources." +
+                "\n WARNING: This will also remove the modules and weapons installed on it.");
+        return true;
+    }
+
+
+
+
+
+
+
+
+
+    public ArrayList<RefitTaskChain> taskchains;
+
+    public void resetRefitTasks(){
+        taskchains = new ArrayList<>();
+    }
+    public void applyRefitTasks(){
+
+    }
+
+
+    private boolean validateSectionID(int id) {return id < 0 || id > sectionTypes.length;}
+    private boolean validateWeaponSlot(int sID, int wID) {
+        if (!validateSectionID(sID))
+            return false;
+        //This is a STUB
+        return wID > 0 && wID < 12;
+    }
+    private boolean validateModuleSlot(int sID, int mID) {
+        if (!validateSectionID(sID))
+            return false;
+        return mID > 0 && mID < sectionTypes[sID].getNumModules();
+    }
+
+
+
+    public RefitTaskChain tryBuildModule(int sectionID, int moduleSlot, ModuleType type, RefitTaskChain chain) {
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    public CanBuildResult canBuildWeapon(int sectionID, int slotID, WeaponType type) {
+        CanBuildResult result = new CanBuildResult();
+        if (!validateWeaponSlot(sectionID, slotID)) {
+            result.possible = false;
+            result.message = "Invalid selection.";
+            return result;
+        }
+
+        //STUB. TODO: check if player can afford to construct this.
+        result.possible = true;
+        result.message = String.format("A test-weapon will be built on section %1$s's weapon slot number %2$s.", sectionID, slotID);
+        return result;
+    }
+    public CanBuildResult canBuildModule(int sectionID, int moduleID, ModuleType type) {
+        CanBuildResult result = new CanBuildResult();
+        if (validateModuleSlot(sectionID, moduleID)) {
+            result.possible = false;
+            result.message = "Invalid selection.";
+            return result;
+        }
+        ShipModule module = modules[sectionID][moduleID];
+        //This is a STUB - No care is made for cargo or crew quarters yet
+
+        if (module.moduleType == ModuleType.Empty) {
+            if(type == ModuleType.Empty) {
+                result.possible = true;
+                result.message = "";
+                return result;
+            }
+            //STUB. TODO: check if player can afford to construct this.
+            result.possible = true;
+            result.message = String.format("A %1$s module will be constructed at section 2$s's module slot number 3$s", type, sectionID, moduleID);
+
+        }
+
+
+        if(type == ModuleType.Empty) {
+            result.possible = true;
+            if (module.moduleType == ModuleType.Empty) {
+                result.message = "";
+            }
+            result.message = "Module at ";
+        }
+
+
+
+    }
+
+
+
+    /** --- end of refit section ----**/
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Test-creates a spaceship, then prints the structure to console.
+     * @param args
+     */
+    public static void main(String[] args) {
+        Spaceship ship = Spaceship.GenerateStart1(new Random(0), 2, 10, 0.0f, 1.0f);
+        System.out.println(ship.toString());
+    }
+}
+class RefitTaskChain {
+    public boolean possible;
+    public String message;
+    ArrayList<RefitTask> chain;
+    public RefitTaskChain() {
+        possible = false;
+        message = "";
+        chain = new ArrayList<>();
+    }
+
+    //todo list of material cost / gain
+
+}
+class RefitTask extends ConstructionTask {
+    private RefitType refitType;
+    private int[] args;
+
+    public RefitTask(int labourCost, RefitType refitType, int... args) {
+        super(labourCost);
+
+        this.refitType = refitType;
+        this.args = args;
+    }
+}
+
+//STUB
+class ConstructionTask {
+    private int labourCost;
+
+    public ConstructionTask(int labourCost) {
+
+        this.labourCost = labourCost;
+    }
+}
+enum RefitType {
+    BuildWeapon, BuildModule, BuildSectionFrame, moveModule
+}
+
+//STUB
+enum WeaponType {
+    None, TestGun;
+    public static WeaponType fromInt(int id){ return values()[id]; }
+    public static int toInt(WeaponType type) {return type.toInt(); }
+    public int toInt() {return ordinal();}
+
+}
+
+//STUB
+class ShipWeapon {
+
 }
