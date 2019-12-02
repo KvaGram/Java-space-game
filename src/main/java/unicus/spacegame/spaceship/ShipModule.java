@@ -22,4 +22,12 @@ public class ShipModule {
     public String GetName() {
         return sectionType.toString() + " " + moduleType.toString();
     }
+
+    //STUB. TODO: return value is a list of Cargo.
+    //This includes stored cargo, components that will be dismantled
+    // and the raw material of the module itself (minus a recycle-loss).
+    //This function will be abstract, and implemented on each module sub-class.
+    public Object[] getCargoOnDestruction() {
+        return new Object[0];
+    }
 }
