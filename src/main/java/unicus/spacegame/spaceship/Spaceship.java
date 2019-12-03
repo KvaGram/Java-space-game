@@ -2,6 +2,7 @@ package unicus.spacegame.spaceship;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 /**
@@ -15,6 +16,57 @@ public class Spaceship {
     public SectionType[] sectionTypes;
     public ShipModule[][] modules;
     public ShipWeapon[][] weaponTypes;
+
+    /**
+     * Module location inner class.
+     * Used to store a location of a module or a section.
+     *
+     */
+    public class ModuleLoc {
+        //section, module
+        int s, m;
+        public boolean isValidSection() {return s < 0 || s > sectionTypes.length;}
+        public boolean isValidModule() {
+            if (!isValidSection())
+                return false;
+            if (m < 0)
+                return false;
+            return  m < sectionTypes[s].getNumModules();
+        }
+        public ModuleLoc(int s, int m){
+            this.s = s; this.m = m;
+        }
+        public ShipModule getModule() {
+            if(isValidModule())
+                return modules[s][m];
+            return null;
+        }
+        public SectionType getSection() {
+            if (isValidSection())
+                return sectionTypes[s];
+            return null;
+        }
+        public ModuleLoc[] getModuleLocList() {
+            if(!isValidSection())
+                return null;
+            int len = getSection().getNumModules();
+            ModuleLoc[] ret = new ModuleLoc[len];
+            for (int i = 0; i < len; i++) {
+                ret[i] = new ModuleLoc(s, i);
+            }
+            return ret;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (! (obj instanceof ModuleLoc))
+                return false;
+            ModuleLoc other = (ModuleLoc)obj;
+
+            return other.s == s && other.m == m;
+        }
+    }
+
 
     /**
      * Creates a length long spaceship, naked down to the framework.
@@ -138,8 +190,6 @@ public class Spaceship {
         return ship;
     }
 
-
-
     public ArrayList<Integer> GetBuildableModules(Point loc) {
         ArrayList<Integer> list = new ArrayList<Integer>();
         if(loc.y < 0 || loc.x < 0)
@@ -176,86 +226,157 @@ public class Spaceship {
         return list;
     }
 
-    public boolean CanRemoveModule(int sectionID, int moduleID, StringBuffer message) {
-        if (validateModuleSlot(sectionID, moduleID)){
+    public boolean canBuildSection(ModuleLoc moduleLoc, SectionType typeToBuild, StringBuffer message) {
+        if (!moduleLoc.isValidSection()) {
             message.append("Illegal selection! How did you manage this? HOW!? (this is a bug, please report it)");
             return false;
         }
-        //TODO: check if any previous task in the chain conflicts with this.
-        for (int i = 0; i < taskchain.size(); i++) {
-
+        if(moduleLoc.getSection() != SectionType.None) {
+            message.append("Cannot build section-frame. You need to strip off the old one first.");
+            return false;
         }
-        ShipModule module = modules[sectionID][moduleID];
+
+        //TODO: get material cost of construction.
+        ArrayList<CargoPlaceholder> cost = new ArrayList<>();
+        if(! CanAfford(cost)) {
+            message.append("You cannot afford X resources :-(");
+            return false;
+        }
+        message.append("You can build this section-frame. It will cost X resources.");
+        return true;
+    }
+
+    public boolean canBuildModule(ModuleLoc moduleLoc, ModuleType typeToBuild, StringBuffer message) {
+        if (moduleLoc.isValidModule()){
+            message.append("Illegal selection! How did you manage this? HOW!? (this is a bug, please report it)");
+            return false;
+        }
+        if(moduleLoc.getModule().moduleType != ModuleType.Empty) {
+
+            message.insert(0, "The existing module must be removed.\n");
+            if (canRemoveModule(moduleLoc, message)) {
+                message.append("\n");
+            }
+            else {
+                message.append("Module cannot be built.");
+                return false;
+            }
+        }
+        //TODO: check on all compatibility issues
+        //If this type of module require gravity, but the section-frame lacks it.
+        if(typeToBuild.getNeedGravity() && !moduleLoc.getSection().getHasGravity()) {
+            message.append("Unable to build module: This module requires gravity, and this section-frame is weightless.");
+            return false;
+        }
+        //TODO: get material cost of construction.
+        ArrayList<CargoPlaceholder> cost = new ArrayList<>();
+        if(! CanAfford(cost)) {
+            message.append("You cannot afford X resources :-(");
+            return false;
+        }
+        message.append("You can build this module. It will cost X resources.");
+        return true;
+
+    }
+    public boolean canRemoveModule(ModuleLoc moduleLoc, StringBuffer message) {
+        if (moduleLoc.isValidModule()){
+            message.append("Illegal selection! How did you manage this? HOW!? (this is a bug, please report it)");
+            return false;
+        }
+
+        ArrayList<ModuleLoc> lockedModules = getLockedModules();
+        if(lockedModules.contains(moduleLoc)) {
+            message.append("Your crew is already busy at work here.");
+            return false;
+        }
+
+        ShipModule module = moduleLoc.getModule();
         if (module.moduleType == ModuleType.Empty) {
             message.append("There is no module to remove.");
             return false;
         }
 
         //placeholder cargo objects
-        ArrayList<Object> cargoToMove = new ArrayList<>();
+        ArrayList<CargoPlaceholder> cargoToMove = new ArrayList<>();
         //placeholder crew housing assignment
-        ArrayList<Object> housingToMove = new ArrayList<>();
+        ArrayList<HousingPlaceholder> housingToMove = new ArrayList<>();
 
         if(module instanceof Habitat) {
             Habitat hModule = (Habitat) module;
-            housingToMove.add(hModule.getHousingAssiments());
+            Collections.addAll(housingToMove, hModule.getHousingAssignments());
         }
-        cargoToMove.add(module.getCargoOnDestruction());
+        Collections.addAll(cargoToMove, module.getCargoOnDestruction());
 
-        int numCargo = cargoToMove.size(); //STUB - should report the total cargo units
+        //Add this location to the locked modules.
+        // This is used when checking if cargo,
+        // recycled resources and displaced crew can be relocated.
+        lockedModules.add(moduleLoc);
+
+        int numCargo = cargoToMove.size(); //STUB - TODO: should report the total cargo units
         int numPeople = housingToMove.size();
-        if( !CheckCanHouseCrew(housingToMove, module)) {
+        if( !checkCanHouseCrew(housingToMove, lockedModules)) {
             message.append("Cannot remove module. There is not enough crew-quarters to move all ");
             message.append(numPeople + " crewmen. Please construct more habitats.");
             return false;
         }
-        if( !CheckStoreCargo(cargoToMove, module)) {
+        if( !checkStoreCargo(cargoToMove, lockedModules)) {
             message.append("Cannot remove module. There is not enough space to store all ");
             message.append(numCargo + " cargo units");
             return false;
         }
 
-        return false;
+        message.append("You can remove this module. You will move and reclaim x resources and displace x crew-members");
+        return true;
     }
-    public boolean CanRemoveSection(int sectionID, StringBuffer message) {
-        if (!validateSectionID(sectionID)) {
+    public boolean canRemoveSection(ModuleLoc moduleLoc, StringBuffer message) {
+        if (!moduleLoc.isValidSection()) {
             message.append("Illegal selection! How did you manage this? HOW!? (this is a bug, please report it)");
             return false;
         }
-        //TODO: check if any previous task in the chain conflicts with this.
-        for (int i = 0; i < taskchain.size(); i++) {
 
-        }
+        ArrayList<ModuleLoc> lockedModules = getLockedModules();
+        for (ModuleLoc l : lockedModules)
+            if (l.s == moduleLoc.s) {
+                message.append("Your crew is already busy working in this section. You cannot remove it.");
+                return false;
+            }
 
-        if(sectionTypes[sectionID] == SectionType.None) {
+        if(moduleLoc.getSection() == SectionType.None) {
             message.append("This section is already stripped.");
             return false;
         }
 
         //placeholder cargo objects
-        ArrayList<Object> cargoToMove = new ArrayList<>();
+        ArrayList<CargoPlaceholder> cargoToMove = new ArrayList<>();
         //placeholder crew housing assignment
-        ArrayList<Object> housingToMove = new ArrayList<>();
+        ArrayList<HousingPlaceholder> housingToMove = new ArrayList<>();
 
         //TODO: add resources stripped from section-frame to cargo.
         //TODO: add weapon-components dismantled to cargo.
 
-        ShipModule[] moduleList = modules[sectionID];
-        for (int i = 0, moduleLength = moduleList.length; i < moduleLength; i++) {
-            cargoToMove.add(moduleList[i].getCargoOnDestruction());
-            if (moduleList[i] instanceof Habitat) {
-                Habitat h = (Habitat) moduleList[i];
-                housingToMove.add(h.getHousingAssiments());
+        ModuleLoc[] sModules = moduleLoc.getModuleLocList();
+        for (int i = 0, moduleLength = sModules.length; i < moduleLength; i++) {
+            ShipModule m = sModules[i].getModule();
+            Collections.addAll(cargoToMove, m.getCargoOnDestruction());
+            if (m instanceof Habitat) {
+                Habitat h = (Habitat) m;
+                Collections.addAll(housingToMove, h.getHousingAssignments());
             }
         }
+
+        //Adds this section's modules to the locked modules list.
+        // This is used when checking if cargo,
+        // recycled resources and displaced crew can be relocated.
+        Collections.addAll(lockedModules, moduleLoc.getModuleLocList());
+
         int numCargo = cargoToMove.size(); //STUB - should report the total cargo units
         int numPeople = housingToMove.size();
-        if( !CheckCanHouseCrew(housingToMove, moduleList)) {
+        if( !checkCanHouseCrew(housingToMove, lockedModules)) {
             message.append("Cannot strip section. There is not enough crew-quarters to move all ");
             message.append(numPeople + " crewmen. Please construct more habitats.");
             return false;
         }
-        if( !CheckStoreCargo(cargoToMove, moduleList)) {
+        if( !checkStoreCargo(cargoToMove, lockedModules)) {
             message.append("Cannot strip section. There is not enough space to store all ");
             message.append(numCargo + " cargo units");
             return false;
@@ -269,27 +390,33 @@ public class Spaceship {
     }
 
     //region checkStore/re-house shortcuts
-    private boolean CheckCanHouseCrew(ArrayList<Object> toMove, ShipModule ignoreModule) {
-        return CheckStoreCargo(toMove, new ShipModule[] {ignoreModule});
+    private boolean checkCanHouseCrew(ArrayList<HousingPlaceholder> toMove) {
+        return checkCanHouseCrew(toMove, new ArrayList<ModuleLoc>());
     }
-    private boolean CheckStoreCargo (ArrayList<Object> toStore, ShipModule ignoreModule) {
-        return CheckStoreCargo(toStore, new ShipModule[] {ignoreModule});
-    }
-    private boolean CheckCanHouseCrew(ArrayList<Object> toMove) {
-        return CheckStoreCargo(toMove, new ShipModule[0]);
-    }
-    private boolean CheckStoreCargo (ArrayList<Object> toStore) {
-        return CheckStoreCargo(toStore, new ShipModule[0]);
+    private boolean checkStoreCargo(ArrayList<CargoPlaceholder> toStore) {
+        return checkStoreCargo(toStore, new ArrayList<ModuleLoc>());
     }
     //endregion
 
     // STUB. TODO: check if crew can be housed in available housing space (except in modules in the ignore list).
-    private boolean CheckCanHouseCrew(ArrayList<Object> toMove, ShipModule[] ignoreList) {
+    private boolean checkCanHouseCrew(ArrayList<HousingPlaceholder> toMove, ArrayList<ModuleLoc> ignoreList) {
         return true;
     }
     // STUB. TODO: check if cargo can be stored in available space (except in modules in the ignore list).
-    private boolean CheckStoreCargo (ArrayList<Object> toStore, ShipModule[] ignoreList) {
+    private boolean checkStoreCargo(ArrayList<CargoPlaceholder> toStore, ArrayList<ModuleLoc> ignoreList) {
         return true;
+    }
+    //STUB! Todo: check if player can afford the cost.
+    private boolean CanAfford(ArrayList<CargoPlaceholder> cost) {
+        return true;
+    }
+    
+    public ArrayList<ModuleLoc> getLockedModules() {
+        ArrayList<ModuleLoc> ret = new ArrayList<>();
+        for (RefitTask task : taskchain) {
+            Collections.addAll(ret, task.targets);
+        }
+        return ret;
     }
 
 
@@ -301,42 +428,24 @@ public class Spaceship {
         taskchain = new ArrayList<>();
     }
 
-    private boolean validateSectionID(int id) {return id < 0 || id > sectionTypes.length;}
-    private boolean validateWeaponSlot(int sID, int wID) {
-        if (!validateSectionID(sID))
-            return false;
-        //This is a STUB
-        return wID > 0 && wID < 12;
-    }
-    private boolean validateModuleSlot(int sID, int mID) {
-        if (!validateSectionID(sID))
-            return false;
-        return mID > 0 && mID < sectionTypes[sID].getNumModules();
-    }
 
     //TODO: move RefitTaskChain and RefitTask out of the class
-    class RefitTaskChain {
-        public String message;
-        ArrayList<RefitTask> chain;
-        public RefitTaskChain() {
-            message = "";
-            chain = new ArrayList<>();
-        }
-    }
-
     /**
      * The refit-task is a task that may show up for the construction job.
      */
     abstract class RefitTask extends ConstructionTask {
         protected RefitType refitType;
-        protected int sectionLocation;
-        protected int moduleLocation;
+        protected ModuleLoc[] targets;
 
-        public RefitTask(int labourCost, String description, RefitType refitType, int sectionLocation, int moduleLocation) {
+        public RefitTask(int labourCost, String description, RefitType refitType, ModuleLoc[] targets) {
             super(labourCost, description);
             this.refitType = refitType;
-            this.sectionLocation = sectionLocation;
-            this.moduleLocation = moduleLocation;
+            this.targets = targets;
+        }
+        public RefitTask(int labourCost, String description, RefitType refitType, ModuleLoc target) {
+            super(labourCost, description);
+            this.refitType = refitType;
+            this.targets = new ModuleLoc[]{target};
         }
 
         /** TODO: move to bottom-most super-class for tasks.
@@ -352,12 +461,8 @@ public class Spaceship {
          */
         abstract boolean onRemove();
 
-        public int getSectionLocation() {
-            return sectionLocation;
-        }
-
-        public int getModuleLocation() {
-            return moduleLocation;
+        public ModuleLoc[] getTargets() {
+            return targets;
         }
 
         public RefitType getRefitType() {
@@ -365,7 +470,6 @@ public class Spaceship {
         }
     }
     enum RefitType{build, remove}
-
 
 
 
@@ -471,3 +575,11 @@ enum WeaponType {
 class ShipWeapon {
 
 }
+
+//Placeholder classes. TODO: write these classes (duh..)
+@SuppressWarnings({"All"})
+class CargoPlaceholder{}
+@SuppressWarnings({"All"})
+class HousingPlaceholder{}
+//NOTE: why o' why complain about placeholders, Intellij.
+// you are needlessly breaking my workflow.

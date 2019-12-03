@@ -27,7 +27,7 @@ public class ShipModule {
     //This includes stored cargo, components that will be dismantled
     // and the raw material of the module itself (minus a recycle-loss).
     //This function will be abstract, and implemented on each module sub-class.
-    public Object[] getCargoOnDestruction() {
-        return new Object[0];
+    public CargoPlaceholder[] getCargoOnDestruction() {
+        return new CargoPlaceholder[0];
     }
 }
