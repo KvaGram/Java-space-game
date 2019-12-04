@@ -410,7 +410,7 @@ public class Spaceship {
     private boolean CanAfford(ArrayList<CargoPlaceholder> cost) {
         return true;
     }
-    
+
     public ArrayList<ModuleLoc> getLockedModules() {
         ArrayList<ModuleLoc> ret = new ArrayList<>();
         for (RefitTask task : taskchain) {

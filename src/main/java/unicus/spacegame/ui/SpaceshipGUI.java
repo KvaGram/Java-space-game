@@ -11,7 +11,8 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-
+/**NOTE: This UI is obsolete, and is kept only for reference.
+ * Some vital function-calls have been disabled, as they have become obsolete.*/
 
 /**
  * SpaceshipGUI renders a model of Spaceship
@@ -236,7 +237,7 @@ public class SpaceshipGUI extends JPanel
      * @param type type of module to construct.
      */
     public void tryBuildModule(ModuleType type) {
-        spaceship.BuildModule(mouseTarget.loc.x, mouseTarget.loc.y, type);
+        //spaceship.BuildModule(mouseTarget.loc.x, mouseTarget.loc.y, type);
         buildMouseTargets();
         repaint();
     }
@@ -249,7 +250,7 @@ public class SpaceshipGUI extends JPanel
      * @param type type of section to construct
      */
     public void tryBuildSection(SectionType type) {
-        spaceship.BuildSection(mouseTarget.loc.x, type);
+        //spaceship.BuildSection(mouseTarget.loc.x, type);
         buildMouseTargets();
         repaint();
     }
