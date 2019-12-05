@@ -3,11 +3,16 @@ package unicus.spacegame;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
+import de.gurkenlabs.litiengine.resources.Resources;
 import org.apache.commons.lang3.ArrayUtils;
 import unicus.spacegame.spaceship.Spaceship;
 import unicus.spacegame.ui.Homeship.HomeshipUI;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.Random;
 
 /**
  * Demo2 is a second proof of concept demo/prototype test.
@@ -52,9 +57,38 @@ public class Demo2 implements IUpdateable {
 
 
     public static void main(String[] args) {
-        new Demo2().run();
+        Demo2 demo = new Demo2();
+        demo.init();
+        demo.run();
     }
 
+    private void init() {
+        Game.setInfo("gameinfo.xml");
+
+        Game.init();
+        Image cursor;
+        try {
+
+            //try loading file.
+            cursor = ImageIO.read(Resources.getLocation("cursor1.png")).getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+        } catch (IOException | IllegalArgumentException err) {
+            //paint backup icon.
+            System.out.println(err);
+            cursor = new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
+            Graphics g = cursor.getGraphics();
+            g.setColor(Color.red);
+            g.drawOval(0, 0, 16, 16);
+        }
+        Game.window().getRenderComponent().setCursor(cursor);
+        //Input.mouse().setGrabMouse(false);
+
+        Random r = new Random(0);
+        Spaceship homeship = Spaceship.GenerateStart1(r, 4, 8, .2f, .8f);
+        ShipRefitController refit = new ShipRefitController("REFIT", homeship);
+        refit.setAsActive();
+
+        Game.screens().display("TEST");
+    }
 
 
     private void run() {
