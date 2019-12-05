@@ -5,6 +5,7 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
 import org.apache.commons.lang3.ArrayUtils;
 import unicus.spacegame.spaceship.Spaceship;
+import unicus.spacegame.ui.Homeship.HomeshipUI;
 
 import java.awt.*;
 
@@ -148,9 +149,12 @@ class SituationScreen extends Screen {
 
 class ShipRefitController extends ControlScreen {
     private Spaceship homeShip;
+    private HomeshipUI homeshipUI;
 
     public ShipRefitController(String screenName, Spaceship spaceship) {
         super(screenName);
+        homeshipUI = new HomeshipUI(homeShip, 0, 0, 1000, 1000);
+        getComponents().add(homeshipUI);
 
         this.homeShip = spaceship;
     }
@@ -182,15 +186,6 @@ class ShipRefitController extends ControlScreen {
         super.render(g);
         //...
     }
-
-
-
-    void addBuildWeaponTask( int sectionID, int weaponSlot, WeaponType weaponType) {
-        RefitTask task = new RefitTask(100, RefitType.BuildWeapon, sectionID, weaponSlot, weaponType.toInt());
-    }
-
-
-
 }
 
 /**

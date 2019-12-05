@@ -20,7 +20,6 @@ public class Spaceship {
     /**
      * Module location inner class.
      * Used to store a location of a module or a section.
-     *
      */
     public class ModuleLoc {
         //section, module
@@ -66,7 +65,9 @@ public class Spaceship {
             return other.s == s && other.m == m;
         }
     }
-
+    public ModuleLoc getModuleLoc(int s, int m){
+        return new ModuleLoc(s, m);
+    }
 
     /**
      * Creates a length long spaceship, naked down to the framework.
@@ -568,6 +569,11 @@ enum WeaponType {
     public static WeaponType fromInt(int id){ return values()[id]; }
     public static int toInt(WeaponType type) {return type.toInt(); }
     public int toInt() {return ordinal();}
+
+}
+
+class ShipSection {
+    SectionType type;
 
 }
 
