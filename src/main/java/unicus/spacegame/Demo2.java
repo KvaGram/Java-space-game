@@ -2,6 +2,8 @@ package unicus.spacegame;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
+import de.gurkenlabs.litiengine.graphics.TextRenderer;
+import de.gurkenlabs.litiengine.gui.screens.GameScreen;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.resources.Resources;
 import org.apache.commons.lang3.ArrayUtils;
@@ -54,7 +56,7 @@ import java.util.Random;
 
 
 public class Demo2 implements IUpdateable {
-
+    ShipRefitController refit;
 
     public static void main(String[] args) {
         Demo2 demo = new Demo2();
@@ -64,7 +66,6 @@ public class Demo2 implements IUpdateable {
 
     private void init() {
         Game.setInfo("gameinfo.xml");
-
         Game.init();
         Image cursor;
         try {
@@ -84,15 +85,15 @@ public class Demo2 implements IUpdateable {
 
         Random r = new Random(0);
         Spaceship homeship = Spaceship.GenerateStart1(r, 4, 8, .2f, .8f);
-        ShipRefitController refit = new ShipRefitController("REFIT", homeship);
-        refit.setAsActive();
 
-        Game.screens().display("TEST");
+        refit = new ShipRefitController("REFIT", homeship);
+
     }
 
 
     private void run() {
-
+        Game.start();
+        Game.screens().display("REFIT");
     }
 
     /**
@@ -105,72 +106,13 @@ public class Demo2 implements IUpdateable {
 
     }
 }
-abstract class ControlScreen extends Screen implements IUpdateable{
-    private boolean active = false;
-
-    public ControlScreen(String screenName){
-        super(screenName);
-        gameScreens = ArrayUtils.add(gameScreens, this);
-    }
-
-    public void setAsActive() {
-        ControlScreen.setActive(this);
-    }
-    protected abstract void onClose();
-    protected abstract void onOpen();
-
-    private static ControlScreen[] gameScreens = new ControlScreen[0];
-    private static ControlScreen currentScreen() {
-        for (ControlScreen gc : gameScreens) {
-            if (gc.active)
-                return gc;
-        }
-        return null;
-    }
-    private static void setActive(ControlScreen as){
-        ControlScreen cs = currentScreen();
-        if(cs == as)
-            return;
-        if(cs != null){
-            cs.active = false;
-            Game.loop().detach(cs);
-            cs.onClose();
-        }
-        as.active = true;
-        Game.screens().display(as);
-        as.onOpen();
-        Game.loop().attach(as);
-
-    }
-
-    @Override
-    public void prepare()
-    {
-        //Intercept the preparation of this screen to confirm
-        // that this is the active screen. Failing that, set it so.
-        ControlScreen cs = currentScreen();
-        if(cs != this) {
-            if(cs != null) {
-                cs.active = false;
-                Game.loop().detach(cs);
-                cs.onClose();
-            }
-            this.active = true;
-            this.onOpen();
-            Game.loop().attach(this);
-        }
-        //resume the UI preparation
-        super.prepare();
-    }
-}
-
 
 /** The situation screen acts as sort of a hub for all the functions of the game.
  * It also provides summaries for the current situation of the ship and crew.
  * In-story it is located in the command-center of the front section of the ship.
  */
 
-class SituationScreen extends Screen {
+class SituationScreen extends GameScreen {
     public SituationScreen(String screenName) {
         super(screenName);
     }
@@ -181,28 +123,17 @@ class SituationScreen extends Screen {
     }
 }
 
-class ShipRefitController extends ControlScreen {
+class ShipRefitController extends GameScreen implements IUpdateable {
     private Spaceship homeShip;
     private HomeshipUI homeshipUI;
 
-    public ShipRefitController(String screenName, Spaceship spaceship) {
+    public ShipRefitController(String screenName, Spaceship homeShip) {
         super(screenName);
+        this.homeShip = homeShip;
         homeshipUI = new HomeshipUI(homeShip, 0, 0, 1000, 1000);
         getComponents().add(homeshipUI);
-
-        this.homeShip = spaceship;
-    }
-
-
-
-    @Override
-    protected void onClose() {
-
-    }
-
-    @Override
-    protected void onOpen() {
-
+        Game.loop().attach(this);
+        Game.screens().add(this);
     }
 
     /**
@@ -212,13 +143,15 @@ class ShipRefitController extends ControlScreen {
      */
     @Override
     public void update() {
+        if(isSuspended())
+            return;
+        //System.out.println("Hello world");
 
     }
 
     @Override
     public void render(final Graphics2D g) {
         super.render(g);
-        //...
     }
 }
 
