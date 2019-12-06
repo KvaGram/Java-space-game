@@ -24,7 +24,7 @@ public class Spaceship {
     public class ModuleLoc {
         //section, module
         int s, m;
-        public boolean isValidSection() {return s < 0 || s > sectionTypes.length;}
+        public boolean isValidSection() {return s >= 0 && s < sectionTypes.length;}
         public boolean isValidModule() {
             if (!isValidSection())
                 return false;
@@ -63,6 +63,14 @@ public class Spaceship {
             ModuleLoc other = (ModuleLoc)obj;
 
             return other.s == s && other.m == m;
+        }
+
+        public int getM() {
+            return m;
+        }
+
+        public int getS() {
+            return s;
         }
     }
     public ModuleLoc getModuleLoc(int s, int m){
