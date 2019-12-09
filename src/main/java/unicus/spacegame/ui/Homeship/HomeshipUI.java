@@ -15,7 +15,7 @@ public class HomeshipUI extends GuiComponent {
     public ModuleComponentUI[] modules;
     public GunSlotComponentUI[] gunSlots;
     private Spaceship homeship;
-
+    private final Point scroll;
     /**
      * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
      *
@@ -28,7 +28,7 @@ public class HomeshipUI extends GuiComponent {
         super(x, y, width, height);
         this.homeship = homeship;
 
-
+        scroll = new Point(0,0);
 
         //number of sections will not change (might refactor to allow this later)
         int numSections = homeship.length;
@@ -41,15 +41,15 @@ public class HomeshipUI extends GuiComponent {
         gunSlots = new GunSlotComponentUI[homeship.length * 6];
 
         for (int s = 0; s < numSections; s++) {
-            sections[s] = new SectionComponentUI(homeship.getModuleLoc(s, -1));
+            sections[s] = new SectionComponentUI(homeship.getModuleLoc(s, -1), scroll);
 
             for (int m = 0; m < sectionNumModules; m++) {
                 int mm = s*sectionNumModules + m;
-                modules[mm] = new ModuleComponentUI(homeship.getModuleLoc(s, m));
+                modules[mm] = new ModuleComponentUI(homeship.getModuleLoc(s, m), scroll);
             }
             for (int g = 0; g < SectionNumGunSlots; g++) {
                 int gg = s*sectionNumModules + g;
-                gunSlots[gg] = new GunSlotComponentUI(homeship.getModuleLoc(s, -1), g);
+                gunSlots[gg] = new GunSlotComponentUI(homeship.getModuleLoc(s, -1), scroll, g);
             }
         }
         Collections.addAll(getComponents(), sections);
@@ -113,7 +113,8 @@ public class HomeshipUI extends GuiComponent {
 
             //todo: check for number of weapons in section.
             // - For now 6 gun slots, unless empty section, then 0.
-            if (!g.loc.isValidSection() || g.loc.getSection() == SectionType.None || g.gunSlot < 0 || g.gunSlot >= 6) {
+
+            if (!g.loc.isValidSection()|| g.loc.getSection() == SectionType.None || g.gunSlot < 0 || g.gunSlot >= 6) {
                 g.suspend();
                 continue;
             }
@@ -129,33 +130,52 @@ public class HomeshipUI extends GuiComponent {
 
     }
 }
-class SectionComponentUI extends  GuiComponent{
-
+abstract class HomeshipUIComponent extends GuiComponent {
+    private final Point scroll;
     protected Spaceship.ModuleLoc loc;
+    protected HomeshipUIComponent(Point scroll, int width, int height, Spaceship.ModuleLoc loc) {
+        super(0,0,width, height);
+        this.scroll = scroll;
+        this.loc = loc;
+    }
+    public int getScreenX() {
+        return (int)getX() + scroll.x;
+    }
+    public int getScreenY() {
+        return (int)getY() + scroll.y;
+    }
+}
+
+class SectionComponentUI extends HomeshipUIComponent{
+
+
 
     /**
      * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
      *
      */
-    protected SectionComponentUI(Spaceship.ModuleLoc loc) {
+    protected SectionComponentUI(Spaceship.ModuleLoc loc, Point scroll) {
 
-        super(0, 0, HomeshipUI.SECTION_WIDTH, HomeshipUI.SECTION_HEIGHT);
+        super(scroll, HomeshipUI.SECTION_WIDTH, HomeshipUI.SECTION_HEIGHT, loc);
         this.loc = loc;
     }
     @Override
     public void render(Graphics2D g) {
         super.render(g);
+
+        int x = getScreenX();
+        int y = getScreenY();
 
         g.setStroke(new BasicStroke(1));
         g.setColor(new Color(186, 190, 180));
-        g.fillRoundRect((int)getX() + 5, (int)getY() + 5, (int)getWidth()-5, (int)getHeight()-5, 10, 10);
+        g.fillRoundRect(x + 5, y + 5, (int)getWidth()-5, (int)getHeight()-5, 10, 10);
 
         g.setColor(new Color(61, 58, 50));
         g.setStroke(new BasicStroke(4));
-        g.drawRoundRect((int)getX() + 5, (int)getY() + 5, (int)getWidth()-4, (int)getHeight()-4, 10, 10);
+        g.drawRoundRect(x + 5, y + 5, (int)getWidth()-4, (int)getHeight()-4, 10, 10);
     }
 }
-class ModuleComponentUI extends  GuiComponent{
+class ModuleComponentUI extends  HomeshipUIComponent{
 
     protected Spaceship.ModuleLoc loc;
 
@@ -163,49 +183,52 @@ class ModuleComponentUI extends  GuiComponent{
      * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
      *
      */
-    protected ModuleComponentUI(Spaceship.ModuleLoc loc) {
-        super(0, 0, HomeshipUI.MODULE_WIDTH, HomeshipUI.MODULE_HEIGHT);
+    protected ModuleComponentUI(Spaceship.ModuleLoc loc, Point scroll) {
+        super(scroll, HomeshipUI.MODULE_WIDTH, HomeshipUI.MODULE_HEIGHT, loc);
         this.loc = loc;
     }
     @Override
     public void render(Graphics2D g) {
         super.render(g);
 
+        int x = getScreenX();
+        int y = getScreenY();
+
         g.setStroke(new BasicStroke(1));
         g.setColor(new Color(110,40,0));
-        g.fillRoundRect((int)getX() + 5, (int)getY() + 5, (int)getWidth()-4, (int)getHeight()-4, 10, 10);
+        g.fillRoundRect(x + 5, y + 5, (int)getWidth()-4, (int)getHeight()-4, 10, 10);
 
         g.setColor(new Color(70, 46, 16));
         g.setStroke(new BasicStroke(4));
-        g.drawRoundRect((int)getX() + 5, (int)getY() + 5, (int)getWidth()-4, (int)getHeight()-4, 10, 10);
+        g.drawRoundRect(x + 5, y + 5, (int)getWidth()-4, (int)getHeight()-4, 10, 10);
     }
 }
-class GunSlotComponentUI extends GuiComponent{
+class GunSlotComponentUI extends HomeshipUIComponent{
 
     //NOTE: maybe put gunslot in moduleloc. with that rename moduleloc to something more fitting
-    protected Spaceship.ModuleLoc loc;
     protected int gunSlot;
 
     /**
      * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
      *
      */
-    protected GunSlotComponentUI(Spaceship.ModuleLoc loc, int gunSlot) {
-        super(0, 0, HomeshipUI.WEAPON_WIDTH, HomeshipUI.WEAPON_HEIGHT);
-        this.loc = loc;
+    protected GunSlotComponentUI(Spaceship.ModuleLoc loc, Point scroll, int gunSlot) {
+        super(scroll, HomeshipUI.WEAPON_WIDTH, HomeshipUI.WEAPON_HEIGHT, loc);
         this.gunSlot = gunSlot;
     }
 
     @Override
     public void render(Graphics2D g) {
         super.render(g);
+        int x = getScreenX();
+        int y = getScreenY();
 
         g.setStroke(new BasicStroke(1));
         g.setColor(new Color(255,0, 0));
-        g.fillRoundRect((int)getX() + 5, (int)getY() + 5, (int)getWidth()-4, (int)getHeight()-4, 10, 10);
+        g.fillRoundRect(x + 5, y + 5, (int)getWidth()-4, (int)getHeight()-4, 10, 10);
 
         g.setColor(new Color(70, 0,0));
         g.setStroke(new BasicStroke(4));
-        g.drawRoundRect((int)getX() + 5, (int)getY() + 5, (int)getWidth()-4, (int)getHeight()-4, 10, 10);
+        g.drawRoundRect(x + 5, y + 5, (int)getWidth()-4, (int)getHeight()-4, 10, 10);
     }
 }
