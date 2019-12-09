@@ -130,7 +130,8 @@ class ShipRefitController extends GameScreen implements IUpdateable {
     public ShipRefitController(String screenName, Spaceship homeShip) {
         super(screenName);
         this.homeShip = homeShip;
-        homeshipUI = new HomeshipUI(homeShip, 0, 0, 1000, 1000);
+
+        homeshipUI = new HomeshipUI(homeShip, 0, 0, Game.window().getWidth(), Game.window().getHeight());
         getComponents().add(homeshipUI);
         Game.loop().attach(this);
         Game.screens().add(this);
