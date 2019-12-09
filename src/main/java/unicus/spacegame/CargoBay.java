@@ -1,6 +1,7 @@
 package unicus.spacegame;
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class CargoBay {
@@ -197,7 +198,7 @@ class CargoModule {
     private final static String CARGO_OXY = "Oxygen";
     private final static String CARGO_SPARES = "Spare parts";
     private final static String CARGO_SHINY = "Shinyium";
-    protected final static String[] CARGO_NAMES = {CARGO_FOOD, CARGO_WATER, CARGO_FUEL, CARGO_OXY, CARGO_SPARES, CARGO_SHINY};
+    protected final static String[] CARGO_NAMES = {CARGO_FOOD, CARGO_WATER, CARGO_FUEL, CARGO_OXY, CARGO_SPARES, CARGO_SHINY}; //TODO replace with enum
     final static int CARGO_TYPECOUNT = CARGO_NAMES.length;
     final static int CARGO_CAPACITY_PER_MODULE = 60;
     int total_fullness;
@@ -265,3 +266,45 @@ class CargoModule {
         return (CARGO_CAPACITY_PER_MODULE - total_fullness);
     }
 }
+
+interface CargoCollection {
+    int getCargoUnits();
+    boolean canMerge(CargoCollection other);
+    boolean doMerge(CargoCollection other);
+}
+interface CargoContainer {
+    ArrayList<CargoCollection> getCollection();
+    int getCapacity();
+    boolean canAdd(CargoCollection newCargo);
+    boolean doAdd(CargoCollection newCargo);
+}
+class WaterCollection implements CargoCollection {
+    int numWater;
+
+    @Override
+    public int getCargoUnits() {
+        return numWater;
+    }
+    @Override
+    public boolean canMerge(CargoCollection other) {
+        if (other instanceof WaterCollection)  {
+            return true;
+        }
+        return false;
+    }
+    @Override
+    public boolean doMerge(CargoCollection other) {
+        try {
+            WaterCollection wOther = (WaterCollection) other;
+            numWater += wOther.numWater;
+            return true;
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
+        }
+    }
+}
+//Option one: Separate classes for each type of content. WaterCollection, FoodCollection, FuelCollection...
+//Option two: Is anything like 'instanceof this' legal so that classes can inherit polymorphic code?
+//Option three: Get an eval() function into java somehow.
+//Option four: generic class, multiple instances, each constructed with an ID for what it's a collection of
