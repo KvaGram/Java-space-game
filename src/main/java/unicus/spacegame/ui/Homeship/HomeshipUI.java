@@ -19,7 +19,7 @@ public class HomeshipUI extends GuiComponent {
     public GunSlotComponentUI[] gunSlots;
     public Scrollbar scrollbar;
     private Spaceship homeship;
-    private final Point scroll;
+    private final Dimension viewarea; //visible pixel screen-size of the homeship
     private final Dimension area; //Full pixel screen-size of the homeship.
     /**
      * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
@@ -32,14 +32,10 @@ public class HomeshipUI extends GuiComponent {
     public HomeshipUI(Spaceship homeship, double x, double y, double width, double height) {
         super(x, y, width, height);
         this.homeship = homeship;
-
-        scroll = new Point(0,0);
+        viewarea = new Dimension((int)width, (int)height);
         area = new Dimension();
 
-        this.scrollbar = new Scrollbar(0, height - 100, width, 40, scroll, area);
-        this.scrollbar.addScrollListener(() -> {
-            updateScroll();
-        });
+        this.scrollbar = new Scrollbar(40, height - 80, width-80, 40, Axis2D.horizontal, area, viewarea);
         getComponents().add(this.scrollbar);
 
         //number of sections will not change (might refactor to allow this later)
@@ -54,27 +50,23 @@ public class HomeshipUI extends GuiComponent {
 
         for (int s = 0; s < numSections; s++) {
             sections[s] = new SectionComponentUI(homeship.getModuleLoc(s, -1));
+            scrollbar.addScrollListener(sections[s]);
 
             for (int m = 0; m < sectionNumModules; m++) {
                 int mm = s*sectionNumModules + m;
                 modules[mm] = new ModuleComponentUI(homeship.getModuleLoc(s, m));
+                scrollbar.addScrollListener(modules[mm]);
             }
             for (int g = 0; g < SectionNumGunSlots; g++) {
                 int gg = s*sectionNumModules + g;
                 gunSlots[gg] = new GunSlotComponentUI(homeship.getModuleLoc(s, -1), g);
+                scrollbar.addScrollListener(gunSlots[gg]);
             }
         }
         Collections.addAll(getComponents(), sections);
         Collections.addAll(getComponents(), modules);
         Collections.addAll(getComponents(), gunSlots);
     }
-
-    private void updateScroll() {
-        for(SectionComponentUI s : sections) {s.setScroll(scroll);}
-        for(ModuleComponentUI  s : modules)  {s.setScroll(scroll);}
-        for(GunSlotComponentUI s : gunSlots) {s.setScroll(scroll);}
-    }
-
     @Override
     public void prepare() {
         super.prepare();
@@ -114,8 +106,7 @@ public class HomeshipUI extends GuiComponent {
                 s.prepare();
             newX = HEAD_WIDTH + SECTION_WIDTH * s.loc.getS();
             newY = START_Y;
-            s.localPos.x = newX;
-            s.localPos.y = newY;
+            s.setLocalPos(newX, newY);
         }
 
         for(ModuleComponentUI m : modules) {
@@ -131,8 +122,7 @@ public class HomeshipUI extends GuiComponent {
             int spread = (SECTION_HEIGHT - numModules * MODULE_HEIGHT) / numModules;
             newX = HEAD_WIDTH + SECTION_WIDTH * m.loc.getS() + SECTION_WIDTH - MODULE_WIDTH;
             newY = START_Y + MODULE_HEIGHT * m.loc.getM() + spread * m.loc.getM() + (int)(spread/2.0);
-            m.localPos.x = newX;
-            m.localPos.y = newY;
+            m.setLocalPos(newX, newY);
         }
         for(GunSlotComponentUI g : gunSlots) {
 
@@ -151,19 +141,28 @@ public class HomeshipUI extends GuiComponent {
             int spread = (SECTION_HEIGHT - numGuns * WEAPON_HEIGHT) / numGuns;
             newX = HEAD_WIDTH + SECTION_WIDTH * g.loc.getS();
             newY = START_Y + WEAPON_HEIGHT * g.gunSlot + spread * g.gunSlot + (int)(spread/2.0);
-            g.localPos.x = newX;
-            g.localPos.y = newY;
+
+            g.setLocalPos(newX, newY);
         }
-        updateScroll();
     }
 }
-abstract class HomeshipUIComponent extends GuiComponent {
+abstract class HomeshipUIComponent extends GuiComponent implements ScrollbarListener {
     protected Spaceship.ModuleLoc loc;
-    protected final Point localPos;
-    protected HomeshipUIComponent(int width, int height, Spaceship.ModuleLoc loc) {
+    private final Point localPos;
+    private boolean needUpdate;
+    private int scrollOffset;
+
+    protected HomeshipUIComponent(int width, int height, Spaceship.ModuleLoc loc){
         super(0,0, width, height);
         this.loc = loc;
         this.localPos = new Point();
+        needUpdate = true;
+        scrollOffset = 0;
+    }
+    public void setLocalPos(int x, int y) {
+        localPos.x = x;
+        localPos.y = y;
+        needUpdate = true;
     }
     public int getIntX() {
         return (int)getX();
@@ -172,11 +171,17 @@ abstract class HomeshipUIComponent extends GuiComponent {
         return (int)getY();
     }
 
-    /**
-     * Sets the GUI component X and Y variables based on the local position and the scroll offset.
-     */
-    public void setScroll(Point scroll) {
-        this.setLocation(localPos.x - scroll.x, localPos.y - scroll.y);
+    public void onScrollUpdate(Axis2D axis, double value) {
+        scrollOffset = (int)value;
+        needUpdate = true;
+    }
+    @Override
+    public void render(Graphics2D g) {
+        super.render(g);
+        if(needUpdate){
+            setLocation(localPos.x - scrollOffset, localPos.y);
+            needUpdate = false;
+        }
     }
 }
 
@@ -263,78 +268,4 @@ class GunSlotComponentUI extends HomeshipUIComponent{
         g.drawRoundRect(x + 5, y + 5, (int)getWidth()-4, (int)getHeight()-4, 10, 10);
     }
 }
-interface ScrollbarListener{void onScrollUpdate();}
-class Scrollbar extends GuiComponent {
-    //Area the scrollbar is scrolling for
-    private final Dimension area;
-    //The offset the scrollbar manipulates
-    private final Point scroll;
-    private ArrayList<ScrollbarListener> listeners;
 
-    /**
-     * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
-     *
-     * @param x      the x
-     * @param y      the y
-     * @param width  the width
-     * @param height
-     */
-    public Scrollbar(double x, double y, double width, double height, Point scroll, Dimension area) {
-        super(x, y, width, height);
-        this.area = area;
-        this.scroll = scroll;
-        this.setForwardMouseEvents(false);
-        listeners = new ArrayList<>();
-    }
-    @Override
-    public void mouseDragged(final MouseEvent e) {
-
-        //if(isSuspended() || !this.getBoundingBox().contains(e.getX(), e.getY())) {
-        //    super.mouseDragged(e);
-        //    return;
-        //}
-        int x = e.getX();
-        scroll.x = (int)(scrollable() * (x / (float)area.width));
-        callScrollUpdate();
-    }
-
-    private int scrollable() {
-        return area.width - (int)getWidth();
-    }
-
-    public void callScrollUpdate() {
-        for (ScrollbarListener evt : listeners) {
-            evt.onScrollUpdate();
-        }
-    }
-    public void addScrollListener(ScrollbarListener listener) {
-        listeners.add(listener);
-    }
-    public boolean removeScrollListener(ScrollbarListener listener) {
-        return listeners.remove(listener);
-    }
-    public boolean tooSmall(){
-        return scrollable() <= 0;
-    }
-
-
-    @Override
-    public void render(Graphics2D g) {
-        super.render(g);
-        if(tooSmall())
-            return;
-
-        double scrollX = scroll.x * scrollable() / getWidth();
-        RoundRectangle2D bar = new RoundRectangle2D.Double(getX(),getY(), getWidth(), getHeight(), 10, 10);
-        Rectangle.Double knob = new Rectangle.Double(scrollX, getY(), getHeight(), getHeight());
-
-        g.setColor(Color.darkGray);
-        g.fill(bar);
-        g.setColor(Color.LIGHT_GRAY);
-        g.fill(knob);
-
-        //ShapeRenderer.render(g, bar);
-        //ShapeRenderer.render(g, knob);
-    }
-
-}

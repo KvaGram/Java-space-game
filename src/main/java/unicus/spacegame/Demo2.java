@@ -84,7 +84,7 @@ public class Demo2 implements IUpdateable {
         //Input.mouse().setGrabMouse(false);
 
         Random r = new Random(0);
-        Spaceship homeship = Spaceship.GenerateStart1(r, 4, 8, .2f, .8f);
+        Spaceship homeship = Spaceship.GenerateStart1(r, 8, 20, .2f, .8f);
 
         refit = new ShipRefitController("REFIT", homeship);
 
