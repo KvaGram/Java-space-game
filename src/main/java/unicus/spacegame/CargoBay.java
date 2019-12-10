@@ -267,6 +267,10 @@ class CargoModule {
     }
 }
 
+enum CargoTypes {
+    FOOD, WATER, FUEL, OXYGEN, PARTS, SHINYIUM;
+}
+
 interface CargoCollection {
     int getCargoUnits();
     boolean canMerge(CargoCollection other);
@@ -278,6 +282,7 @@ interface CargoContainer {
     boolean canAdd(CargoCollection newCargo);
     boolean doAdd(CargoCollection newCargo);
 }
+
 class WaterCollection implements CargoCollection {
     int numWater;
 
@@ -304,6 +309,35 @@ class WaterCollection implements CargoCollection {
         }
     }
 }
+
+class BasicCargoCollection implements CargoCollection {
+    CargoTypes ctype;
+    int numCargo;
+    BasicCargoCollection(CargoTypes ctype) {
+        this.ctype=ctype;
+        numCargo=0;
+    }
+    @Override
+    public int getCargoUnits() {
+        return numCargo;
+    }
+
+    @Override
+    public boolean canMerge(CargoCollection other) {
+        BasicCargoCollection bOther = (BasicCargoCollection) other;
+        return (this.ctype == bOther.ctype);
+    }
+
+    @Override
+    public boolean doMerge(CargoCollection other) {
+        BasicCargoCollection bOther = (BasicCargoCollection) other;
+        assert (this.ctype == bOther.ctype);
+        this.numCargo += bOther.numCargo;
+        bOther.numCargo = 0;
+        return false;
+    }
+}
+
 //Option one: Separate classes for each type of content. WaterCollection, FoodCollection, FuelCollection...
 //Option two: Is anything like 'instanceof this' legal so that classes can inherit polymorphic code?
 //Option three: Get an eval() function into java somehow.
