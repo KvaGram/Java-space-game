@@ -154,6 +154,8 @@ class ShipRefitController extends GameScreen implements IUpdateable {
     public void render(final Graphics2D g) {
         super.render(g);
     }
+
+
 }
 
 /**

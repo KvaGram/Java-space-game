@@ -3,12 +3,20 @@ package unicus.spacegame.ui.Homeship;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 import unicus.spacegame.spaceship.SectionType;
 import unicus.spacegame.spaceship.Spaceship;
+import unicus.spacegame.ui.Axis2D;
+import unicus.spacegame.ui.MenuController;
+import unicus.spacegame.ui.Scrollbar;
+import unicus.spacegame.ui.ScrollbarListener;
+import unicus.spacegame.ui.PopMenu;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.Collections;
+
+import static unicus.spacegame.ui.Axis2D.*;
+
 
 /**
  * The Homeship UI renders a 2D representation of the spaceship, its section frames and modules
@@ -21,6 +29,8 @@ public class HomeshipUI extends GuiComponent {
     private Spaceship homeship;
     private final Dimension viewarea; //visible pixel screen-size of the homeship
     private final Dimension area; //Full pixel screen-size of the homeship.
+    private PopMenu popMenu;
+
     /**
      * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
      *
@@ -35,7 +45,8 @@ public class HomeshipUI extends GuiComponent {
         viewarea = new Dimension((int)width, (int)height);
         area = new Dimension();
 
-        this.scrollbar = new Scrollbar(40, height - 80, width-80, 40, Axis2D.horizontal, area, viewarea);
+
+        this.scrollbar = new Scrollbar(40, height - 80, width-80, 40, horizontal, area, viewarea);
         getComponents().add(this.scrollbar);
 
         //number of sections will not change (might refactor to allow this later)
@@ -66,11 +77,16 @@ public class HomeshipUI extends GuiComponent {
         Collections.addAll(getComponents(), sections);
         Collections.addAll(getComponents(), modules);
         Collections.addAll(getComponents(), gunSlots);
+
+        popMenu = new PopMenu(0,0,400, 200, new String[0], new boolean[0]);
+        getComponents().add(popMenu);
     }
     @Override
     public void prepare() {
         super.prepare();
         updateLayout();
+
+        openMenu(null, new String[]{"test normal 1","test normal 2", "test normal 3", "test disabled 3", "test disabled 4"}, new boolean[]{true, true, true, false, false});
     }
 
     @Override
@@ -144,6 +160,14 @@ public class HomeshipUI extends GuiComponent {
 
             g.setLocalPos(newX, newY);
         }
+    }
+    void openMenu(MenuController controller, String[] options, boolean[] enabledOptions) {
+        popMenu.setController(controller);
+        popMenu.setOptions(options, enabledOptions);
+        popMenu.prepare();
+    }
+    void closeMenu() {
+        popMenu.suspend();
     }
 }
 abstract class HomeshipUIComponent extends GuiComponent implements ScrollbarListener {

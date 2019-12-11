@@ -1,16 +1,15 @@
-package unicus.spacegame.ui.Homeship;
+package unicus.spacegame.ui;
 
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
-enum ButtonState{normal, disabled, highlight, pressed}
+enum ButtonState{normal, disabled, pressed}
 interface ButtonController {void onButtonPress(BasicButton button);}
 public class BasicButton extends GuiComponent {
     @Override
     public void mousePressed(final MouseEvent e) {
         if(isSuspended() || !this.getBoundingBox().contains(e.getX(), e.getY())) {
-            super.mousePressed(e);
             return;
         }
         if ( controller != null ) {
@@ -26,7 +25,7 @@ public class BasicButton extends GuiComponent {
 
     public Color onNormalColor = Color.blue;
     public Color onDisabledColor = Color.lightGray;
-    public Color onHighlightColor = Color.cyan;
+    public Color onHoverColor = Color.cyan;
     public Color onPressedColor = Color.green;
 
     /**
@@ -44,24 +43,28 @@ public class BasicButton extends GuiComponent {
     }
     @Override
     public void render(Graphics2D g){
-        switch (state){
+        switch (state) {
             case normal:
-                g.setColor(onNormalColor);
+                if (isHovered())
+                    g.setColor(onHoverColor);
+                else
+                    g.setColor(onNormalColor);
                 break;
-            case disabled:s:
+            case disabled:
+                s:
                 g.setColor(onDisabledColor);
-                break;
-            case highlight:
-                g.setColor(onHighlightColor);
                 break;
             case pressed:
                 g.setColor(onPressedColor);
                 break;
         }
-        g.fillRect((int)getX(), (int)getY(), (int)getHeight(), (int)getWidth());
+        g.fillRect((int)getX(), (int)getY(),(int)getWidth(), (int)getHeight());
         g.setColor(Color.black);
-        g.drawString(text, (int)getX()+5, (int)getY()+5);
+        g.drawString(text, (int)getX()+20, (int)getY()+20);
     }
 
 
+    public void setController(ButtonController controller) {
+        this.controller = controller;
+    }
 }

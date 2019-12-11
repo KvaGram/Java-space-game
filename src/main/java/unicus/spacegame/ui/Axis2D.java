@@ -1,3 +1,3 @@
-package unicus.spacegame.ui.Homeship;
+package unicus.spacegame.ui;
 
 public enum Axis2D {vertical, horizontal}

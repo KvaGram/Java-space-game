@@ -1,4 +1,4 @@
-package unicus.spacegame.ui.Homeship;
+package unicus.spacegame.ui;
 
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 
@@ -6,8 +6,6 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
-
-interface ScrollbarListener{void onScrollUpdate(Axis2D axis, double value);}
 
 public class Scrollbar extends GuiComponent {
 
