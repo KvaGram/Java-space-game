@@ -271,45 +271,6 @@ enum CargoTypes {
     FOOD, WATER, FUEL, OXYGEN, PARTS, SHINYIUM;
 }
 
-interface CargoCollection {
-    int getCargoUnits();
-    boolean canMerge(CargoCollection other);
-    boolean doMerge(CargoCollection other);
-}
-interface CargoContainer {
-    ArrayList<CargoCollection> getCollection();
-    int getCapacity();
-    boolean canAdd(CargoCollection newCargo);
-    boolean doAdd(CargoCollection newCargo);
-}
-
-class WaterCollection implements CargoCollection {
-    int numWater;
-
-    @Override
-    public int getCargoUnits() {
-        return numWater;
-    }
-    @Override
-    public boolean canMerge(CargoCollection other) {
-        if (other instanceof WaterCollection)  {
-            return true;
-        }
-        return false;
-    }
-    @Override
-    public boolean doMerge(CargoCollection other) {
-        try {
-            WaterCollection wOther = (WaterCollection) other;
-            numWater += wOther.numWater;
-            return true;
-        } catch (Exception e) {
-            System.out.println(e);
-            return false;
-        }
-    }
-}
-
 class BasicCargoCollection implements CargoCollection {
     CargoTypes ctype;
     int numCargo;
