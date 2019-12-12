@@ -45,4 +45,7 @@ public enum SectionType {
     };
     public abstract int getNumModules();
     public abstract boolean getHasGravity();
+    public SectionType[] getBuildable(){
+        return new SectionType[]{Normal, Wheel, GravityPlated};
+    }
 };

@@ -1,5 +1,7 @@
 package unicus.spacegame.spaceship;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.awt.*;
 
 /**
@@ -38,4 +40,10 @@ public enum ModuleType {
 
     public abstract boolean getNeedGravity();
     public abstract Color getPaintColor();
+    public ModuleType[] getBuildable(boolean includeGravity){
+        ModuleType[] ret = new ModuleType[]{Cargo};
+        if(includeGravity)
+            ret = ArrayUtils.addAll(ret, Habitat);
+        return ret;
+    }
 };
