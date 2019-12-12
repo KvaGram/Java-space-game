@@ -1,5 +1,6 @@
 package unicus.spacegame.ui.Homeship;
 
+import de.gurkenlabs.litiengine.gui.ComponentMouseEvent;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 import unicus.spacegame.spaceship.SectionType;
 import unicus.spacegame.spaceship.Spaceship;
@@ -11,25 +12,24 @@ import unicus.spacegame.ui.PopMenu;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.awt.geom.RoundRectangle2D;
-import java.util.ArrayList;
 import java.util.Collections;
 
 import static unicus.spacegame.ui.Axis2D.*;
-
 
 /**
  * The Homeship UI renders a 2D representation of the spaceship, its section frames and modules
  */
 public class HomeshipUI extends GuiComponent {
+    private HomeshipUIController controller;
     public SectionComponentUI[] sections;
     public ModuleComponentUI[] modules;
     public GunSlotComponentUI[] gunSlots;
     public Scrollbar scrollbar;
     private Spaceship homeship;
-    private final Dimension viewarea; //visible pixel screen-size of the homeship
-    private final Dimension area; //Full pixel screen-size of the homeship.
+    private final Dimension viewArea = new Dimension(); //visible pixel screen-size of the homeship
+    private final Dimension area = new Dimension(); //Full pixel screen-size of the homeship.
     private PopMenu popMenu;
+
 
     /**
      * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
@@ -42,12 +42,7 @@ public class HomeshipUI extends GuiComponent {
     public HomeshipUI(Spaceship homeship, double x, double y, double width, double height) {
         super(x, y, width, height);
         this.homeship = homeship;
-        viewarea = new Dimension((int)width, (int)height);
-        area = new Dimension();
-
-
-        this.scrollbar = new Scrollbar(40, height - 80, width-80, 40, horizontal, area, viewarea);
-        getComponents().add(this.scrollbar);
+        this.viewArea.setSize((int)width, (int)height);
 
         //number of sections will not change (might refactor to allow this later)
         int numSections = homeship.length;
@@ -60,27 +55,49 @@ public class HomeshipUI extends GuiComponent {
         gunSlots = new GunSlotComponentUI[homeship.length * 6];
 
         for (int s = 0; s < numSections; s++) {
-            sections[s] = new SectionComponentUI(homeship.getModuleLoc(s, -1));
-            scrollbar.addScrollListener(sections[s]);
-
+            //extra code-block, so variable-name loc can be reused.
+            {
+                Spaceship.ShipLoc loc = homeship.getShipLoc(s, 0, -1);
+                sections[s] = new SectionComponentUI(loc);
+                scrollbar.addScrollListener(sections[s]);
+                sections[s].onClicked(componentMouseEvent -> onShipPartClicked(loc, componentMouseEvent));
+            }
             for (int m = 0; m < sectionNumModules; m++) {
+                Spaceship.ShipLoc loc = homeship.getShipLoc(s, m+1, -1);
                 int mm = s*sectionNumModules + m;
-                modules[mm] = new ModuleComponentUI(homeship.getModuleLoc(s, m));
+                modules[mm] = new ModuleComponentUI(loc);
                 scrollbar.addScrollListener(modules[mm]);
+                modules[mm].onClicked(componentMouseEvent -> onShipPartClicked(loc, componentMouseEvent));
             }
             for (int g = 0; g < SectionNumGunSlots; g++) {
+                Spaceship.ShipLoc loc = homeship.getShipLoc(s, 0, g);
                 int gg = s*sectionNumModules + g;
-                gunSlots[gg] = new GunSlotComponentUI(homeship.getModuleLoc(s, -1), g);
+                //TODO: remove g parameter from GunSlotComponentUI constructor
+                gunSlots[gg] = new GunSlotComponentUI(loc, g);
                 scrollbar.addScrollListener(gunSlots[gg]);
+                gunSlots[gg].onClicked(componentMouseEvent -> onShipPartClicked(loc, componentMouseEvent));
             }
         }
         Collections.addAll(getComponents(), sections);
         Collections.addAll(getComponents(), modules);
         Collections.addAll(getComponents(), gunSlots);
 
+
+
+        this.scrollbar = new Scrollbar(40, height - 80, width-80, 40, horizontal, area, viewArea);
+        getComponents().add(this.scrollbar);
+
         popMenu = new PopMenu(0,0,400, 200, new String[0], new boolean[0]);
         getComponents().add(popMenu);
     }
+
+    private void onShipPartClicked(Spaceship.ShipLoc loc, ComponentMouseEvent componentMouseEvent) {
+        popMenu.setX(componentMouseEvent.getEvent().getX());
+        popMenu.setY(componentMouseEvent.getEvent().getY());
+        if(controller != null)
+            controller.onSelected(loc);
+    }
+
     @Override
     public void prepare() {
         super.prepare();
@@ -106,7 +123,7 @@ public class HomeshipUI extends GuiComponent {
     public static int WEAPON_WIDTH = 50;
     public static int WEAPON_HEIGHT = 50;
 
-
+    //TODO: needs update due to the ShipLoc change.
     void updateLayout() {
         area.height = SECTION_HEIGHT;
         area.width = HEAD_WIDTH + homeship.length * SECTION_WIDTH + TAIL_WIDTH;
@@ -169,14 +186,27 @@ public class HomeshipUI extends GuiComponent {
     void closeMenu() {
         popMenu.suspend();
     }
+
+    //This override is enabled to make it possible to click out of the popmenu.
+    //It will also let the controller know that this happened.
+    @Override
+    public void mouseClicked(final MouseEvent e) {
+        //If popMenu is suspended, or mouse is over the popMenu, do as normal.
+        if(popMenu.isSuspended() || popMenu.isHovered() ) {
+            super.mouseClicked(e);
+            return;
+        }
+        //otherwise, let controller know the menu has been closed.
+
+    }
 }
 abstract class HomeshipUIComponent extends GuiComponent implements ScrollbarListener {
-    protected Spaceship.ModuleLoc loc;
+    protected Spaceship.ShipLoc loc;
     private final Point localPos;
     private boolean needUpdate;
     private int scrollOffset;
 
-    protected HomeshipUIComponent(int width, int height, Spaceship.ModuleLoc loc){
+    protected HomeshipUIComponent(int width, int height, Spaceship.ShipLoc loc){
         super(0,0, width, height);
         this.loc = loc;
         this.localPos = new Point();
@@ -214,7 +244,7 @@ class SectionComponentUI extends HomeshipUIComponent{
      * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
      *
      */
-    protected SectionComponentUI(Spaceship.ModuleLoc loc) {
+    protected SectionComponentUI(Spaceship.ShipLoc loc) {
 
         super(HomeshipUI.SECTION_WIDTH, HomeshipUI.SECTION_HEIGHT, loc);
         this.loc = loc;
@@ -237,13 +267,13 @@ class SectionComponentUI extends HomeshipUIComponent{
 }
 class ModuleComponentUI extends  HomeshipUIComponent{
 
-    protected Spaceship.ModuleLoc loc;
+    protected Spaceship.ShipLoc loc;
 
     /**
      * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
      *
      */
-    protected ModuleComponentUI(Spaceship.ModuleLoc loc) {
+    protected ModuleComponentUI(Spaceship.ShipLoc loc) {
         super(HomeshipUI.MODULE_WIDTH, HomeshipUI.MODULE_HEIGHT, loc);
         this.loc = loc;
     }
@@ -272,7 +302,7 @@ class GunSlotComponentUI extends HomeshipUIComponent{
      * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
      *
      */
-    protected GunSlotComponentUI(Spaceship.ModuleLoc loc, int gunSlot) {
+    protected GunSlotComponentUI(Spaceship.ShipLoc loc, int gunSlot) {
         super(HomeshipUI.WEAPON_WIDTH, HomeshipUI.WEAPON_HEIGHT, loc);
         this.gunSlot = gunSlot;
     }

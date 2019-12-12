@@ -2,13 +2,11 @@ package unicus.spacegame;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
-import de.gurkenlabs.litiengine.graphics.TextRenderer;
 import de.gurkenlabs.litiengine.gui.screens.GameScreen;
-import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.resources.Resources;
-import org.apache.commons.lang3.ArrayUtils;
 import unicus.spacegame.spaceship.Spaceship;
 import unicus.spacegame.ui.Homeship.HomeshipUI;
+import unicus.spacegame.ui.Homeship.HomeshipUIController;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -56,7 +54,7 @@ import java.util.Random;
 
 
 public class Demo2 implements IUpdateable {
-    ShipRefitController refit;
+    ShipRefitController shipView;
 
     public static void main(String[] args) {
         Demo2 demo = new Demo2();
@@ -86,14 +84,14 @@ public class Demo2 implements IUpdateable {
         Random r = new Random(0);
         Spaceship homeship = Spaceship.GenerateStart1(r, 8, 20, .2f, .8f);
 
-        refit = new ShipRefitController("REFIT", homeship);
+        shipView = new ShipRefitController("SHIPVIEW", homeship);
 
     }
 
 
     private void run() {
         Game.start();
-        Game.screens().display("REFIT");
+        Game.screens().display("SHIPVIEW");
     }
 
     /**
@@ -123,7 +121,7 @@ class SituationScreen extends GameScreen {
     }
 }
 
-class ShipRefitController extends GameScreen implements IUpdateable {
+class ShipRefitController extends GameScreen implements IUpdateable, HomeshipUIController {
     private Spaceship homeShip;
     private HomeshipUI homeshipUI;
 
@@ -156,6 +154,11 @@ class ShipRefitController extends GameScreen implements IUpdateable {
     }
 
 
+    @Override
+    public void onSelected(Spaceship.ShipLoc loc) {
+        //TODO what to do when a section, module or component is selected.
+        //Expected to run homeshipUI.openMenu
+    }
 }
 
 /**
