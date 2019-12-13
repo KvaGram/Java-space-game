@@ -45,34 +45,33 @@ public class HomeshipUI extends GuiComponent {
         this.viewArea.setSize((int)width, (int)height);
 
         //number of sections will not change (might refactor to allow this later)
-        int numSections = homeship.length;
-        sections = new SectionComponentUI[homeship.length];
+        int numSections = homeship.middleLength;
+        sections = new SectionComponentUI[homeship.middleLength];
         //There can be up to 6 modules per section
         int sectionNumModules = 6;
-        modules = new ModuleComponentUI[homeship.length * 6];
+        modules = new ModuleComponentUI[homeship.middleLength * 6];
         //There can be up to 6 gun slots per section
         int SectionNumGunSlots = 6;
-        gunSlots = new GunSlotComponentUI[homeship.length * 6];
+        gunSlots = new GunSlotComponentUI[homeship.middleLength * 6];
 
         for (int s = 0; s < numSections; s++) {
             //extra code-block, so variable-name loc can be reused.
             {
-                Spaceship.ShipLoc loc = homeship.getShipLoc(s, 0, -1);
+                Spaceship.ShipLoc loc = homeship.getShipLoc(s, 0);
                 sections[s] = new SectionComponentUI(loc);
                 scrollbar.addScrollListener(sections[s]);
                 sections[s].onClicked(componentMouseEvent -> onShipPartClicked(loc, componentMouseEvent));
             }
             for (int m = 0; m < sectionNumModules; m++) {
-                Spaceship.ShipLoc loc = homeship.getShipLoc(s, m+1, -1);
+                Spaceship.ShipLoc loc = homeship.getShipLoc(s, m+1);
                 int mm = s*sectionNumModules + m;
                 modules[mm] = new ModuleComponentUI(loc);
                 scrollbar.addScrollListener(modules[mm]);
                 modules[mm].onClicked(componentMouseEvent -> onShipPartClicked(loc, componentMouseEvent));
             }
             for (int g = 0; g < SectionNumGunSlots; g++) {
-                Spaceship.ShipLoc loc = homeship.getShipLoc(s, 0, g);
+                Spaceship.ShipLoc loc = homeship.getShipLoc(s, 0);
                 int gg = s*sectionNumModules + g;
-                //TODO: remove g parameter from GunSlotComponentUI constructor
                 gunSlots[gg] = new GunSlotComponentUI(loc, g);
                 scrollbar.addScrollListener(gunSlots[gg]);
                 gunSlots[gg].onClicked(componentMouseEvent -> onShipPartClicked(loc, componentMouseEvent));
@@ -126,7 +125,7 @@ public class HomeshipUI extends GuiComponent {
     //TODO: needs update due to the ShipLoc change.
     void updateLayout() {
         area.height = SECTION_HEIGHT;
-        area.width = HEAD_WIDTH + homeship.length * SECTION_WIDTH + TAIL_WIDTH;
+        area.width = HEAD_WIDTH + homeship.middleLength * SECTION_WIDTH + TAIL_WIDTH;
 
         int newX;
         int newY;
@@ -163,7 +162,7 @@ public class HomeshipUI extends GuiComponent {
             //todo: check for number of weapons in section.
             // - For now 6 gun slots, unless empty section, then 0.
 
-            if (!g.loc.isValidSection()|| g.loc.getSection() == SectionType.None || g.gunSlot < 0 || g.gunSlot >= 6) {
+            if (!g.loc.isValidSection() || g.gunSlot < 0 || g.gunSlot > g.loc.getSection().getNumComponents()) {
                 g.suspend();
                 continue;
             }

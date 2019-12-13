@@ -276,7 +276,7 @@ public class SpaceshipGUI extends JPanel
 //        g.fillRect (0, 0, bounds.width, bounds.height);
 
         //Paint modules
-        for(int i = 0; i < spaceship.length; i++) {
+        for(int i = 0; i < spaceship.middleLength; i++) {
             int sLength = spaceship.modules[i].length;
             if(sLength < 1)
                 paintEmptySec(i, g);
@@ -378,7 +378,7 @@ public class SpaceshipGUI extends JPanel
     public Rectangle getShipModuleRect(int sIndex, int mIndex){
         Rectangle bounds = getBounds();
 
-        int baseWidth = bounds.width / (spaceship.length + 2);
+        int baseWidth = bounds.width / (spaceship.middleLength + 2);
         int baseHeight = bounds.height / (spaceship.sectionTypes[sIndex].getNumModules());
 
         Rectangle drawRect = new Rectangle();
@@ -418,9 +418,9 @@ public class SpaceshipGUI extends JPanel
     public Rectangle getShipEmptySecRect(int sIndex){
         Rectangle bounds = getBounds();
         Rectangle drawRect = new Rectangle();
-        int baseWidth = bounds.width / (spaceship.length + 2);
+        int baseWidth = bounds.width / (spaceship.middleLength + 2);
         drawRect.height = bounds.height / 10;
-        drawRect.width = bounds.width / (spaceship.length + 2) - 10;
+        drawRect.width = bounds.width / (spaceship.middleLength + 2) - 10;
         drawRect.x = baseWidth * (sIndex + 1) + 10;
         drawRect.y = bounds.height / 2 - bounds.height / 20;
 
@@ -435,7 +435,7 @@ public class SpaceshipGUI extends JPanel
     public Rectangle getBridgeRect(){
         Rectangle bounds = getBounds();
         Rectangle drawRect = new Rectangle();
-        drawRect.width = bounds.width / (spaceship.length + 2) - 10;
+        drawRect.width = bounds.width / (spaceship.middleLength + 2) - 10;
         drawRect.height = bounds.height / 2;
         drawRect.x = 10;
         drawRect.y = bounds.height / 4;
@@ -450,12 +450,12 @@ public class SpaceshipGUI extends JPanel
      */
     public Rectangle getEngineRect(){
         Rectangle bounds = getBounds();
-        int baseWidth = bounds.width / (spaceship.length + 2);
+        int baseWidth = bounds.width / (spaceship.middleLength + 2);
 
         Rectangle drawRect = new Rectangle();
-        drawRect.width = bounds.width / (spaceship.length + 2) - 10;
+        drawRect.width = bounds.width / (spaceship.middleLength + 2) - 10;
         drawRect.height = bounds.height / 2;
-        drawRect.x = (spaceship.length+1) * baseWidth;
+        drawRect.x = (spaceship.middleLength +1) * baseWidth;
         drawRect.y = bounds.height / 4;
 
         return drawRect;
@@ -479,7 +479,7 @@ public class SpaceshipGUI extends JPanel
                 MouseTargetType.staticModule, "engine",
                 getEngineRect(), new Point()
         ));
-        for(int i = 0; i < spaceship.length; i++) {
+        for(int i = 0; i < spaceship.middleLength; i++) {
             if (spaceship.modules[i].length < 1) {
                 mouseTargets.add(new MouseTarget(
                         MouseTargetType.section,

@@ -11,13 +11,13 @@ import java.util.Random;
  * Each section has a number of modules, depending on the SectionType.
  */
 public class Spaceship {
-    public int length;
+    public int middleLength;
     //lists the type of sections currently installed. 0 is near bridge, other end near engineering.
-    public SectionType[] sectionTypes;
-    public ShipModule[][] modules;
-    public ShipWeapon[][] weaponTypes;
+    //public SectionType[] sectionTypes; //<- to remove
+    public AbstractShipModule[][] modules;
+    //public ShipWeapon[][] weaponTypes; //<- to remove
 
-    /* TODO: static special moddules
+    /* TODO: static special modules
 
     head:
         Bridge
@@ -32,7 +32,7 @@ public class Spaceship {
 
     /**
      * Ship location, inner class.
-     * Used to store a location of a section, module, and/or component.
+     * Used to store a location of a section or module
      *
      * A section-value of 0 points to the head end of the ship.
      * A section-value of {@link this.length} points to the tail end of the ship.
@@ -41,23 +41,21 @@ public class Spaceship {
      * A module-value of 0 refer to the section itself.
      * A module-value above number of modules in the section or -1 and below are invalid, and does not point to any module or component.
      *
-     * A component-value of -1 or equal/greater than number of components in the module is invalid, and does not point to a module.
-     * If the module-value is 0, the component-value may refer to a weapon-component attached to the section.
-     *
      */
+
+    //NOTE TO SELF: removing component from ShipLoc. Complete the new module array structure.
     public class ShipLoc {
         //section, module, component.
-        int s, m, c;
-        public boolean isValidSection() {return s >= 0 && s <= sectionTypes.length;}
-        public boolean isValidModule() {
-            if (!isValidSection() || m < 0)
-                return false;
-            return m <= getSection().getNumModules();
+        int s, m;
+
+        ShipLoc(int s, int m){
+            this.s = s; this.m = m;
         }
-        public boolean isValidComponent() {
-            if(!isValidModule() || c < 0)
+        public boolean isValidSection() {return s >= 0 && s < modules.length;}
+        public boolean isValidModule() {
+            if (!isValidSection() || m <= 0)
                 return false;
-            return  c <= 6;//TODO: getAbstractShipPart().getNumComponents();
+            return m < modules[s].length;
         }
 
         /**
@@ -68,18 +66,17 @@ public class Spaceship {
         /**
          * @return If this is the tail section.
          */
-        public boolean isTail(){return s == length;}
-        public ShipLoc(int s, int m, int c){
-            this.s = s; this.m = m; this.c = c;
-        }
-        public ShipModule getModule() {
+        public boolean isTail(){return s == middleLength;}
+
+
+        public AbstractShipModule getModule() {
             if(isValidModule())
                 return modules[s][m];
             return null;
         }
-        public SectionType getSection() {
+        public AbstractShipSection getSection() {
             if (isValidSection())
-                return sectionTypes[s];
+                return (AbstractShipSection) modules[s][0];
             return null;
         }
         public ShipLoc[] getModuleLocList() {
@@ -87,8 +84,8 @@ public class Spaceship {
                 return null;
             int len = getSection().getNumModules();
             ShipLoc[] ret = new ShipLoc[len];
-            for (int i = 0; i < len; i++) {
-                ret[i] = new ShipLoc(s, i, -1);
+            for (int i = 1; i < len; i++) {
+                ret[i] = new ShipLoc(s, i);
             }
             return ret;
         }
@@ -109,70 +106,92 @@ public class Spaceship {
         public int getS() {
             return s;
         }
-        public int getC() {
-            return c;
-        }
     }
 
     /**
      *
      * @param s section index. exceptions: 0 refer to the head section, {@code length} refer to the tail section.
      * @param m module index. exceptions: 0 refer to the section itself.
-     * @param c component index. Only sections can hold weapon components.
      * @return
      */
-    public ShipLoc getShipLoc(int s, int m, int c){
-        return new ShipLoc(s, m, c);
+    public ShipLoc getShipLoc(int s, int m){
+        return new ShipLoc(s, m);
     }
 
     /**
      * Creates a length long spaceship, naked down to the framework.
      * Not meant to be used directly. Use one of the Generate functions instead.
-     * @param length
+     * @param middleLength
      */
-    public Spaceship(int length)
+    public Spaceship(int middleLength)
     {
-        this.length = length;
-        sectionTypes = new SectionType[length];
-        modules = new ShipModule[length][0];
-        for (int i = 0; i < length; i++)
+        this.middleLength = middleLength;
+        //sectionTypes = new SectionType[length];
+        modules = new AbstractShipModule[middleLength +2][0];
+
+        int i = 0;
+        //TODO: add head section
+        i++;
+        for (; i <= middleLength +1; i++)
         {
-            //None-type sections
-            sectionTypes[i] = SectionType.None;
-            modules[i] = new ShipModule[0];
+            //Stripped sections
+            modules[i] = new AbstractShipModule[1];
+            modules[i][0] = new NullSection(new ShipLoc(i, 0));
         }
+        //TODO add tail section
     }
 
     /**
      * Replaces a section of the spaceship.
-     * Warning: this WILL replace the existing modules in it with empty modules, without asking!
-     * Planned: function to check if replacing a section should be allowed (by gameplay rules)
+     * Warning: this WILL replace (destroy!) the existing section and modules,
+     * including the components in it, with the new section and empty modules, without asking!
      *
      * @param index section index of module to replace.
      * @param sectionType The new section type.
      */
     private void forceBuildSection(int index, SectionType sectionType)
     {
+        if (index < 1 || index > middleLength) {
+            throw new IllegalArgumentException("Whoops.. that location is invalid for construction.\n" +
+                    "Someone did a programming woopsie, because of that, the game will now quit.");
+        }
+        AbstractShipSection newSection;
+        ShipLoc sectionLoc = new ShipLoc(index, 0);
+        switch (sectionType) {
+            //TODO: add classes for missing types.
+            default:
+                newSection = new NullSection(sectionLoc);
+        }
+
         // ( index >= 0 && index < length);
-        int sLength = sectionType.getNumModules();
-        sectionTypes[index] = sectionType;
-        modules[index] = new ShipModule[sLength];
-        for(int i = 0; i < sLength; i++){
-            modules[index][i] = new ShipModule(sectionType);
+        int sLength = newSection.getNumModules();
+        //sectionTypes[index] = sectionType;
+        modules[index] = new AbstractShipModule[sLength];
+        modules[index][0] = newSection;
+        for(int i = 1; i < sLength+1; i++){
+            modules[index][i] = new NullModule(new ShipLoc(index, i));
         }
     }
 
     /**
      * Replaces a module of the spaceship.
-     * Warning: this WILL replace the existing module, without asking!
-     * Planned: function to check if replacing a module should be allowed (by gameplay rules)
+     * Warning: this WILL replace (destroy!) the existing module, including any components, without asking!
      *
-     * @param sIndex The section index
-     * @param mIndex The module index (of section)
-     * @param mType The new module type.
+     * @param loc The location to build the module in.
+     * @param moduleType The new module type.
      */
-    private void forceBuildModule(int sIndex, int mIndex, ModuleType mType){
-        modules[sIndex][mIndex] = new ShipModule(sectionTypes[sIndex], mType);
+    private void forceBuildModule(ShipLoc loc, ModuleType moduleType){
+        if (!loc.isValidModule())
+            throw new IllegalArgumentException("Whoops.. that location is invalid for construction.\n" +
+                    "Someone did a programming woopsie, because of that, the game will now quit.");
+        AbstractShipModule newModule;
+        switch (moduleType) {
+            //TODO: add classes for missing types.
+            default:
+                newModule = new NullModule(loc);
+        }
+
+        modules[loc.s][loc.m] = newModule;
     }
 
     /**
@@ -192,7 +211,7 @@ public class Spaceship {
     }
 
     /**
-     * Generates a new spaceship, with some fixed specification
+     * Generates a new spaceship with a set number of cargobays that are full
      * @param rand The instance of Random to use.
      * @param length The length of the Spaceship
      * @param full How much of the potential space will be filled with cargo (range 0, 1)
@@ -205,9 +224,9 @@ public class Spaceship {
 
         Spaceship ship = new Spaceship(length);
         //center of the wheel section hosts the first hab module
-        int habstart = SectionType.Wheel.getNumModules() / 2;
-        ship.forceBuildSection(0, SectionType.Wheel);
-        ship.forceBuildModule(0, habstart, ModuleType.Habitat);
+        int habstart = SectionType.Wheel.getNumModules() / 2 + 1;
+        ship.forceBuildSection(1, SectionType.Wheel);
+        ship.forceBuildModule(ship.getShipLoc(1,habstart), ModuleType.Habitat);
 
 
         int normSize = SectionType.Normal.getNumModules();
@@ -228,6 +247,7 @@ public class Spaceship {
                 ship.forceBuildSection(i, SectionType.Normal);
                 for(int j = 0; j < normSize; j++)
                 {
+                    ShipLoc loc = ship.getShipLoc(i, j);
                     ModuleType type;
                     float moduleEmptyChance = rand.nextFloat();
                     System.out.println("Chance module is empty: " + moduleEmptyChance + " can be empty: " + canBeEmpty);
@@ -237,7 +257,7 @@ public class Spaceship {
                         type = ModuleType.Cargo;
                         usedCargoSpace++;
                     }
-                    ship.forceBuildModule(i, j, type);
+                    ship.forceBuildModule(loc, type);
                 }
             }
 
@@ -247,13 +267,14 @@ public class Spaceship {
         return ship;
     }
 
+/*
     public ArrayList<Integer> GetBuildableModules(Point loc) {
         ArrayList<Integer> list = new ArrayList<Integer>();
         if(loc.y < 0 || loc.x < 0)
             return list;
         else {
             SectionType sectionType = sectionTypes[loc.x];
-            ShipModule module = modules[loc.x][loc.y];
+            AbstractShipModule module = modules[loc.x][loc.y];
             ModuleType[] mTypes = ModuleType.values();
 
             for (int i = 0; i < mTypes.length; i++)
@@ -283,15 +304,19 @@ public class Spaceship {
         return list;
     }
 
+*/
     public boolean canBuildSection(ShipLoc shipLoc, SectionType typeToBuild, StringBuffer message) {
         if (!shipLoc.isValidSection()) {
             message.append("Illegal selection! How did you manage this? HOW!? (this is a bug, please report it)");
             return false;
         }
-        if(shipLoc.getSection() != SectionType.None) {
+        /*
+        //TODO: find a more elegant check for this, or remove
+        if(shipLoc.getSection().getClass() == NullSection.class) {
             message.append("Cannot build section-frame. You need to strip off the old one first.");
             return false;
         }
+         */
 
         //TODO: get material cost of construction.
         ArrayList<CargoPlaceholder> cost = new ArrayList<>();
@@ -303,26 +328,22 @@ public class Spaceship {
         return true;
     }
 
-    public boolean canBuildModule(ShipLoc shipLoc, ModuleType typeToBuild, StringBuffer message) {
-        if (shipLoc.isValidModule()){
+    public boolean canBuildModule(ShipLoc loc, ModuleType typeToBuild, StringBuffer message) {
+        if (loc.isValidModule()){
             message.append("Illegal selection! How did you manage this? HOW!? (this is a bug, please report it)");
             return false;
         }
-        if(shipLoc.getModule().moduleType != ModuleType.Empty) {
-
-            message.insert(0, "The existing module must be removed.\n");
-            if (canRemoveModule(shipLoc, message)) {
-                message.append("\n");
-            }
-            else {
-                message.append("Module cannot be built.");
-                return false;
-            }
+        //Check section for compadibility with moduleType.
+        if (!loc.getSection().canBuildModule(typeToBuild, message)) {
+            message.append("\nModule cannot be built.");
+            return false;
         }
-        //TODO: check on all compatibility issues
-        //If this type of module require gravity, but the section-frame lacks it.
-        if(typeToBuild.getNeedGravity() && !shipLoc.getSection().getHasGravity()) {
-            message.append("Unable to build module: This module requires gravity, and this section-frame is weightless.");
+
+        if (canRemoveModule(loc, message)) {
+            message.append("\n");
+        }
+        else {
+            message.append("\nModule cannot be built.");
             return false;
         }
         //TODO: get material cost of construction.
@@ -347,8 +368,9 @@ public class Spaceship {
             return false;
         }
 
-        ShipModule module = shipLoc.getModule();
-        if (module.moduleType == ModuleType.Empty) {
+        AbstractShipModule module = shipLoc.getModule();
+        //TODO: find more elegant way for checking this.
+        if (module.getClass() == NullModule.class) {
             message.append("There is no module to remove.");
             return false;
         }
@@ -397,8 +419,8 @@ public class Spaceship {
                 message.append("Your crew is already busy working in this section. You cannot remove it.");
                 return false;
             }
-
-        if(shipLoc.getSection() == SectionType.None) {
+        //TODO: find a more elegant way on checking for this
+        if(shipLoc.getSection().getClass() == NullSection.class) {
             message.append("This section is already stripped.");
             return false;
         }
@@ -413,7 +435,7 @@ public class Spaceship {
 
         ShipLoc[] sModules = shipLoc.getModuleLocList();
         for (int i = 0, moduleLength = sModules.length; i < moduleLength; i++) {
-            ShipModule m = sModules[i].getModule();
+            AbstractShipModule m = sModules[i].getModule();
             Collections.addAll(cargoToMove, m.getCargoOnDestruction());
             if (m instanceof Habitat) {
                 Habitat h = (Habitat) m;
