@@ -1,8 +1,7 @@
 package unicus.spacegame.spaceship;
 
-public class NullModule extends AbstractShipModule {
-
-    public NullModule(Spaceship.ShipLoc loc) {
+public class HabitatModule extends AbstractShipModule {
+    public HabitatModule(Spaceship.ShipLoc loc) {
         super(loc);
     }
 
@@ -19,16 +18,17 @@ public class NullModule extends AbstractShipModule {
     /**
      * For modules:
      * Whatever this module requires gravity to be constructed.
-     * @return false
+     *
+     * @return true
      */
     @Override
     public boolean useGravity() {
-        return false;
+        return true;
     }
 
     @Override
     public String GetName() {
-        return "Empty space for a module";
+        return "Habitat module at " + loc.toString();
     }
 
     @Override

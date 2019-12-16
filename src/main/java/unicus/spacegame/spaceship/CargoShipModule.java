@@ -1,8 +1,10 @@
 package unicus.spacegame.spaceship;
 
-public class NullSection extends AbstractShipSection {
+//TODO: rename to CargoModule or CargoBay once the cargo code has been merged with this code.
+// - also, this class should implement CargoContainer.
 
-    public NullSection(Spaceship.ShipLoc loc) {
+public class CargoShipModule extends AbstractShipModule {
+    public CargoShipModule(Spaceship.ShipLoc loc) {
         super(loc);
     }
 
@@ -16,25 +18,20 @@ public class NullSection extends AbstractShipSection {
         return new abstractShipComponent[0];
     }
 
+    /**
+     * For modules:
+     * Whatever this module requires gravity to be constructed.
+     *
+     * @return false
+     */
     @Override
-    public AbstractShipModule[] GetModuleTypes() {
-        return new AbstractShipModule[0];
-    }
-
-    @Override
-    public int getNumModules() {
-        return 0;
-    }
-
-    @Override
-    public boolean canBuildModule(ModuleType typeToBuild, StringBuffer message) {
-        message.append("This section is stripped");
+    public boolean useGravity() {
         return false;
     }
 
     @Override
     public String GetName() {
-        return "Stripped Section";
+        return "Cargo bay at " + loc.toString();
     }
 
     @Override

@@ -1,6 +1,5 @@
 package unicus.spacegame.spaceship;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -11,7 +10,9 @@ import java.util.Random;
  * Each section has a number of modules, depending on the SectionType.
  */
 public class Spaceship {
+    public final int headLocation;
     public int middleLength;
+    public final int tailLocation;
     //lists the type of sections currently installed. 0 is near bridge, other end near engineering.
     //public SectionType[] sectionTypes; //<- to remove
     public AbstractShipModule[][] modules;
@@ -125,20 +126,27 @@ public class Spaceship {
      */
     public Spaceship(int middleLength)
     {
+        this.headLocation = 0; //It's always 0, but hey, now the code might be more readable.
         this.middleLength = middleLength;
+        this.tailLocation = 1 + middleLength; //The tail's index is right after the middle sections.
+
+
         //sectionTypes = new SectionType[length];
-        modules = new AbstractShipModule[middleLength +2][0];
+        modules = new AbstractShipModule[middleLength +2][1];
 
         int i = 0;
         //TODO: add head section
+        //placeholder head section
+        modules[i][0] = new StrippedFrame(new ShipLoc(i, 0));
         i++;
-        for (; i <= middleLength +1; i++)
+        for (; i < middleLength + 1; i++)
         {
             //Stripped sections
-            modules[i] = new AbstractShipModule[1];
-            modules[i][0] = new NullSection(new ShipLoc(i, 0));
+            modules[i][0] = new StrippedFrame(new ShipLoc(i, 0));
         }
         //TODO add tail section
+        //placeholder tail section
+        modules[i][0] = new StrippedFrame(new ShipLoc(i, 0));
     }
 
     /**
@@ -148,8 +156,10 @@ public class Spaceship {
      *
      * @param index section index of module to replace.
      * @param sectionType The new section type.
+     *
+     * @return the new section-frame
      */
-    private void forceBuildSection(int index, SectionType sectionType)
+    private AbstractShipSection forceBuildSection(int index, SectionType sectionType)
     {
         if (index < 1 || index > middleLength) {
             throw new IllegalArgumentException("Whoops.. that location is invalid for construction.\n" +
@@ -159,18 +169,29 @@ public class Spaceship {
         ShipLoc sectionLoc = new ShipLoc(index, 0);
         switch (sectionType) {
             //TODO: add classes for missing types.
+            case Normal:
+                newSection = new BasicFrame(sectionLoc);
+                break;
+            case Wheel:
+                newSection = new WheelFrame(sectionLoc);
+                break;
+            case GravityPlated:
+                newSection = new GravityFrame(sectionLoc);
+                break;
+            case None:
             default:
-                newSection = new NullSection(sectionLoc);
+                newSection = new StrippedFrame(sectionLoc);
         }
 
         // ( index >= 0 && index < length);
         int sLength = newSection.getNumModules();
         //sectionTypes[index] = sectionType;
-        modules[index] = new AbstractShipModule[sLength];
+        modules[index] = new AbstractShipModule[sLength +1];
         modules[index][0] = newSection;
         for(int i = 1; i < sLength+1; i++){
             modules[index][i] = new NullModule(new ShipLoc(index, i));
         }
+        return newSection;
     }
 
     /**
@@ -179,19 +200,31 @@ public class Spaceship {
      *
      * @param loc The location to build the module in.
      * @param moduleType The new module type.
+     *
+     * @return The new module
      */
-    private void forceBuildModule(ShipLoc loc, ModuleType moduleType){
+    private AbstractShipModule forceBuildModule(ShipLoc loc, ModuleType moduleType){
         if (!loc.isValidModule())
             throw new IllegalArgumentException("Whoops.. that location is invalid for construction.\n" +
                     "Someone did a programming woopsie, because of that, the game will now quit.");
         AbstractShipModule newModule;
         switch (moduleType) {
+            case Cargo:
+                newModule = new CargoShipModule(loc);
+                break;
             //TODO: add classes for missing types.
+            case Habitat:
+                newModule = new HabitatModule(loc);
+                break;
+            case Empty:
             default:
                 newModule = new NullModule(loc);
+                break;
         }
 
         modules[loc.s][loc.m] = newModule;
+
+        return newModule;
     }
 
     /**
@@ -213,7 +246,7 @@ public class Spaceship {
     /**
      * Generates a new spaceship with a set number of cargobays that are full
      * @param rand The instance of Random to use.
-     * @param length The length of the Spaceship
+     * @param length The number of sections in the middle of the HomeShip.
      * @param full How much of the potential space will be filled with cargo (range 0, 1)
      * @return A Spaceship
      */
@@ -224,19 +257,20 @@ public class Spaceship {
 
         Spaceship ship = new Spaceship(length);
         //center of the wheel section hosts the first hab module
-        int habstart = SectionType.Wheel.getNumModules() / 2 + 1;
-        ship.forceBuildSection(1, SectionType.Wheel);
+        AbstractShipSection wheelSection = ship.forceBuildSection(1, SectionType.Wheel);
+
+        int habstart = wheelSection.getNumModules()/2 + 1;
         ship.forceBuildModule(ship.getShipLoc(1,habstart), ModuleType.Habitat);
 
 
-        int normSize = SectionType.Normal.getNumModules();
+        int normSize = 6;//SectionType.Normal.getNumModules();
         int totCargoSpace = (normSize * (length-1));
         int usedCargoSpace = 0;
         int targetFilled = Math.round( (float)totCargoSpace * full);
 
         System.out.println("Total cargo space: " + totCargoSpace + ", target cargo: " + targetFilled);
 
-        for(int i = 1; i < length; i++){
+        for(int i = 2; i < ship.modules.length-1; i++){
             //If none of the modules are used, can targetFilled still be reached?
             boolean canBeEmpty = (usedCargoSpace + normSize * (length - i - 1)) > targetFilled;
             float sectionEmptyChance = rand.nextFloat();
@@ -245,7 +279,7 @@ public class Spaceship {
                 ship.forceBuildSection(i, SectionType.None);
             } else {
                 ship.forceBuildSection(i, SectionType.Normal);
-                for(int j = 0; j < normSize; j++)
+                for(int j = 1; j < normSize+1; j++)
                 {
                     ShipLoc loc = ship.getShipLoc(i, j);
                     ModuleType type;
@@ -420,7 +454,7 @@ public class Spaceship {
                 return false;
             }
         //TODO: find a more elegant way on checking for this
-        if(shipLoc.getSection().getClass() == NullSection.class) {
+        if(shipLoc.getSection().getClass() == StrippedFrame.class) {
             message.append("This section is already stripped.");
             return false;
         }

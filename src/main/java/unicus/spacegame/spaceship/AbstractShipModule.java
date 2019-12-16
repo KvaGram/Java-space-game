@@ -18,6 +18,15 @@ public abstract class AbstractShipModule extends AbstractShipPart{
     }
     public abstract int getNumComponents();
     public abstract abstractShipComponent[] getComponents();
+
+    /**
+     * For modules:
+     * Whatever this module requires gravity to be constructed.
+     * For section-frames:
+     * Whatever this section-frame provides gravity.
+     * @return
+     */
+    public abstract boolean useGravity();
 }
 
 
