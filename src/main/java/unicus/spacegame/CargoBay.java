@@ -1,6 +1,7 @@
 package unicus.spacegame;
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class CargoBay {
@@ -49,7 +50,7 @@ public class CargoBay {
             if (cargo.total_fullness < CargoModule.CARGO_CAPACITY_PER_MODULE) { //check if that module has space
                 int add_amount = Math.min(remaining_amount, CargoModule.CARGO_CAPACITY_PER_MODULE - cargo.total_fullness);
                 remaining_amount -= add_amount;
-                cargo.AddCargo(add_amount, type);
+                cargo.AddCargo(add_amount, type, false);
             }
         }
         if (remaining_amount != 0) { System.out.println("Couldn't fit it all.");}
@@ -69,11 +70,20 @@ public class CargoBay {
         if (remaining_amount != 0) { System.out.println("Didn't have that much.");}
         return (remaining_amount == 0);
     }
-
     private void ListCargo() {
         for (CargoModule cargo : cargos) {
             cargo.PrintCargo();
         }
+    }
+    private int[] CountTotalCargo() {
+        int[] result = new int[CargoModule.CARGO_TYPECOUNT];
+        for (CargoModule cargo : cargos) {
+            int[] temp = cargo.CountLocalCargo();
+            for (int i=0; i<result.length; i++) {
+                result[i] += temp[i];
+            }
+        }
+        return result;
     }
 
     public CargoBay() { //constructor
@@ -83,12 +93,94 @@ public class CargoBay {
         }
     }
     public void reorderCargo(String sortpattern) {
-        if (sortpattern == "Compact") {
-            System.out.println("Compacting cargo...");
-        } else if (sortpattern == "Type") {
-            System.out.println("Sorting by type...");
-        } else if (sortpattern == "Spread") {
-            System.out.println("Spreading it all around...");
+        switch (sortpattern) {
+            case "Compact":
+                System.out.println("Compacting cargo...");
+                reorderCargoCompactly();
+                break;
+            case "Type":
+                System.out.println("Sorting by type...");
+                reorderCargoByType();
+                break;
+            case "Spread":
+                System.out.println("Spreading it all around...");
+                reorderCargoSpread();
+                break;
+        }
+    }
+    public void reorderCargoCompactly() {
+        //see how much cargo we have
+        int[] cargoAmounts = CountTotalCargo();
+        //remove it all
+        for (CargoModule m: cargos) {
+            for (String cargotype: CargoModule.CARGO_NAMES) {
+                m.RemoveCargo(m.contents.get(cargotype), cargotype, true);
+            }
+        }
+        //put it back in order
+        int j = 0;
+        for (int i=0; i<cargoAmounts.length; i++) {
+            while (cargoAmounts[i] > 0 && j < cargos.length) {
+                int chunk = Math.min(cargoAmounts[i], cargos[j].getSpace());
+                if (chunk == 0) { j++; }
+                else {
+                    cargos[j].AddCargo(chunk, CargoModule.CARGO_NAMES[i], false);
+                    cargoAmounts[i] -= chunk;
+                }
+            }
+        }
+    }
+    public void reorderCargoByType() {
+        int[] cargoAmounts = CountTotalCargo();
+        int roundUpSum = 0;
+        int cm = CargoModule.CARGO_CAPACITY_PER_MODULE;
+        //Determine if we have space to sort things separately
+        for (int cargoAmount : cargoAmounts) {
+            roundUpSum += (cargoAmount + cm - 1) / cm;
+        }
+        if (roundUpSum > cargos.length) {
+            System.out.println("Wasn't space to sort completely separately. Falling back to compact sort.");
+            reorderCargoCompactly();
+        } else {
+            for (CargoModule m: cargos) {
+                for (String cargotype : CargoModule.CARGO_NAMES) {
+                    m.RemoveCargo(m.contents.get(cargotype), cargotype, true);
+                }
+            }
+            for (int i=0; i<cargoAmounts.length; i++) {
+                for (int j=0; j<cargos.length; j++) {
+                    if (cargoAmounts[i] != 0 && cargos[j].getSpace() == 60) {
+                        int chunk = Math.min(cargoAmounts[i], cm);
+                        cargoAmounts[i] -= chunk;
+                        cargos[j].AddCargo(chunk, CargoModule.CARGO_NAMES[i], false);
+                    }
+                }
+            }
+        }
+    }
+    public void reorderCargoSpread() {
+        //first carry out old cargo
+        int[] cargoAmounts = CountTotalCargo();
+        for (CargoModule m: cargos) {
+            for (String cargotype: CargoModule.CARGO_NAMES) {
+                m.RemoveCargo(m.contents.get(cargotype), cargotype, true);
+            }
+        }
+        //then put back in new order
+        int totalCargo = 0;
+        for (int c: cargoAmounts) {totalCargo += c;}
+        int i=0;
+        while (totalCargo > 0) {
+            for (CargoModule unit: cargos) {
+                while (i < cargoAmounts.length && cargoAmounts[i] == 0) {
+                    i++;
+                }
+                if (i < cargoAmounts.length) {
+                    totalCargo -= 1;
+                    cargoAmounts[i] -= 1;
+                    unit.AddCargo(1, CargoModule.CARGO_NAMES[i], true);
+                }
+            }
         }
     }
     public void createStartCargo() {
@@ -106,8 +198,8 @@ class CargoModule {
     private final static String CARGO_OXY = "Oxygen";
     private final static String CARGO_SPARES = "Spare parts";
     private final static String CARGO_SHINY = "Shinyium";
-    private final static String[] CARGO_NAMES = {CARGO_FOOD, CARGO_WATER, CARGO_FUEL, CARGO_OXY, CARGO_SPARES, CARGO_SHINY};
-    //final static int CARGO_TYPECOUNT = CARGO_NAMES.length;
+    protected final static String[] CARGO_NAMES = {CARGO_FOOD, CARGO_WATER, CARGO_FUEL, CARGO_OXY, CARGO_SPARES, CARGO_SHINY}; //TODO replace with enum
+    final static int CARGO_TYPECOUNT = CARGO_NAMES.length;
     final static int CARGO_CAPACITY_PER_MODULE = 60;
     int total_fullness;
     String moduleID;
@@ -122,13 +214,39 @@ class CargoModule {
         CargoBay master = cb;
         moduleID = (String) ("Module "+(id+1));
     }
-    public void AddCargo(int amount, String type) {
+    public boolean AddCargo(int amount, String type, boolean force) {
         if (total_fullness + amount > CARGO_CAPACITY_PER_MODULE) {
-            //decide how to complain on capacity failure. return type bool?
+            if (force) {
+                int free_space = CARGO_CAPACITY_PER_MODULE - total_fullness;
+                total_fullness += free_space;
+                contents.put(type, free_space);
+            }
+            return false;
         } else {
             total_fullness += amount;
-            contents.put(type, amount+contents.get(type));
+            contents.put(type, contents.get(type)+amount);
         }
+        return true;
+    }
+    public boolean RemoveCargo(int amount, String type, boolean force) {
+        if (contents.get(type) < amount) {
+            if (force) {
+                total_fullness -= contents.get(type);
+                contents.put(type, 0);
+            }
+            return false;
+        } else {
+            total_fullness -= amount;
+            contents.put(type, contents.get(type)-amount);
+        }
+        return true;
+    }
+    public int[] CountLocalCargo() {
+        int[] result = new int[CARGO_TYPECOUNT];
+        for (int i=0; i<CARGO_TYPECOUNT; i++) {
+            result[i] = contents.get(CARGO_NAMES[i]);
+        }
+        return result;
     }
 
     public void PrintCargo() {
@@ -141,6 +259,47 @@ class CargoModule {
             }
         }
         if (maybeEmpty) {  System.out.print("Nothing."); }
-        System.out.println("");
+        System.out.println();
+    }
+
+    public int getSpace() {
+        return (CARGO_CAPACITY_PER_MODULE - total_fullness);
     }
 }
+
+enum CargoTypes {
+    FOOD, WATER, FUEL, OXYGEN, PARTS, SHINYIUM;
+}
+
+class BasicCargoCollection implements CargoCollection {
+    CargoTypes ctype;
+    int numCargo;
+    BasicCargoCollection(CargoTypes ctype) {
+        this.ctype=ctype;
+        numCargo=0;
+    }
+    @Override
+    public int getCargoUnits() {
+        return numCargo;
+    }
+
+    @Override
+    public boolean canMerge(CargoCollection other) {
+        BasicCargoCollection bOther = (BasicCargoCollection) other;
+        return (this.ctype == bOther.ctype);
+    }
+
+    @Override
+    public boolean doMerge(CargoCollection other) {
+        BasicCargoCollection bOther = (BasicCargoCollection) other;
+        assert (this.ctype == bOther.ctype);
+        this.numCargo += bOther.numCargo;
+        bOther.numCargo = 0;
+        return false;
+    }
+}
+
+//Option one: Separate classes for each type of content. WaterCollection, FoodCollection, FuelCollection...
+//Option two: Is anything like 'instanceof this' legal so that classes can inherit polymorphic code?
+//Option three: Get an eval() function into java somehow.
+//Option four: generic class, multiple instances, each constructed with an ID for what it's a collection of

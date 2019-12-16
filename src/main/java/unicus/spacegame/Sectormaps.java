@@ -12,7 +12,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -249,78 +248,9 @@ public class Sectormaps extends JPanel implements Scrollable {
         repaint();
     }
 
-    /**
-     * Sets refrence to the star the spaceship in on the sectormap.
-     * @param shipLocation
-     */
-    public void setShipLocation(StarData shipLocation) {
-        showShip = true;
-        this.shipLocation = shipLocation;
-        repaint();
-    }
-
-    /**
-     * Hides the spaceship from view.
-     */
-    public void hideShip() {
-        showShip = false;
-        repaint();
-    }
-
-    public Sectormaps(){
-        this(new Random());
-    }
-    public Sectormaps(long seed){
-        this(new Random(seed));
-    }
-    public Sectormaps(Random sourceRand) {
-        //initial background
-        this.setOpaque(true);
-        this.setBackground(Color.black);
-
-        /**
-         * This is the spaceship icon.
-         * It has to be in this class, as it needs to be drawn with the map.
-         *
-         * Note the added properties above:
-         *     boolean showGrid
-         *     boolean showShip
-         *     Point shipLocation
-         *
-         *     Image shipSprite
-         *     ImageObserver shipSpriteObserver
-         *
-         *  - Lars
-         */
-
-        try {
-            //try loading file.
-            shipSprite = ImageIO.read(getClass().getResource("ui/spaceshipicon.png")).getScaledInstance(shipW, shipH, Image.SCALE_SMOOTH);
-        } catch (IOException err) {
-            //paint backup icon.
-            System.out.println(err);
-            shipSprite = new BufferedImage(shipW, shipH, BufferedImage.TYPE_INT_RGB);
-            Graphics g = shipSprite.getGraphics();
-            g.setColor(Color.red);
-            g.drawOval(0, 0, shipW, shipH);
-        }
-        ImageObserver shipSpriteObserver = new ImageObserver() {
-            @Override
-            public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
-                return true; //Note: not 100% sure what this is needed for (animation maybe?). Should try to figure it out.
-            }
-        };
-
-
-        //  (old hardcoded random initializers)
-        //rft = new Random(41356);
-        //TriangleRandom = new Random(333);
-
-        rft = new Random(sourceRand.nextLong());
-        TriangleRandom = new Random(sourceRand.nextLong());
-        starObjects = new StarData[t_secs][];
-
-        //Create stars in secs_stars_coords[][][]. Should be refactored to separate method.
+    /** Randomly generates stars and connections between them to populate sectors */
+    public void initializeStarsAndLanes() {
+        //Create stars in secs_stars_coords[][][].
         for (int i=0; i<x_secs; i++) {
             for (int j=0; j<y_secs; j++) {
                 int ij = i+(j*x_secs); // linear number of sector, for array indexing
@@ -399,6 +329,81 @@ public class Sectormaps extends JPanel implements Scrollable {
                 crossSectorPair[1].connections.add(crossSectorPair[0]);
             }
         }
+    }
+
+    /**
+     * Sets refrence to the star the spaceship in on the sectormap.
+     * @param shipLocation
+     */
+    public void setShipLocation(StarData shipLocation) {
+        showShip = true;
+        this.shipLocation = shipLocation;
+        repaint();
+    }
+
+    /**
+     * Hides the spaceship from view.
+     */
+    public void hideShip() {
+        showShip = false;
+        repaint();
+    }
+
+    public Sectormaps(){
+        this(new Random());
+    }
+    public Sectormaps(long seed){
+        this(new Random(seed));
+    }
+    public Sectormaps(Random sourceRand) {
+        //initial background
+        this.setOpaque(true);
+        this.setBackground(Color.black);
+
+        /**
+         * This is the spaceship icon.
+         * It has to be in this class, as it needs to be drawn with the map.
+         *
+         * Note the added properties above:
+         *     boolean showGrid
+         *     boolean showShip
+         *     Point shipLocation
+         *
+         *     Image shipSprite
+         *     ImageObserver shipSpriteObserver
+         *
+         *  - Lars
+         */
+
+        try {
+            //try loading file.
+            shipSprite = ImageIO.read(new File("src/main/resources/spaceshipicon.png")).getScaledInstance(shipW, shipH, Image.SCALE_SMOOTH);
+        } catch (IOException err) {
+            //paint backup icon.
+            System.out.println(err);
+            shipSprite = new BufferedImage(shipW, shipH, BufferedImage.TYPE_INT_RGB);
+            Graphics g = shipSprite.getGraphics();
+            g.setColor(Color.red);
+            g.drawOval(0, 0, shipW, shipH);
+        }
+        ImageObserver shipSpriteObserver = new ImageObserver() {
+            @Override
+            public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
+                return true; //Note: not 100% sure what this is needed for (animation maybe?). Should try to figure it out.
+            }
+        };
+
+
+        //  (old hardcoded random initializers)
+        //rft = new Random(41356);
+        //TriangleRandom = new Random(333);
+
+        rft = new Random(sourceRand.nextLong());
+        TriangleRandom = new Random(sourceRand.nextLong());
+        starObjects = new StarData[t_secs][];
+
+        initializeStarsAndLanes();
+
         //Sets pixel size of panel, for use with scrolledPanes and layout managers.
         //NOTE: If number of or size of sectors change in runtime, remember to update this.
         // Set using number of sectors times sector height and width + start x and y + 20px padding at the end of both axis.
@@ -490,10 +495,10 @@ public class Sectormaps extends JPanel implements Scrollable {
 
     /**
      * Gets star from array of stars.
-     * @param subsection
-     * @param index
-     * @return
-     * @throws ArrayIndexOutOfBoundsException
+     * @param subsection The subsector the star is to be found in
+     * @param index The number of the star within the subsector
+     * @return starData The star located at that position and index
+     * @throws ArrayIndexOutOfBoundsException if first argument is higher than number of subsectors, or second argument higher than number of stars in the subsector specified by first argument
      */
     public StarData getStar(int subsection, int index) throws ArrayIndexOutOfBoundsException {
         return starObjects[subsection][index];
@@ -505,7 +510,6 @@ public class Sectormaps extends JPanel implements Scrollable {
 
 
         //Draw hyperlanes but from star connection data instead
-
         for (StarData[] sector: starObjects) {
             for (StarData star: sector) {
                 boolean isShipLocation = star == shipLocation;

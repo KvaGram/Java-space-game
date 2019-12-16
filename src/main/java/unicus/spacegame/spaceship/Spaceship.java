@@ -210,7 +210,7 @@ public class Spaceship {
         AbstractShipModule newModule;
         switch (moduleType) {
             case Cargo:
-                newModule = new CargoShipModule(loc);
+                newModule = new CargoModule(loc);
                 break;
             //TODO: add classes for missing types.
             case Habitat:
