@@ -64,7 +64,6 @@ public class Demo2 implements IUpdateable {
 
     private void init() {
         Game.setInfo("gameinfo.xml");
-        Game.init();
         Image cursor;
         try {
 
@@ -78,11 +77,14 @@ public class Demo2 implements IUpdateable {
             g.setColor(Color.red);
             g.drawOval(0, 0, 16, 16);
         }
-        Game.window().getRenderComponent().setCursor(cursor);
-        //Input.mouse().setGrabMouse(false);
 
         Random r = new Random(0);
         Spaceship homeship = Spaceship.GenerateStart1(r, 8, 20, .2f, .8f);
+
+        Game.init();
+        Game.window().getRenderComponent().setCursor(cursor);
+        //Input.mouse().setGrabMouse(false);
+        // (above) bugged feature. Waiting for litiengine version 0.4.18 for a bug-fix
 
         shipView = new ShipRefitController("SHIPVIEW", homeship);
 
