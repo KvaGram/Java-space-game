@@ -83,6 +83,7 @@ public class Demo2 implements IUpdateable {
 
         Game.init();
         Game.window().getRenderComponent().setCursor(cursor);
+        Game.window().getRenderComponent().setCursorOffset(8,8);
         //Input.mouse().setGrabMouse(false);
         // (above) bugged feature. Waiting for litiengine version 0.4.18 for a bug-fix
 
