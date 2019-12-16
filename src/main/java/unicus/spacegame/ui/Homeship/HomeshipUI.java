@@ -54,23 +54,25 @@ public class HomeshipUI extends GuiComponent {
         int SectionNumGunSlots = 6;
         gunSlots = new GunSlotComponentUI[homeship.middleLength * 6];
 
+        this.scrollbar = new Scrollbar(40, height - 80, width-80, 40, horizontal, area, viewArea);
+
         for (int s = 0; s < numSections; s++) {
             //extra code-block, so variable-name loc can be reused.
             {
-                Spaceship.ShipLoc loc = homeship.getShipLoc(s, 0);
+                Spaceship.ShipLoc loc = homeship.getShipLoc(s+1, 0);
                 sections[s] = new SectionComponentUI(loc);
                 scrollbar.addScrollListener(sections[s]);
                 sections[s].onClicked(componentMouseEvent -> onShipPartClicked(loc, componentMouseEvent));
             }
             for (int m = 0; m < sectionNumModules; m++) {
-                Spaceship.ShipLoc loc = homeship.getShipLoc(s, m+1);
+                Spaceship.ShipLoc loc = homeship.getShipLoc(s+1, m+1);
                 int mm = s*sectionNumModules + m;
                 modules[mm] = new ModuleComponentUI(loc);
                 scrollbar.addScrollListener(modules[mm]);
                 modules[mm].onClicked(componentMouseEvent -> onShipPartClicked(loc, componentMouseEvent));
             }
             for (int g = 0; g < SectionNumGunSlots; g++) {
-                Spaceship.ShipLoc loc = homeship.getShipLoc(s, 0);
+                Spaceship.ShipLoc loc = homeship.getShipLoc(s+1, 0);
                 int gg = s*sectionNumModules + g;
                 gunSlots[gg] = new GunSlotComponentUI(loc, g);
                 scrollbar.addScrollListener(gunSlots[gg]);
@@ -81,9 +83,6 @@ public class HomeshipUI extends GuiComponent {
         Collections.addAll(getComponents(), modules);
         Collections.addAll(getComponents(), gunSlots);
 
-
-
-        this.scrollbar = new Scrollbar(40, height - 80, width-80, 40, horizontal, area, viewArea);
         getComponents().add(this.scrollbar);
 
         popMenu = new PopMenu(0,0,400, 200, new String[0], new boolean[0]);
