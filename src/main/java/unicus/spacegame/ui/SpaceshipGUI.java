@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**NOTE: This UI is obsolete, and is kept only for reference.
- * Some vital function-calls have been disabled, as they have become obsolete.*/
+ * Some vital function-calls and properties have been
+ * disabled or replaced by placeholders, as they have become obsolete.*/
 
 /**
  * SpaceshipGUI renders a model of Spaceship
@@ -193,8 +194,8 @@ public class SpaceshipGUI extends JPanel
     public void openBuildMenu() {
         if(mouseTarget.type == MouseTargetType.staticModule)
             return;
-        ArrayList<Integer> validModules  = spaceship.GetBuildableModules(mouseTarget.loc);
-        ArrayList<Integer> validSections = spaceship.GetBuildableSections(mouseTarget.loc);
+        ArrayList<Integer> validModules  = new ArrayList<>();//spaceship.GetBuildableModules(mouseTarget.loc);
+        ArrayList<Integer> validSections = new ArrayList<>();//spaceship.GetBuildableSections(mouseTarget.loc);
 
         if(!validModules.isEmpty()) {
             for (int i = 0; i < popBuildOptionsModules.length; i++)
@@ -360,7 +361,7 @@ public class SpaceshipGUI extends JPanel
         Rectangle r = getShipModuleRect(sIndex, mIndex);
 
         g.setStroke(new BasicStroke(1));
-        g.setColor(spaceship.modules[sIndex][mIndex].moduleType.getPaintColor());
+        //g.setColor(spaceship.modules[sIndex][mIndex].moduleType.getPaintColor());
         g.fillRoundRect(r.x, r.y, r.width, r.height, 10, 10);
 
         g.setColor(Color.BLACK);
@@ -379,7 +380,7 @@ public class SpaceshipGUI extends JPanel
         Rectangle bounds = getBounds();
 
         int baseWidth = bounds.width / (spaceship.middleLength + 2);
-        int baseHeight = bounds.height / (spaceship.sectionTypes[sIndex].getNumModules());
+        int baseHeight = 100;//bounds.height / (spaceship.sectionTypes[sIndex].getNumModules());
 
         Rectangle drawRect = new Rectangle();
         drawRect.width  = baseWidth - 20;
