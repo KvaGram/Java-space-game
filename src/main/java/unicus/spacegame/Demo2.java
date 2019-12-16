@@ -4,6 +4,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.gui.screens.GameScreen;
 import de.gurkenlabs.litiengine.resources.Resources;
+import org.apache.commons.lang3.ArrayUtils;
 import unicus.spacegame.spaceship.Spaceship;
 import unicus.spacegame.ui.Homeship.HomeshipUI;
 import unicus.spacegame.ui.Homeship.HomeshipUIController;
@@ -53,11 +54,17 @@ import java.util.Random;
  */
 
 
-public class Demo2 implements IUpdateable {
+class Demo2 implements IUpdateable {
+    final boolean nogui;
+
     ShipRefitController shipView;
 
+    Demo2(String[] args) {
+        nogui = ArrayUtils.contains(args, "NOGUI");
+    }
+
     public static void main(String[] args) {
-        Demo2 demo = new Demo2();
+        Demo2 demo = new Demo2(args);
         demo.init();
         demo.run();
     }
@@ -94,7 +101,9 @@ public class Demo2 implements IUpdateable {
 
     private void run() {
         Game.start();
-        Game.screens().display("SHIPVIEW");
+        if (!nogui)
+            Game.screens().display("SHIPVIEW");
+        //TODO: add and display brigadier
     }
 
     /**
