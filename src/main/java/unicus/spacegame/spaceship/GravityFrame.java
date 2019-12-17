@@ -42,7 +42,7 @@ public class GravityFrame extends AbstractShipSection {
 
     @Override
     public String GetName() {
-        return null;
+        return "Gravity frame at " +  loc.toString();
     }
 
     @Override

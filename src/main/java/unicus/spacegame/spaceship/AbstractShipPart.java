@@ -76,4 +76,6 @@ public abstract class AbstractShipPart {
     //Returns a container of storable parts, material and cargo retrieved/reclaimed
     // from removing/dismantling this ship-part.
     public abstract CargoPlaceholder[] getCargoOnDestruction();
+
+    public void getInfo(StringBuffer b) {b.append("\n " + GetName());}
 }

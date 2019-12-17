@@ -42,7 +42,7 @@ public class BasicFrame extends AbstractShipSection {
 
     @Override
     public String GetName() {
-        return null;
+        return "Basic frame at " +  loc.toString();
     }
 
     @Override

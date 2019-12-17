@@ -42,7 +42,7 @@ public class WheelFrame extends AbstractShipSection {
 
     @Override
     public String GetName() {
-        return null;
+        return "WheelFrame at " + loc.toString();
     }
 
     @Override

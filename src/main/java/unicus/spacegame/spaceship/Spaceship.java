@@ -16,6 +16,27 @@ public class Spaceship {
     //lists the type of sections currently installed. 0 is near bridge, other end near engineering.
     //public SectionType[] sectionTypes; //<- to remove
     public AbstractShipModule[][] modules;
+
+    /**
+     *  prints a detailed summary of the spaceship to the string-buffer
+     * @param b
+     */
+    public void getInfo(StringBuffer b) {
+        String name = "The Homeship";
+        int numCrew = 0;
+        int numJobs = 0;
+        b.append("\nSummary of " + name);
+        b.append("\nNumber of crew - " + numCrew);
+        b.append("\nNumber of jobs - " + numJobs);
+        b.append("\nNumber of buildable sections - " + middleLength);
+        b.append("\n------------------------------------");
+        for (AbstractShipModule[] s : modules) {
+            for (AbstractShipModule m : s) {
+                m.getInfo(b);
+            }
+        }
+
+    }
     //public ShipWeapon[][] weaponTypes; //<- to remove
 
     /* TODO: static special modules
@@ -106,6 +127,11 @@ public class Spaceship {
 
         public int getS() {
             return s;
+        }
+
+        @Override
+        public String toString() {
+            return "(Section " + s + ", Module " + m + ")";
         }
     }
 

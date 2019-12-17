@@ -44,7 +44,7 @@ public class StrippedFrame extends AbstractShipSection {
 
     @Override
     public String GetName() {
-        return "Stripped Section";
+        return "Stripped Section at " +  loc.toString();
     }
 
     @Override

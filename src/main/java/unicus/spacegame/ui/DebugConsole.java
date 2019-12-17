@@ -1,12 +1,11 @@
 package unicus.spacegame.ui;
 
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import de.gurkenlabs.litiengine.IUpdateable;
 import unicus.spacegame.spaceship.Spaceship;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.OutputStream;
@@ -16,6 +15,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 
+import com.mojang.brigadier.CommandDispatcher;
+
+import static com.mojang.brigadier.arguments.IntegerArgumentType.*;
+import static com.mojang.brigadier.builder.LiteralArgumentBuilder.*;
+import static com.mojang.brigadier.builder.RequiredArgumentBuilder.*;
+
 public class DebugConsole implements IUpdateable {
     public static void main(String[] args) {
         DebugConsole c = new DebugConsole(Spaceship.GenerateStart1(new Random(), 8, 10, 0.5f, 0.8f));
@@ -23,24 +28,27 @@ public class DebugConsole implements IUpdateable {
 
     }
 
+
     private Spaceship homeship;
+    PrintStream out;
+    JTextArea ta;
+    JTextField tf;
     public DebugConsole(Spaceship homeship) {
         this.homeship = homeship;
+        ta = new JTextArea();
+        tf = new JTextField();
+        ta.setBackground(Color.lightGray);
+        tf.setBackground(Color.yellow);
+
+        TextAreaOutputStream taos = new TextAreaOutputStream(ta, 60);
+        out = new PrintStream(taos);
     }
 
 
     public void run() {
         JFrame frame = new JFrame();
         frame.add(new JLabel("debug terminal"), BorderLayout.NORTH);
-        JTextArea ta = new JTextArea();
-        JTextField tf = new JTextField();
-        ta.setBackground(Color.lightGray);
-        tf.setBackground(Color.yellow);
-
-        TextAreaOutputStream taos = new TextAreaOutputStream(ta, 60);
-        PrintStream ps = new PrintStream(taos);
-
-        System.setOut(ps);
+        System.setOut(out);
 
         frame.add(new JScrollPane(ta), BorderLayout.CENTER);
         frame.add(new JScrollPane(tf), BorderLayout.SOUTH);
@@ -65,10 +73,24 @@ public class DebugConsole implements IUpdateable {
         frame.setSize(800, 600);
     }
 
-    private void process(String input) {
-        System.out.println("Processing input");
-        System.out.println("> " + input);
+    private void process(String rawInput) {
+
+        String[] input = rawInput.toLowerCase().split(" ");
+        //System.out.println("Processing input");
+        //System.out.println("> " + input);
+        if(input[0].equals("print")){
+            if(input[1].equals("ship")) {
+                StringBuffer b = new StringBuffer();
+                homeship.getInfo(b);
+                out.println(b.toString());
+            }
+            else
+                out.println("Print what? input error");
+        }
+        else
+            out.println("unknown command");
     }
+
 
     /**
      * This method is called by the game loop on all objects that need to update
