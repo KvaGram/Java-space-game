@@ -4,8 +4,8 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.gui.screens.GameScreen;
 import de.gurkenlabs.litiengine.resources.Resources;
-import org.apache.commons.lang3.ArrayUtils;
 import unicus.spacegame.spaceship.Spaceship;
+import unicus.spacegame.ui.DebugConsole;
 import unicus.spacegame.ui.Homeship.HomeshipUI;
 import unicus.spacegame.ui.Homeship.HomeshipUIController;
 
@@ -55,12 +55,10 @@ import java.util.Random;
 
 
 class Demo2 implements IUpdateable {
-    final boolean nogui;
 
     ShipRefitController shipView;
 
     Demo2(String[] args) {
-        nogui = ArrayUtils.contains(args, "NOGUI");
     }
 
     public static void main(String[] args) {
@@ -87,22 +85,24 @@ class Demo2 implements IUpdateable {
 
         Random r = new Random(0);
         Spaceship homeship = Spaceship.GenerateStart1(r, 8, 20, .2f, .8f);
-
         Game.init();
         Game.window().getRenderComponent().setCursor(cursor);
-        Game.window().getRenderComponent().setCursorOffset(8,8);
+        Game.window().getRenderComponent().setCursorOffset(8, 8);
+
         //Input.mouse().setGrabMouse(false);
         // (above) bugged feature. Waiting for litiengine version 0.4.18 for a bug-fix
 
         shipView = new ShipRefitController("SHIPVIEW", homeship);
 
+        DebugConsole console = new DebugConsole(homeship);
+        console.run();
+        Game.loop().attach(console);
     }
 
 
     private void run() {
         Game.start();
-        if (!nogui)
-            Game.screens().display("SHIPVIEW");
+        Game.screens().display("SHIPVIEW");
         //TODO: add and display brigadier
     }
 
@@ -132,7 +132,9 @@ class SituationScreen extends GameScreen {
         //...
     }
 }
-
+/**
+ * The ship refit screen is an interface to select changes to The Homeship
+ */
 class ShipRefitController extends GameScreen implements IUpdateable, HomeshipUIController {
     private Spaceship homeShip;
     private HomeshipUI homeshipUI;
@@ -173,6 +175,4 @@ class ShipRefitController extends GameScreen implements IUpdateable, HomeshipUIC
     }
 }
 
-/**
- * The ship refit screen is an interface to select changes to The Homeship
- */
+
