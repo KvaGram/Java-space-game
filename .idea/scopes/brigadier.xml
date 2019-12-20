@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="brigadier" pattern="lib:com.mojang.brigadier.*" />
+</component>

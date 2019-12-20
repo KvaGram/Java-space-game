@@ -17,26 +17,6 @@ public class Spaceship {
     //public SectionType[] sectionTypes; //<- to remove
     public AbstractShipModule[][] modules;
 
-    /**
-     *  prints a detailed summary of the spaceship to the string-buffer
-     * @param b
-     */
-    public void getInfo(StringBuffer b) {
-        String name = "The Homeship";
-        int numCrew = 0;
-        int numJobs = 0;
-        b.append("\nSummary of " + name);
-        b.append("\nNumber of crew - " + numCrew);
-        b.append("\nNumber of jobs - " + numJobs);
-        b.append("\nNumber of buildable sections - " + middleLength);
-        b.append("\n------------------------------------");
-        for (AbstractShipModule[] s : modules) {
-            for (AbstractShipModule m : s) {
-                m.getInfo(b);
-            }
-        }
-
-    }
     //public ShipWeapon[][] weaponTypes; //<- to remove
 
     /* TODO: static special modules
@@ -73,9 +53,10 @@ public class Spaceship {
         ShipLoc(int s, int m){
             this.s = s; this.m = m;
         }
+
         public boolean isValidSection() {return s >= 0 && s < modules.length;}
         public boolean isValidModule() {
-            if (!isValidSection() || m <= 0)
+            if (!isValidSection() || m < 0)
                 return false;
             return m < modules[s].length;
         }
