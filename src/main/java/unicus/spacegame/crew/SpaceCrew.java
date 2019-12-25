@@ -1,4 +1,6 @@
 package unicus.spacegame.crew;
+import unicus.spacegame.utilities.NameGenerator;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -11,6 +13,24 @@ import java.util.Random;
  *   in the same way HomeShip holds the model for the home-ship.
  * */
 public class SpaceCrew {
+    /**
+     * The last used crew-key used to create a crewman.
+     * NOTE: This value is essential to keep when saving and loading a game.
+     * There can never be more than one AbstractCrewman object per crew-key
+     */
+    private int lastCrewKey = Integer.MIN_VALUE;
+
+    /**
+     * Gets a new crew-key for an AbstractCrewman, and increments LAST_CREW_KEY
+     * @return a unique integer value to use as a identifying key for a crewman
+     */
+    protected int getNextCrewKey(){
+        lastCrewKey++;
+        return lastCrewKey;
+    }
+
+    //TODO: Add constructor, crewGenerator (start scenarios), crew-lists
+
     public static void main(String[] args) {
         //Create window
         JFrame frame = new JFrame("Crew Tracker");
@@ -53,6 +73,11 @@ public class SpaceCrew {
         frame.setVisible(true);
     }
 }
+/*
+TODO: Old code below.
+ To be refactored into new classes and objects
+ */
+
 
 /*
 * Skills-types put in an enum.
