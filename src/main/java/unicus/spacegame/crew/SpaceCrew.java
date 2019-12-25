@@ -1,10 +1,16 @@
-package unicus.spacegame;
+package unicus.spacegame.crew;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
-
-public class Crew {
+/*
+ * Refactor notes:
+ * Crew.java is renamed to SpaceCrew.java.
+ * Package spacegame.crew has been added as a place to keep all crew code
+ * SpaceCrew is going to be the main model class for crew
+ *   in the same way HomeShip holds the model for the home-ship.
+ * */
+public class SpaceCrew {
     public static void main(String[] args) {
         //Create window
         JFrame frame = new JFrame("Crew Tracker");
