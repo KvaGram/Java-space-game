@@ -1,6 +1,6 @@
 package unicus.spacegame;
 
-import unicus.spacegame.spaceship.Spaceship;
+import unicus.spacegame.spaceship.HomeShip;
 import unicus.spacegame.ui.ShipViewUI;
 import unicus.spacegame.ui.StarEventListener;
 import unicus.spacegame.ui.StarmapUI;
@@ -84,7 +84,7 @@ public class Demo1 extends JPanel {
         Random shipRand = new Random(r.nextLong());
         long starRandom = r.nextLong();
 
-        Spaceship ship = Spaceship.GenerateStart1(shipRand, 4, 8, 0.3f, 0.8f);
+        HomeShip ship = HomeShip.GenerateStart1(shipRand, 4, 8, 0.3f, 0.8f);
 
         starSysView  = new SwingStarSystem();
         starMapView  = new StarmapUI(starRandom);

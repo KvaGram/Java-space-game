@@ -6,7 +6,7 @@ public class WheelFrame extends AbstractShipSection {
         return new AbstractShipModule[0];
     }
 
-    public WheelFrame(Spaceship.ShipLoc sectionLoc) {
+    public WheelFrame(HomeShip.ShipLoc sectionLoc) {
         super(sectionLoc);
     }
 

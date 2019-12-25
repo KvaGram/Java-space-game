@@ -4,7 +4,7 @@ import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.gui.screens.GameScreen;
 import de.gurkenlabs.litiengine.resources.Resources;
-import unicus.spacegame.spaceship.Spaceship;
+import unicus.spacegame.spaceship.HomeShip;
 import unicus.spacegame.ui.DebugConsole;
 import unicus.spacegame.ui.Homeship.HomeshipUI;
 import unicus.spacegame.ui.Homeship.HomeshipUIController;
@@ -84,7 +84,7 @@ class Demo2 implements IUpdateable {
         }
 
         Random r = new Random(0);
-        Spaceship homeship = Spaceship.GenerateStart1(r, 8, 20, .2f, .8f);
+        HomeShip homeship = HomeShip.GenerateStart1(r, 8, 20, .2f, .8f);
         Game.init();
         Game.window().getRenderComponent().setCursor(cursor);
         Game.window().getRenderComponent().setCursorOffset(8, 8);
@@ -136,10 +136,10 @@ class SituationScreen extends GameScreen {
  * The ship refit screen is an interface to select changes to The Homeship
  */
 class ShipRefitController extends GameScreen implements IUpdateable, HomeshipUIController {
-    private Spaceship homeShip;
+    private HomeShip homeShip;
     private HomeshipUI homeshipUI;
 
-    public ShipRefitController(String screenName, Spaceship homeShip) {
+    public ShipRefitController(String screenName, HomeShip homeShip) {
         super(screenName);
         this.homeShip = homeShip;
 
@@ -169,7 +169,7 @@ class ShipRefitController extends GameScreen implements IUpdateable, HomeshipUIC
 
 
     @Override
-    public void onSelected(Spaceship.ShipLoc loc) {
+    public void onSelected(HomeShip.ShipLoc loc) {
         //TODO what to do when a section, module or component is selected.
         //Expected to run homeshipUI.openMenu
     }

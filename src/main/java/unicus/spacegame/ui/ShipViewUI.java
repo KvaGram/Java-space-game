@@ -1,6 +1,6 @@
 package unicus.spacegame.ui;
 
-import unicus.spacegame.spaceship.Spaceship;
+import unicus.spacegame.spaceship.HomeShip;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,7 +28,7 @@ public class ShipViewUI extends JLayeredPane implements ActionListener {
     private JButton btnDoCargo;
     private JButton btnDoEngine;
 
-    public ShipViewUI(Spaceship spaceship)
+    public ShipViewUI(HomeShip homeShip)
     {
         System.out.println("Working Directory = " +
                 System.getProperty("user.dir"));
@@ -37,7 +37,7 @@ public class ShipViewUI extends JLayeredPane implements ActionListener {
         spaceshipBgFile = new ImageIcon( getClass().getResource("spaceship_bg.jpg"));
         spaceshipBg = new ImageLabel("");
         spaceshipBg.setIcon(spaceshipBgFile);
-        spaceshipGUI = new SpaceshipGUI(spaceship);
+        spaceshipGUI = new SpaceshipGUI(homeShip);
         spaceshipGUI.setOpaque(false);
         buttonLayer = new JPanel();
         buttonLayer.setOpaque(false);
@@ -89,7 +89,7 @@ public class ShipViewUI extends JLayeredPane implements ActionListener {
             rand = new Random(0);
         }
 
-        Spaceship ship = Spaceship.GenerateStart1(rand, 2, 10, 0.3f, 1.0f);
+        HomeShip ship = HomeShip.GenerateStart1(rand, 2, 10, 0.3f, 1.0f);
         ShipViewUI view = new ShipViewUI(ship);
 
         JFrame frame = new JFrame("Ship view proto");
@@ -112,8 +112,8 @@ public class ShipViewUI extends JLayeredPane implements ActionListener {
         Random rand = new Random();
 
         if (source == btnNewSpaceship){
-            Spaceship ship = Spaceship.GenerateStart1(rand, 2, 10, 0.3f, 1.0f);
-            spaceshipGUI.setSpaceship(ship);
+            HomeShip ship = HomeShip.GenerateStart1(rand, 2, 10, 0.3f, 1.0f);
+            spaceshipGUI.setHomeShip(ship);
         }
         else if (source == btnDoCrew){
             out.println("You knock the crew upside down");

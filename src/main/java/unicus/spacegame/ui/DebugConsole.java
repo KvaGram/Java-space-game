@@ -9,7 +9,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import de.gurkenlabs.litiengine.IUpdateable;
 import unicus.spacegame.spaceship.AbstractShipModule;
-import unicus.spacegame.spaceship.Spaceship;
+import unicus.spacegame.spaceship.HomeShip;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +18,6 @@ import java.awt.event.KeyEvent;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -32,19 +31,19 @@ import com.mojang.brigadier.arguments.*;
 
 public class DebugConsole implements IUpdateable {
     public static void main(String[] args) {
-        DebugConsole c = new DebugConsole(Spaceship.GenerateStart1(new Random(), 8, 10, 0.5f, 0.8f));
+        DebugConsole c = new DebugConsole(HomeShip.GenerateStart1(new Random(), 8, 10, 0.5f, 0.8f));
         c.run();
 
     }
 
-    private Spaceship homeship;
+    private HomeShip homeship;
     PrintStream out;
     JTextArea ta;
     JTextField tf;
     CommandDispatcher<Object> dispatcher;
     private static Object dummySender = new Object();
 
-    public DebugConsole(Spaceship homeship) {
+    public DebugConsole(HomeShip homeship) {
         this.homeship = homeship;
         ta = new JTextArea();
         tf = new JTextField();
@@ -77,7 +76,7 @@ public class DebugConsole implements IUpdateable {
                 ).then(
                         argument("loc", shipLocArgument())
                                 .executes( context -> {
-                                    printShipLoc(context.getArgument("loc", Spaceship.ShipLoc.class));
+                                    printShipLoc(context.getArgument("loc", HomeShip.ShipLoc.class));
                                     return 1;
                                 })
 
@@ -140,7 +139,7 @@ public class DebugConsole implements IUpdateable {
         return new ShipLocArgument(homeship);
     }
 
-    private void printShipLoc(Spaceship.ShipLoc loc){
+    private void printShipLoc(HomeShip.ShipLoc loc){
         StringBuffer b = new StringBuffer();
         loc.getModule().getInfo(b);
         out.println(b.toString());
@@ -189,20 +188,20 @@ class InvalidShipLocMessage implements Message{
     }
 }
 
-class ShipLocArgument implements ArgumentType<Spaceship.ShipLoc> {
-    private Spaceship homeship;
+class ShipLocArgument implements ArgumentType<HomeShip.ShipLoc> {
+    private HomeShip homeship;
     private ShipLocTarget target;
 
-    ShipLocArgument(Spaceship homeship, ShipLocTarget target) {
+    ShipLocArgument(HomeShip homeship, ShipLocTarget target) {
         this.homeship = homeship;
         this.target = target;
     }
-    ShipLocArgument(Spaceship homeship) {
+    ShipLocArgument(HomeShip homeship) {
         this(homeship, ShipLocTarget.either);
     }
 
     @Override
-    public Spaceship.ShipLoc parse(StringReader reader) throws CommandSyntaxException {
+    public HomeShip.ShipLoc parse(StringReader reader) throws CommandSyntaxException {
         reader.expect('(');
         int section = reader.readInt();
         reader.expect(':');
@@ -211,7 +210,7 @@ class ShipLocArgument implements ArgumentType<Spaceship.ShipLoc> {
 
         CommandExceptionType exceptionType = new CommandExceptionType() {};
 
-        Spaceship.ShipLoc loc = homeship.getShipLoc(section, module);
+        HomeShip.ShipLoc loc = homeship.getShipLoc(section, module);
         if (!loc.isValidModule()) {
             Message msg = new Message() {
                 @Override public String getString() {return loc.toString() + " does not point to a valid module or section."; }

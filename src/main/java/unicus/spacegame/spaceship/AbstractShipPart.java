@@ -11,9 +11,9 @@ import java.io.PrintStream;
  */
 public abstract class AbstractShipPart {
     private final ShipPartType partType;
-    protected final Spaceship.ShipLoc loc;
+    protected final HomeShip.ShipLoc loc;
 
-    protected AbstractShipPart(ShipPartType partType, Spaceship.ShipLoc loc) {
+    protected AbstractShipPart(ShipPartType partType, HomeShip.ShipLoc loc) {
 
         this.partType = partType;
         this.loc = loc;
@@ -23,7 +23,7 @@ public abstract class AbstractShipPart {
         return partType;
     }
 
-    public Spaceship.ShipLoc getLoc() {
+    public HomeShip.ShipLoc getLoc() {
         return loc;
     }
 

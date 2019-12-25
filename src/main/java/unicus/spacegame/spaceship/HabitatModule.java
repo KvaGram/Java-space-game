@@ -1,7 +1,7 @@
 package unicus.spacegame.spaceship;
 
 public class HabitatModule extends AbstractShipModule {
-    public HabitatModule(Spaceship.ShipLoc loc) {
+    public HabitatModule(HomeShip.ShipLoc loc) {
         super(loc);
     }
 

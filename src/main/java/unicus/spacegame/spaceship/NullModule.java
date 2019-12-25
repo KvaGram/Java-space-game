@@ -2,7 +2,7 @@ package unicus.spacegame.spaceship;
 
 public class NullModule extends AbstractShipModule {
 
-    public NullModule(Spaceship.ShipLoc loc) {
+    public NullModule(HomeShip.ShipLoc loc) {
         super(loc);
     }
 

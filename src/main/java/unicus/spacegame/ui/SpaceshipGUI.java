@@ -3,7 +3,7 @@ package unicus.spacegame.ui;
 import org.apache.commons.lang3.ArrayUtils;
 import unicus.spacegame.spaceship.ModuleType;
 import unicus.spacegame.spaceship.SectionType;
-import unicus.spacegame.spaceship.Spaceship;
+import unicus.spacegame.spaceship.HomeShip;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * SpaceshipGUI renders a model of Spaceship
  * and allows a user to edit module layout of the spaceship.
- * @see Spaceship
+ * @see HomeShip
  *
  * This prototype UI feature a popout drop-menu that allows
  * the user to change either a single module or an entire section.
@@ -27,7 +27,7 @@ import java.util.Random;
 public class SpaceshipGUI extends JPanel
 {
     // spaceship is the datastructure this UI represents.
-    Spaceship spaceship;
+    HomeShip homeShip;
 
     //popBuild is the drop-menu that appears when clicking on a menu.
     //See methods openBuildMenu and closeBuildMenu.
@@ -58,11 +58,11 @@ public class SpaceshipGUI extends JPanel
     /**
      * Constructor of the Spaceship UI.
      * Requires a reference to the spaceship.
-     * @param spaceship The spaceship to display and edit.
+     * @param homeShip The spaceship to display and edit.
      */
-    public SpaceshipGUI(Spaceship spaceship)
+    public SpaceshipGUI(HomeShip homeShip)
     {
-        this.spaceship = spaceship;
+        this.homeShip = homeShip;
         this.mousePoint = new Point(0, 0);
         this.uiState = UIState.select;
         this.screen = this.getBounds();
@@ -159,7 +159,7 @@ public class SpaceshipGUI extends JPanel
         } else {
             rand = new Random();
         }
-        Spaceship ship = Spaceship.GenerateStart1(rand, 2, 10, 0.3f, 1.0f);
+        HomeShip ship = HomeShip.GenerateStart1(rand, 2, 10, 0.3f, 1.0f);
         SpaceshipGUI gui = new SpaceshipGUI(ship);
 
         JFrame frame = new JFrame("Ship modules proto");
@@ -177,10 +177,10 @@ public class SpaceshipGUI extends JPanel
 
     /**
      * Replaces the current spaceship
-     * @param spaceship New spaceship to display and manage.
+     * @param homeShip New spaceship to display and manage.
      */
-    public void setSpaceship(Spaceship spaceship){
-        this.spaceship = spaceship;
+    public void setHomeShip(HomeShip homeShip){
+        this.homeShip = homeShip;
         uiState = UIState.select;
         mouseTarget = null;
         buildMouseTargets();
@@ -277,8 +277,8 @@ public class SpaceshipGUI extends JPanel
 //        g.fillRect (0, 0, bounds.width, bounds.height);
 
         //Paint modules
-        for(int i = 0; i < spaceship.middleLength; i++) {
-            int sLength = spaceship.modules[i].length;
+        for(int i = 0; i < homeShip.middleLength; i++) {
+            int sLength = homeShip.modules[i].length;
             if(sLength < 1)
                 paintEmptySec(i, g);
             for (int j = 0; j < sLength; j++)
@@ -379,7 +379,7 @@ public class SpaceshipGUI extends JPanel
     public Rectangle getShipModuleRect(int sIndex, int mIndex){
         Rectangle bounds = getBounds();
 
-        int baseWidth = bounds.width / (spaceship.middleLength + 2);
+        int baseWidth = bounds.width / (homeShip.middleLength + 2);
         int baseHeight = 100;//bounds.height / (spaceship.sectionTypes[sIndex].getNumModules());
 
         Rectangle drawRect = new Rectangle();
@@ -419,9 +419,9 @@ public class SpaceshipGUI extends JPanel
     public Rectangle getShipEmptySecRect(int sIndex){
         Rectangle bounds = getBounds();
         Rectangle drawRect = new Rectangle();
-        int baseWidth = bounds.width / (spaceship.middleLength + 2);
+        int baseWidth = bounds.width / (homeShip.middleLength + 2);
         drawRect.height = bounds.height / 10;
-        drawRect.width = bounds.width / (spaceship.middleLength + 2) - 10;
+        drawRect.width = bounds.width / (homeShip.middleLength + 2) - 10;
         drawRect.x = baseWidth * (sIndex + 1) + 10;
         drawRect.y = bounds.height / 2 - bounds.height / 20;
 
@@ -436,7 +436,7 @@ public class SpaceshipGUI extends JPanel
     public Rectangle getBridgeRect(){
         Rectangle bounds = getBounds();
         Rectangle drawRect = new Rectangle();
-        drawRect.width = bounds.width / (spaceship.middleLength + 2) - 10;
+        drawRect.width = bounds.width / (homeShip.middleLength + 2) - 10;
         drawRect.height = bounds.height / 2;
         drawRect.x = 10;
         drawRect.y = bounds.height / 4;
@@ -451,12 +451,12 @@ public class SpaceshipGUI extends JPanel
      */
     public Rectangle getEngineRect(){
         Rectangle bounds = getBounds();
-        int baseWidth = bounds.width / (spaceship.middleLength + 2);
+        int baseWidth = bounds.width / (homeShip.middleLength + 2);
 
         Rectangle drawRect = new Rectangle();
-        drawRect.width = bounds.width / (spaceship.middleLength + 2) - 10;
+        drawRect.width = bounds.width / (homeShip.middleLength + 2) - 10;
         drawRect.height = bounds.height / 2;
-        drawRect.x = (spaceship.middleLength +1) * baseWidth;
+        drawRect.x = (homeShip.middleLength +1) * baseWidth;
         drawRect.y = bounds.height / 4;
 
         return drawRect;
@@ -480,18 +480,18 @@ public class SpaceshipGUI extends JPanel
                 MouseTargetType.staticModule, "engine",
                 getEngineRect(), new Point()
         ));
-        for(int i = 0; i < spaceship.middleLength; i++) {
-            if (spaceship.modules[i].length < 1) {
+        for(int i = 0; i < homeShip.middleLength; i++) {
+            if (homeShip.modules[i].length < 1) {
                 mouseTargets.add(new MouseTarget(
                         MouseTargetType.section,
                         "empty section",
                         getShipEmptySecRect(i), new Point(i, -1)
                 ));
             }
-            for (int j = 0; j < spaceship.modules[i].length; j++) {
+            for (int j = 0; j < homeShip.modules[i].length; j++) {
                 mouseTargets.add(new MouseTarget(
                         MouseTargetType.module,
-                        spaceship.modules[i][j].GetName(),
+                        homeShip.modules[i][j].GetName(),
                         getShipModuleRect(i, j), new Point(i, j)
                 ));
             }

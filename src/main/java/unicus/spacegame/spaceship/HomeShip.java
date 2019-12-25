@@ -9,7 +9,7 @@ import java.util.Random;
  * The spaceship has a length of sections (at least 2).
  * Each section has a number of modules, depending on the SectionType.
  */
-public class Spaceship {
+public class HomeShip {
     public final int headLocation;
     public int middleLength;
     public final int tailLocation;
@@ -131,7 +131,7 @@ public class Spaceship {
      * Not meant to be used directly. Use one of the Generate functions instead.
      * @param middleLength
      */
-    public Spaceship(int middleLength)
+    public HomeShip(int middleLength)
     {
         this.headLocation = 0; //It's always 0, but hey, now the code might be more readable.
         this.middleLength = middleLength;
@@ -243,7 +243,7 @@ public class Spaceship {
      * @param maxFull maximum cargo to spawn with (range 0, 1)
      * @return A Spaceship
      */
-    static public Spaceship GenerateStart1(Random rand, int minLength, int maxLength, float minFull, float maxFull){
+    static public HomeShip GenerateStart1(Random rand, int minLength, int maxLength, float minFull, float maxFull){
         int length = rand.nextInt(maxLength - minLength) + minLength;
         float fullRange = maxFull - minFull;
         float full = rand.nextFloat() * fullRange + minFull;
@@ -257,12 +257,12 @@ public class Spaceship {
      * @param full How much of the potential space will be filled with cargo (range 0, 1)
      * @return A Spaceship
      */
-    private static Spaceship GenerateStart1(Random rand, int length, float full){
+    private static HomeShip GenerateStart1(Random rand, int length, float full){
         //length MUST be at least 2.
         if (length < 2)
             length = 2;
 
-        Spaceship ship = new Spaceship(length);
+        HomeShip ship = new HomeShip(length);
         //center of the wheel section hosts the first hab module
         AbstractShipSection wheelSection = ship.forceBuildSection(1, SectionType.Wheel);
 
@@ -663,7 +663,7 @@ public class Spaceship {
      * @param args
      */
     public static void main(String[] args) {
-        Spaceship ship = Spaceship.GenerateStart1(new Random(0), 2, 10, 0.0f, 1.0f);
+        HomeShip ship = HomeShip.GenerateStart1(new Random(0), 2, 10, 0.0f, 1.0f);
         System.out.println(ship.toString());
     }
 }

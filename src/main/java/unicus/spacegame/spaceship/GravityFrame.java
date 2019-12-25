@@ -6,7 +6,7 @@ public class GravityFrame extends AbstractShipSection {
         return new AbstractShipModule[0];
     }
 
-    public GravityFrame(Spaceship.ShipLoc sectionLoc) {
+    public GravityFrame(HomeShip.ShipLoc sectionLoc) {
         super(sectionLoc);
     }
 

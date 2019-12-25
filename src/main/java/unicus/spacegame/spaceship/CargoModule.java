@@ -13,7 +13,7 @@ public class CargoModule extends AbstractShipModule implements CargoContainer {
     int numCargo;
     ArrayList<CargoCollection> myStuff;
 
-    public CargoModule(Spaceship.ShipLoc loc) {
+    public CargoModule(HomeShip.ShipLoc loc) {
         super(loc);
     }
 
