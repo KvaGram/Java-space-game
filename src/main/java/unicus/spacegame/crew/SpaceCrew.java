@@ -1,4 +1,5 @@
 package unicus.spacegame.crew;
+import org.apache.commons.lang3.ArrayUtils;
 import unicus.spacegame.utilities.NameGenerator;
 
 import javax.swing.*;
@@ -29,8 +30,42 @@ public class SpaceCrew {
         return lastCrewKey;
     }
 
+    public SpaceCrew(){
+        crewmen = new AbstractCrewman[0];
+    }
+
     //TODO: Add constructor, crewGenerator (start scenarios), crew-lists
 
+    /**
+     * List of all crewman objects that can be referenced in game, living or dead.
+     * All lists and references of crewmen eventually refer to this list.
+     */
+    private AbstractCrewman[] crewmen;
+
+    /**
+     * Adds new crewmen to the list of crewmen.
+     * If a crewman already exists (same keyID), the old object will be replaced with the new.
+     *
+     * @param newCrewObjects
+     */
+    private void addReplaceCrewmen(AbstractCrewman... newCrewObjects) {
+        int[] toRemove = new int[0];
+        for (AbstractCrewman c:newCrewObjects) {
+            for (int i = 0; i < crewmen.length; i++)
+                if (crewmen[i].keyID == c.keyID) ArrayUtils.add(toRemove, i);
+        }
+        ArrayUtils.removeAll(crewmen, toRemove);
+        ArrayUtils.addAll(crewmen, newCrewObjects);
+    }
+    private void removeCrewmen(int... crewKeys) {
+        int[] toRemove = new int[0];
+        for (int key:crewKeys)
+            for (int i = 0; i < crewmen.length; i++)
+                if (crewmen[i].keyID == key) ArrayUtils.add(toRemove, i);
+        ArrayUtils.removeAll(crewmen, toRemove);
+    }
+
+    //TODO: rewrite tester to use the new AdultCrewman class and features
     public static void main(String[] args) {
         //Create window
         JFrame frame = new JFrame("Crew Tracker");
@@ -72,55 +107,17 @@ public class SpaceCrew {
         frame.getContentPane().add(BorderLayout.CENTER, j_text);
         frame.setVisible(true);
     }
+
+    public AbstractCrewman[] getCrewmen() {
+        return crewmen;
+    }
 }
+
 /*
 TODO: Old code below.
  To be refactored into new classes and objects
  */
 
-
-/*
-* Skills-types put in an enum.
-* This makes it easier to change the list in the future
-* - Lars
-*/
-enum SkillTypes
-{
-    research,
-    diplomacy,
-    medical,
-    teaching,
-    navigation,
-    engineering,
-    mining,
-    leadership,
-    gunnery,
-    boarding;
-
-    // Static function for all of SkillTypes:
-
-    public static int GetIndexByType(SkillTypes type) {
-        return type.ordinal();
-    }
-    public static SkillTypes GetTypeByIndex(int index) {
-        return SkillTypes.values()[index];
-    }
-    public static SkillTypes GetTypeByString(String name) {
-        return SkillTypes.valueOf(name.toLowerCase().trim());
-    }
-    public static int GetIndexByString(String name) {
-        return GetIndexByType(GetTypeByString(name));
-    }
-    public static int GetNumSkills(){
-        return SkillTypes.values().length;
-    }
-
-    //Individual functions for each value:
-
-    public String getName(){
-        return this.toString();
-    }
-}
 
 class Crewman {
     /* changes:

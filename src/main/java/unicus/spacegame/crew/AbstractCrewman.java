@@ -33,6 +33,12 @@ public abstract class AbstractCrewman {
      */
     public final CrewmanGeneData geneData;
 
+    public int getAge(int currentDate) {
+        return currentDate - birthDate;
+    }
+    public float getAgeYears(int currentDate) {
+        return getAge(currentDate) / 12.0f;
+    }
 
     /**
      * Generates a random new AbstractCrewman.
