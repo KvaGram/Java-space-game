@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: de.gurkenlabs:litiengine:0.4.18">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/de/gurkenlabs/litiengine/0.4.18/litiengine-0.4.18.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/de/gurkenlabs/litiengine/0.4.18/litiengine-0.4.18-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/de/gurkenlabs/litiengine/0.4.18/litiengine-0.4.18-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

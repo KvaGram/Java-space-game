@@ -1,8 +1,10 @@
 package unicus.spacegame;
 
+import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.gui.screens.GameScreen;
+import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
 import unicus.spacegame.spaceship.Spaceship;
 import unicus.spacegame.ui.DebugConsole;
@@ -86,11 +88,8 @@ class Demo2 implements IUpdateable {
         Random r = new Random(0);
         Spaceship homeship = Spaceship.GenerateStart1(r, 8, 20, .2f, .8f);
         Game.init();
-        Game.window().getRenderComponent().setCursor(cursor);
-        Game.window().getRenderComponent().setCursorOffset(8, 8);
-
-        //Input.mouse().setGrabMouse(false);
-        // (above) bugged feature. Waiting for litiengine version 0.4.18 for a bug-fix
+        Game.window().cursor().set(cursor, 8, 8);
+        Input.mouse().setGrabMouse(false);
 
         shipView = new ShipRefitController("SHIPVIEW", homeship);
 
