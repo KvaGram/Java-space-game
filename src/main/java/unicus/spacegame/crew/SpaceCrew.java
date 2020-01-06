@@ -1,6 +1,5 @@
 package unicus.spacegame.crew;
 import org.apache.commons.lang3.ArrayUtils;
-import unicus.spacegame.utilities.NameGenerator;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,18 +19,34 @@ public class SpaceCrew {
      * There can never be more than one AbstractCrewman object per crew-key
      */
     private int lastCrewKey = Integer.MIN_VALUE;
+    /**
+     * The last used job-key used to create a job or workplace.
+     * NOTE: This value is essential to keep when saving and loading a game.
+     * There can never be more than one AbstractJob object per job-key
+     */
+    private int lastJobKey = Integer.MIN_VALUE;
 
     /**
-     * Gets a new crew-key for an AbstractCrewman, and increments LAST_CREW_KEY
+     * Gets a new crew-key for an AbstractCrewman, and increments lastCrewKey
      * @return a unique integer value to use as a identifying key for a crewman
      */
     protected int getNextCrewKey(){
         lastCrewKey++;
         return lastCrewKey;
     }
+    /**
+     * Gets a new crew-key for an AbstractJob, and increments lastJobKey
+     * @return a unique integer value to use as a identifying key for a job or workplace
+     */
+    protected int getNextJobKey(){
+        lastJobKey++;
+        return lastJobKey;
+    }
 
     public SpaceCrew(){
-        crewmen = new AbstractCrewman[0];
+        this.crewmen = new AbstractCrewman[0];
+        this.jobs = new AbstractJob[0];
+        this.jobAssignments = new JobAssignment[0];
     }
 
     //TODO: Add constructor, crewGenerator (start scenarios), crew-lists
@@ -41,6 +56,14 @@ public class SpaceCrew {
      * All lists and references of crewmen eventually refer to this list.
      */
     private AbstractCrewman[] crewmen;
+    /**
+     * Lists of all job objects that can be referenced in game, active or not.
+     * All lists and references to jobs eventually refer to this list.
+     */
+    private AbstractJob[] jobs;
+
+
+    private JobAssignment[] jobAssignments;
 
     /**
      * Adds new crewmen to the list of crewmen.
@@ -48,22 +71,135 @@ public class SpaceCrew {
      *
      * @param newCrewObjects
      */
-    private void addReplaceCrewmen(AbstractCrewman... newCrewObjects) {
+    public void addReplaceCrewmen(AbstractCrewman... newCrewObjects) {
         int[] toRemove = new int[0];
         for (AbstractCrewman c:newCrewObjects) {
             for (int i = 0; i < crewmen.length; i++)
-                if (crewmen[i].keyID == c.keyID) ArrayUtils.add(toRemove, i);
+                if (crewmen[i].keyID == c.keyID) toRemove = ArrayUtils.add(toRemove, i);
         }
-        ArrayUtils.removeAll(crewmen, toRemove);
-        ArrayUtils.addAll(crewmen, newCrewObjects);
+        crewmen = ArrayUtils.removeAll(crewmen, toRemove);
+        crewmen = ArrayUtils.addAll(crewmen, newCrewObjects);
     }
+
     private void removeCrewmen(int... crewKeys) {
         int[] toRemove = new int[0];
         for (int key:crewKeys)
             for (int i = 0; i < crewmen.length; i++)
-                if (crewmen[i].keyID == key) ArrayUtils.add(toRemove, i);
-        ArrayUtils.removeAll(crewmen, toRemove);
+                if (crewmen[i].keyID == key) toRemove = ArrayUtils.add(toRemove, i);
+        crewmen = ArrayUtils.removeAll(crewmen, toRemove);
     }
+    /**
+     * Adds new job to the list of jobs.
+     * If a job already exists (same keyID), it should not, the old object will be replaced with the new.
+     *
+     * @param newJobObjects
+     */
+    public void addJobs(AbstractJob... newJobObjects) {
+        int[] toRemove = new int[0];
+        for (AbstractJob j:newJobObjects) {
+            for (int i = 0; i < jobs.length; i++)
+                if (jobs[i].getKeyID() == j.getKeyID()) toRemove = ArrayUtils.add(toRemove, i);
+        }
+        jobs = ArrayUtils.removeAll(jobs, toRemove);
+        jobs = ArrayUtils.addAll(jobs, newJobObjects);
+    }
+    public void removeJobs(int... jobKeys) {
+        int[] toRemove = new int[0];
+        for (int i = 0; i < jobs.length; i++)
+            if (ArrayUtils.contains(jobKeys, jobs[i].getKeyID()))  toRemove = ArrayUtils.add(toRemove, i);
+        jobs = ArrayUtils.removeAll(jobs, toRemove);
+    }
+    public boolean canAssignCrew(int jobID, int crewID) {
+        return canAssignCrew(jobID, crewID, new StringBuffer());
+    }
+    public boolean canAssignCrew(int jobID, int crewID, StringBuffer message) {
+        AbstractJob job = getJob(jobID);
+        AbstractCrewman crewman = getCrew(crewID);
+        if(job == null) {
+            message.append("Cannot assign crewman, invalid job ID.");
+            return false;
+        }
+        if(crewman == null) {
+            message.append("Cannot assign crewman, invalid crewman ID");
+            return false;
+        }
+        if(false) { //TODO: check for illegible for work
+            message.append("Cannot assign crewman, this crewman can't work.");
+            return false;
+        }
+        int numAssigned = 0;
+        for (JobAssignment a : jobAssignments) {
+            if(a.getJobID() == jobID) {
+                if(a.getCrewID() == crewID) {
+                    message.append("Cannot assign crewman, crewman is already assigned.");
+                    return false;
+                }
+
+                numAssigned ++;
+                if(numAssigned >= job.getNumWorkerSlots()) {
+                    message.append("Cannot assign crewman, the workplace is full.");
+                    return false;
+                }
+            }
+        }
+        message.append("Crewman may be assigned.");
+        return true;
+    }
+    public void assignCrew(int jobID, int crewID) {
+        if(!canAssignCrew(jobID, crewID))
+            return;
+        JobAssignment newJA = new JobAssignment(jobID, crewID);
+        jobAssignments = ArrayUtils.add(jobAssignments, newJA);
+    }
+    public void unassignCrew(int jobID, int crewID) {
+        for (int i = 0; i < jobAssignments.length; i++) {
+            if(jobAssignments[i].getJobID() == jobID && jobAssignments[i].getCrewID() == crewID) {
+                jobAssignments = ArrayUtils.remove(jobAssignments, i);
+                return;
+            }
+        }
+    }
+    public void unassignAllCrew(int jobID) {
+        int[] toRemove = new int[0];
+        for (int i = 0; i < jobAssignments.length; i++) {
+            if(jobAssignments[i].getJobID() == jobID) {
+                toRemove = ArrayUtils.add(toRemove, i);
+            }
+        }
+        jobAssignments = ArrayUtils.removeAll(jobAssignments, toRemove);
+    }
+    public AbstractJob getJob(int jobID){
+        for (AbstractJob j : jobs) {
+            if(j.getKeyID() == jobID)
+                return j;
+        }
+        return null;
+    }
+    public AbstractCrewman getCrew(int crewID){
+        for (AbstractCrewman c : crewmen) {
+            if(c.getKeyID() == crewID)
+                return c;
+        }
+        return null;
+    }
+    public JobAssignment[] getAssignmentsByJob(int jobID){
+        JobAssignment[] assignments = new JobAssignment[0];
+        for (JobAssignment ja : jobAssignments) {
+            if(ja.getJobID() == jobID)
+                assignments = ArrayUtils.add(assignments, ja);
+        }
+        return assignments;
+
+    }
+    public JobAssignment[] getAssignmentsByCrewman(int crewID){
+        JobAssignment[] assignments = new JobAssignment[0];
+        for (JobAssignment ja : jobAssignments) {
+            if(ja.getCrewID() == crewID)
+                assignments = ArrayUtils.add(assignments, ja);
+        }
+        return assignments;
+    }
+
 
     //TODO: rewrite tester to use the new AdultCrewman class and features
     public static void main(String[] args) {

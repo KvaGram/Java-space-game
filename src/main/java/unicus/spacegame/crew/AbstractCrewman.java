@@ -94,4 +94,8 @@ public abstract class AbstractCrewman {
 
         this.state = newState;
     }
+
+    public int getKeyID() {
+        return keyID;
+    }
 }
