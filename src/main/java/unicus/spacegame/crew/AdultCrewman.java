@@ -4,6 +4,8 @@ Note that some features of the AdultCrewman may be moved to a new superclass
  or interfaces as other implementations of AbstractCrewman are written.
  */
 
+import java.util.Random;
+
 /**
  * A typical adult crewman.
  */
@@ -62,8 +64,18 @@ public class AdultCrewman extends AbstractCrewman {
     }
 
     public AdultCrewman(int keyID, int birthDate, long randomSeed, int[] parents) {
+        //Note: Super-function generates random name and gender
         super(keyID, CrewmanState.adult, birthDate, randomSeed, parents);
         this.skillValues = new int[SkillTypes.values().length];
+
+        //Randomize each skill with a minimum of 5 and a maximum of 60.
+        int MIN_SKILL = 5;
+        int MAX_SKILL = 60;
+        int RAND_SKILL = MAX_SKILL - MIN_SKILL;
+        Random r = new Random(randomSeed);
+        for (int i = 0; i < skillValues.length; i++) {
+            skillValues[i] = r.nextInt(RAND_SKILL) + MIN_SKILL;
+        }
     }
 
     public AdultCrewman(int keyID, int birthDate, CrewSelfID selfID, CrewmanGeneData geneData, int[] skillValues) {
