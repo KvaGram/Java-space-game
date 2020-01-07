@@ -5,6 +5,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class CargoBay {
+    private static CargoBay instance;
+    public static CargoBay getInstance() {
+        return instance;
+    }
+
     private final static int CARGO_MODULES_COUNT = 12;
     CargoModule[] cargos;
     public static void main(String[] args) {
@@ -91,6 +96,7 @@ public class CargoBay {
         for (int i=0; i<cargos.length; i++) {
             cargos[i] = new CargoModule(this, i);
         }
+        instance = this;
     }
     public void reorderCargo(String sortpattern) {
         switch (sortpattern) {
