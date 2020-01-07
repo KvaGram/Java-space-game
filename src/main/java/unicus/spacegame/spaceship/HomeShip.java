@@ -203,6 +203,7 @@ public class HomeShip {
         // ( index >= 0 && index < length);
         int sLength = newSection.getNumModules();
         //sectionTypes[index] = sectionType;
+        destroySection(index);
         modules[index] = new AbstractShipModule[sLength +1];
         modules[index][0] = newSection;
         for(int i = 1; i < sLength+1; i++){
@@ -238,10 +239,32 @@ public class HomeShip {
                 newModule = new NullModule(loc);
                 break;
         }
-
+        destroyModule(loc.getModule());
         modules[loc.s][loc.m] = newModule;
 
         return newModule;
+    }
+
+    /** prepares a section for destruction.
+     * @param index
+     */
+    private void destroySection(int index) {
+        for (AbstractShipModule m : modules[index]) {
+            destroyModule(m);
+        }
+    }
+
+
+    /** Prepares a module or section object for destruction
+     * This puts the reclaimed resources back in storage and displaces any crew and cargo that might be there.
+     * @param m
+     */
+    private void destroyModule(AbstractShipModule m) {
+        for (abstractShipComponent c : m.getComponents()) {
+            //This stores or destroys the components.
+            c.onDestroy();
+        }
+        m.onDestroy();
     }
 
     /**

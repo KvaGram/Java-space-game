@@ -13,6 +13,10 @@ import java.util.Random;
  *   in the same way HomeShip holds the model for the home-ship.
  * */
 public class SpaceCrew {
+    private static SpaceCrew instace;
+    public static SpaceCrew getInstance() {
+        return instace;
+    }
     /**
      * The last used crew-key used to create a crewman.
      * NOTE: This value is essential to keep when saving and loading a game.
@@ -47,6 +51,7 @@ public class SpaceCrew {
         this.crewmen = new AbstractCrewman[0];
         this.jobs = new AbstractJob[0];
         this.jobAssignments = new JobAssignment[0];
+        instace = this;
     }
 
     //TODO: Add constructor, crewGenerator (start scenarios), crew-lists
@@ -198,6 +203,13 @@ public class SpaceCrew {
                 assignments = ArrayUtils.add(assignments, ja);
         }
         return assignments;
+    }
+    public JobAssignment getAssignment(int jobID, int crewID) {
+        for (JobAssignment ja : jobAssignments) {
+            if(ja.getJobID() == jobID && ja.getCrewID() == crewID)
+                return ja;
+        }
+        return null;
     }
 
 
