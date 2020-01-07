@@ -64,7 +64,7 @@ public class HelloWorld {
             g.setColor(Color.red);
             g.drawOval(0, 0, 16, 16);
         }
-        Game.window().getRenderComponent().setCursor(cursor);
+        Game.window().cursor().set(cursor);
         //Input.mouse().setGrabMouse(false);
 
 

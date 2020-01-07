@@ -10,12 +10,20 @@ import java.util.Random;
  * Each section has a number of modules, depending on the SectionType.
  */
 public class HomeShip {
+
+    private static HomeShip instance;
+    public static HomeShip getInstance() {
+        return instance;
+    }
+
     public final int headLocation;
     public int middleLength;
     public final int tailLocation;
     //lists the type of sections currently installed. 0 is near bridge, other end near engineering.
     //public SectionType[] sectionTypes; //<- to remove
     public AbstractShipModule[][] modules;
+
+
 
     //public ShipWeapon[][] weaponTypes; //<- to remove
 
@@ -154,6 +162,8 @@ public class HomeShip {
         //TODO add tail section
         //placeholder tail section
         modules[i][0] = new StrippedFrame(new ShipLoc(i, 0));
+
+        instance = this;
     }
 
     /**
