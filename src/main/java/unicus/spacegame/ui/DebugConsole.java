@@ -8,6 +8,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import de.gurkenlabs.litiengine.IUpdateable;
+import unicus.spacegame.gameevent.GameEvent;
 import unicus.spacegame.spaceship.AbstractShipModule;
 import unicus.spacegame.spaceship.HomeShip;
 
@@ -99,6 +100,29 @@ public class DebugConsole implements IUpdateable {
         refit build component [ShipLoc] [index] [partType] check
         refit build component [ShipLoc] [index] [partType] force
          */
+    }
+    public void addGameEventCommands(GameEvent gameEvent) {
+        dispatcher.register(literal("event").then(
+                literal("run").then(
+                    argument("event_id", integer(1)).executes(context -> {
+                        int eventID = context.getArgument("event_id", int.class);
+                        gameEvent.event_byID(eventID);
+                        return eventID;
+                    })
+                )
+            ).then(
+                literal("option").then(
+                    argument("option_choice", integer(0)).executes(context -> {
+                        int optionChoice = context.getArgument("option_choice", int.class);
+                        //Insert code for selecting choice here <--------
+                        return optionChoice;
+
+                    })
+                )
+            )
+        );
+
+
     }
 
 
