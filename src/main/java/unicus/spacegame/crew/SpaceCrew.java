@@ -12,46 +12,24 @@ import java.util.Random;
  * SpaceCrew is going to be the main model class for crew
  *   in the same way HomeShip holds the model for the home-ship.
  * */
+
 public class SpaceCrew {
     private static SpaceCrew instace;
     public static SpaceCrew getInstance() {
         return instace;
     }
-    /**
-     * The last used crew-key used to create a crewman.
-     * NOTE: This value is essential to keep when saving and loading a game.
-     * There can never be more than one AbstractCrewman object per crew-key
-     */
-    private int lastCrewKey = Integer.MIN_VALUE;
-    /**
-     * The last used job-key used to create a job or workplace.
-     * NOTE: This value is essential to keep when saving and loading a game.
-     * There can never be more than one AbstractJob object per job-key
-     */
-    private int lastJobKey = Integer.MIN_VALUE;
 
-    /**
-     * Gets a new crew-key for an AbstractCrewman, and increments lastCrewKey
-     * @return a unique integer value to use as a identifying key for a crewman
-     */
-    protected int getNextCrewKey(){
-        lastCrewKey++;
-        return lastCrewKey;
-    }
-    /**
-     * Gets a new crew-key for an AbstractJob, and increments lastJobKey
-     * @return a unique integer value to use as a identifying key for a job or workplace
-     */
-    protected int getNextJobKey(){
-        lastJobKey++;
-        return lastJobKey;
-    }
+    private final ObjectKey crewKeys;
+    private final ObjectKey jobKeys;
 
     public SpaceCrew(){
         this.crewmen = new AbstractCrewman[0];
         this.jobs = new AbstractJob[0];
         this.jobAssignments = new JobAssignment[0];
         instace = this;
+
+        jobKeys = new ObjectKey();
+        crewKeys = new ObjectKey();
     }
 
     //TODO: Add constructor, crewGenerator (start scenarios), crew-lists
