@@ -2,15 +2,28 @@ package unicus.spacegame.gameevent;
 
 import de.gurkenlabs.litiengine.IUpdateable;
 import unicus.spacegame.ui.DebugConsole;
+import java.util.Random;
 
+import java.lang.invoke.MethodType;
 import java.util.ArrayList;
 
 public final class GameEvent implements IUpdateable {
     private static GameEvent INSTANCE;
     private String info = "Magic singleton class";
+    ArrayList<RandomEvent> myEvents = new ArrayList<RandomEvent>();
     private GameEvent() {
         INSTANCE = this;
         DebugConsole.getInstance().addGameEventCommands();
+        myEvents.add(ScientificDiscovery);
+        myEvents.add(MinorAirLeak);
+        myEvents.add(MetallicDeposit);
+        myEvents.add(AlienMapSellerTrue);
+        myEvents.add(AlienMapSellerTrueResult);
+        myEvents.add(AlienMapSellerFake);
+        myEvents.add(AlienMapSellerFakeResult);
+        myEvents.add(GoodGrowingSeason);
+        myEvents.add(CrewPlayingGames);
+        myEvents.add(WeaponDrillAccident);
     }
 
     /** Data structure for the event list is in flux. Possibly an external file, possibly a series of constructors.
@@ -23,19 +36,27 @@ public final class GameEvent implements IUpdateable {
         return INSTANCE;
     }
 
-    ArrayList<RandomEvent> el = new ArrayList<RandomEvent>();
-
-    /** Look over the list of events that are qualified to happen
-    (e.g. "alien runs amok" only if you have aliens aboard)
+    /** Looks over the list of events that are qualified to happen [NB: doesn't actually do this yet, docs ahead of code]
+    e.g. "alien runs amok" only if you have >0 aliens aboard
     Calculate appropriate weightings for common and rare events
     Pick one of them and hand off execution to avoid code duplication.
      */
     public int event_Random() {
         //Prerequisite verifier algorithm go here
+
+        //Weighted random selection algorithm. Akin to picking off a D&D random table with entries like 00-22, 22-30, 31-80, 81-99.
         int sum_weights=0;
-        sum_weights += ScientificDiscovery.weight;
-        sum_weights += MinorAirLeak.weight;
-        //Random selection algorithm go here
+        for (RandomEvent r: myEvents) {
+            sum_weights += r.weight;
+        }
+        int i = 0;
+        int r = new Random().nextInt(sum_weights); //To pick based on relative weight, we have to select from sum of weights, not number of events
+        while (r > myEvents.get(i).weight) {
+            r -= myEvents.get(i).weight;
+            i++;
+        }
+        execute_event(myEvents.get(i).event_id); //convert index-in-list to index-by-ID
+
         return event_byID(0);
     }
     /** **obsolete! should merge with execute_event**
@@ -99,13 +120,11 @@ public final class GameEvent implements IUpdateable {
         return nextEventID;
     }
 
-
-    private  int nextEventID = 0;
+    private int nextEventID = 0;
     private int currentEventID = 0;
     public boolean eventIsWaiting(){
         return currentEventID != 0;
     }
-
 
     //NOTE: if testing standalone without litiengine, have the driver run this update on a loop. - Lars
     @Override
@@ -150,10 +169,12 @@ public final class GameEvent implements IUpdateable {
             new int[]{0,41}, new String[]{"No thanks","Pay them 2 Shinium."});
     private RandomEvent AlienMapSellerTrueResult = new RandomEvent(41, "We have integrated the alien coordinates into our own database. We are slightly closer to finding our way back to Earth.",
             new int[]{0}, new String[]{"Onwards!"});
+    AlienMapSellerTrueResult.weight = 0; //Why is this a syntax error? Why is it an "Unknown class" syntax error??
     private RandomEvent AlienMapSellerFake = new RandomEvent(45, "An independent alien ship is hailing us, offering to trade us knowledge of galactic hyperlanes for some of our shinyum.",
             new int[]{0,46}, new String[]{"No thanks","Pay them 2 Shinium."});
     private RandomEvent AlienMapSellerFakeResult = new RandomEvent(46, "Sadly the alien coordinates turned out to be gibberish, but after all the time we spent trying to calculate, the scammers have fled.",
             new int[]{0}, new String[]{"Damn them!"});
+    AlienMapSellerFakeResult.weight = 0;
     private RandomEvent GoodGrowingSeason = new RandomEvent(50, "Our hydroponic tanks have been flourishing the past week and we are ready to harvest an unusually large crop. +4 food.",
             new int[]{0}, new String[]{"I just hope it's not broccoli."});
     private RandomEvent CrewPlayingGames = new RandomEvent(60, "Your crew has been socializing happily over a lot of the games in the rec room recently. Morale has improved.",
@@ -171,7 +192,7 @@ public final class GameEvent implements IUpdateable {
 }
 
 /*
-Data that needs to be in an event:
+Data that needs to be associated an event:
 -ID
 -Dialog text
 -whether it is an initial or a follow-up event (i.e. can it happen on its own).
