@@ -7,7 +7,9 @@ import com.mojang.brigadier.exceptions.CommandExceptionType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
+import unicus.spacegame.crew.SpaceCrew;
 import unicus.spacegame.gameevent.GameEvent;
 import unicus.spacegame.spaceship.AbstractShipModule;
 import unicus.spacegame.spaceship.HomeShip;
@@ -31,59 +33,59 @@ import com.mojang.brigadier.arguments.*;
 
 
 public class DebugConsole implements IUpdateable {
-    public static void main(String[] args) {
-        DebugConsole c = new DebugConsole(HomeShip.GenerateStart1(new Random(), 8, 10, 0.5f, 0.8f));
-        c.run();
+    private static DebugConsole instance;
 
+    public static void main(String[] args) {
+        DebugConsole c = new DebugConsole();
+        HomeShip.GenerateStart1(new Random(), 8, 10, 0.5f, 0.8f);
+        c.run();
     }
 
-    private HomeShip homeship;
+
     PrintStream out;
     JTextArea ta;
     JTextField tf;
+    TextAreaOutputStream outStream;
     CommandDispatcher<Object> dispatcher;
     private static Object dummySender = new Object();
 
-    public DebugConsole(HomeShip homeship) {
-        this.homeship = homeship;
+    public DebugConsole() {
         ta = new JTextArea();
         tf = new JTextField();
         ta.setBackground(Color.lightGray);
         tf.setBackground(Color.yellow);
 
-        TextAreaOutputStream taos = new TextAreaOutputStream(ta, 60);
-        out = new PrintStream(taos);
+        outStream = new TextAreaOutputStream(ta, 60);
+        out = new PrintStream(outStream);
 
 
         dispatcher = new CommandDispatcher<Object>();
-        dispatcher.register(literal("print").then(literal("ship").executes( context -> {
-            printShip();
-            return 1;
-        })));
+        instance = this;
+    }
 
-        //Print - prints information about the homeship (todo: the crew, cargo etc)
+    public void write(String text) {
+        out.println(text);
+    }
+
+    public static DebugConsole getInstance() {
+        if (instance == null)
+            instance = new DebugConsole();
+        return instance;
+    }
+
+    public void addShipCommands() {
+        //SpaceCrew crew = SpaceCrew.getInstance();
+        HomeShip ship = HomeShip.getInstance();
+
         /*
+        Print - prints information about the homeship (todo: the crew, cargo etc)
+
         print ship: print a summary of the homeship
         print [ShipLoc] print a summary of a module or section.
-         */
-        dispatcher.register(
-                literal("print").then(
-                        literal("ship")
-                                .executes( context -> {
-                                    printShip();
-                                    return 1;
-                                }
-                        )
-                ).then(
-                        argument("loc", shipLocArgument())
-                                .executes( context -> {
-                                    printShipLoc(context.getArgument("loc", HomeShip.ShipLoc.class));
-                                    return 1;
-                                })
 
-                )
-        );
-        /* refit - change the ship configuration
+
+        refit - change the ship configuration
+
         refit remove [ShipLoc] - Attempts to remove a module or section by normal means.
         refit remove [ShipLoc] check - checks if a module or section can be removed.
         refit remove [ShipLoc] force - instantly removes a module or section ignoring requirements, tasks and resources.
@@ -95,13 +97,40 @@ public class DebugConsole implements IUpdateable {
         refit build [ShipLoc] [partType] - Attempts to build the partType module or section-frame by normal means.
         refit build [ShipLoc] [partType] check - checks if the partType module or section-frame can be built.
         refit build [ShipLoc] [partType] force - instantly builds the module or section, ignoring illegal combinations, requirements, tasks and resources.
-        
+
         refit build component [ShipLoc] [index] [partType]
         refit build component [ShipLoc] [index] [partType] check
         refit build component [ShipLoc] [index] [partType] force
          */
+        dispatcher.register(
+                literal("print").then(
+                        literal("ship")
+                                .executes( context -> {
+                                            printShip();
+                                            return 1;
+                                        }
+                                )
+                ).then(
+                        argument("loc", shipLocArgument())
+                                .executes( context -> {
+                                    printShipLoc(context.getArgument("loc", HomeShip.ShipLoc.class));
+                                    return 1;
+                                })
+
+                )
+        );
     }
-    public void addGameEventCommands(GameEvent gameEvent) {
+
+    public void addGameEventCommands() {
+        GameEvent gameEvent = GameEvent.getInstance();
+        /*
+        event run [event_id] - forcefully runs the event of this id, if it exist. event_id must be above 0, fails if an event is waiting
+        event option [option_choice] - selects an option as response to an event, fails if no event is waiting.
+        event random - runs a randomly selected event, fails if an event is waiting
+
+         */
+
+
         dispatcher.register(literal("event").then(
                 literal("run").then(
                     argument("event_id", integer(1)).executes(context -> {
@@ -114,11 +143,15 @@ public class DebugConsole implements IUpdateable {
                 literal("option").then(
                     argument("option_choice", integer(0)).executes(context -> {
                         int optionChoice = context.getArgument("option_choice", int.class);
-                        //Insert code for selecting choice here <--------
-                        return optionChoice;
+                        return gameEvent.handle_option(optionChoice);
 
                     })
                 )
+            ).then(
+                literal("random").executes(context -> {
+                    int event_id = gameEvent.event_Random();
+                    return event_id;
+                })
             )
         );
 
@@ -160,7 +193,7 @@ public class DebugConsole implements IUpdateable {
     }
 
     private ShipLocArgument shipLocArgument(){
-        return new ShipLocArgument(homeship);
+        return new ShipLocArgument(HomeShip.getInstance());
     }
 
     private void printShipLoc(HomeShip.ShipLoc loc){
@@ -176,9 +209,9 @@ public class DebugConsole implements IUpdateable {
         b.append("\nSummary of " + name);
         b.append("\nNumber of crew - " + numCrew);
         b.append("\nNumber of jobs - " + numJobs);
-        b.append("\nNumber of buildable sections - " + homeship.middleLength);
+        b.append("\nNumber of buildable sections - " + HomeShip.getInstance().middleLength);
         b.append("\n------------------------------------");
-        for (AbstractShipModule[] s : homeship.modules) {
+        for (AbstractShipModule[] s : HomeShip.getInstance().modules) {
             for (AbstractShipModule m : s) {
                 m.getInfo(b);
             }

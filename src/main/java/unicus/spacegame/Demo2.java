@@ -6,6 +6,7 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.gui.screens.GameScreen;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
+import unicus.spacegame.gameevent.GameEvent;
 import unicus.spacegame.spaceship.HomeShip;
 import unicus.spacegame.ui.DebugConsole;
 import unicus.spacegame.ui.Homeship.HomeshipUI;
@@ -93,9 +94,11 @@ class Demo2 implements IUpdateable {
 
         shipView = new ShipRefitController("SHIPVIEW", homeship);
 
-        DebugConsole console = new DebugConsole(homeship);
+        DebugConsole console = new DebugConsole();
         console.run();
         Game.loop().attach(console);
+
+        GameEvent.getInstance(); //get the events initiated
     }
 
 

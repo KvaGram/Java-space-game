@@ -1,14 +1,16 @@
 package unicus.spacegame.gameevent;
 
 import de.gurkenlabs.litiengine.IUpdateable;
+import unicus.spacegame.ui.DebugConsole;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public final class GameEvent implements IUpdateable {
     private static GameEvent INSTANCE;
     private String info = "Magic singleton class";
     private GameEvent() {
+        INSTANCE = this;
+        DebugConsole.getInstance().addGameEventCommands();
     }
 
     /** Data structure for the event list is in flux. Possibly an external file, possibly a series of constructors.
@@ -28,43 +30,88 @@ public final class GameEvent implements IUpdateable {
     Calculate appropriate weightings for common and rare events
     Pick one of them and hand off execution to avoid code duplication.
      */
-    public void event_Random() {
+    public int event_Random() {
         //Prerequisite verifier algorithm go here
         int sum_weights=0;
         sum_weights += ScientificDiscovery.weight;
         sum_weights += MinorAirLeak.weight;
         //Random selection algorithm go here
-        event_byID(0);
+        return event_byID(0);
     }
-    /** Event picker, sanity checker
+    /** **obsolete! should merge with execute_event**
+     *
+     * Event picker, sanity checker
      * Call handling for event chains
      * I forget the name of the pattern but it prevents events from getting into deep stacks of chained calls
      */
-    public void event_byID(int eventID) { //Also useful for debugging by console!
-        if (eventID == 0) {
-            return; //There is no event 0!
-        }
-        int next_ID = 0;
-        do {
-            next_ID = execute_event(eventID);
-        } while (next_ID != 0);
-        return;
+    public int event_byID(int eventID) { //Also useful for debugging by console!
+        return execute_event(eventID);
+        //if (eventID == 0) {
+        //    return; //There is no event 0!
+        //}
+        //int next_ID = 0;
+        //do {
+        //    next_ID = execute_event(eventID);
+        //} while (next_ID != 0);
+        //return;
     }
 
-    /** Returns the ID of a 'follow-up' event for when there is an event chain
+    /** **should merge with event_byID**
+     * Returns the ID of a 'follow-up' event for when there is an event chain
     (e.g. an event asks you to make a decision between two feuding crew; you may get a second event where the loser takes matters into his own hands)
     Return 0 to signal there is no further event */
     public int execute_event(int eventID) {
+        if(eventID == 0) {
+            DebugConsole.getInstance().write("Oopsie: Event 0 was called");
+            return 0;
+        }
+
+        if(eventIsWaiting()) {
+            DebugConsole.getInstance().write("Warning: new event was called while waiting for response to an event.");
+            return 0;
+        }
+        currentEventID = eventID;
+        nextEventID = 0;
+
+        //temporary write to debug console
+        DebugConsole c = DebugConsole.getInstance();
+        c.write("Hello? Yes this is event text...");
+        //NOTE: please put the events in an easy to access list. - Lars
+        c.write("type event option # to respond:");
+        c.write("0 - option 0");
+        c.write("1 - option 2");
+        c.write("2 - option 3");
+
 
         //Pop up a UI dialog box:
         //UI.text = event_text;
         //for i in (0,event_options) : {UI.button = event_choice_text, event_choice_ID}
         //return ID of clicked button
-        return 0;  //placeholder
+        return currentEventID; //return current event ID to give the console some context on what the f- it just did - Lars
+    }
+    public int handle_option(int option) {
+        if(!eventIsWaiting())
+            return 0;
+
+        //do option stuff
+        nextEventID = 0; //whatever next id is, if there is one.
+        currentEventID = 0;
+        return nextEventID;
     }
 
+
+    private  int nextEventID = 0;
+    private int currentEventID = 0;
+    public boolean eventIsWaiting(){
+        return currentEventID != 0;
+    }
+
+
+    //NOTE: if testing standalone without litiengine, have the driver run this update on a loop. - Lars
     @Override
     public void update() {
+        if(!eventIsWaiting() && nextEventID != 0)
+            execute_event(nextEventID);
 
     }
 
