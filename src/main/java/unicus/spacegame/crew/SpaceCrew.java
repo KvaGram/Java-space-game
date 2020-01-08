@@ -1,5 +1,6 @@
 package unicus.spacegame.crew;
 import org.apache.commons.lang3.ArrayUtils;
+import unicus.spacegame.utilities.ObjectKey;
 
 import javax.swing.*;
 import java.awt.*;
@@ -106,6 +107,7 @@ public class SpaceCrew {
             message.append("Cannot assign crewman, invalid crewman ID");
             return false;
         }
+        //noinspection ConstantConditions <- placeholder
         if(false) { //TODO: check for illegible for work
             message.append("Cannot assign crewman, this crewman can't work.");
             return false;
@@ -236,6 +238,14 @@ public class SpaceCrew {
 
     public AbstractCrewman[] getCrewmen() {
         return crewmen;
+    }
+
+    public ObjectKey getCrewKeys() {
+        return crewKeys;
+    }
+
+    public ObjectKey getJobKeys() {
+        return jobKeys;
     }
 }
 
