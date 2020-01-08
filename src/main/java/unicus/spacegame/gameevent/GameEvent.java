@@ -95,9 +95,28 @@ public final class GameEvent implements IUpdateable {
     //Events should be private. External classes call event_by_ID(), not the event object itself.
     private RandomEvent ScientificDiscovery = new RandomEvent(10, "One of our crewmen has made a scientific breakthrough in his spare time! We have gained 5 research points.",
             new int[]{0}, new String[]{"That's good."});
-
     private RandomEvent MinorAirLeak = new RandomEvent(20, "There was a minor leak in one of the airlocks. We found and patched it, but our oxygen supplies have been depleted slightly.",
             new int[]{0}, new String[]{"Unfortunate."});
+    private RandomEvent MetallicDeposit = new RandomEvent(30, "We have stumbled on an asteroid with a high purity metal deposit. The metal was easy to extract and has been added to our stores.",
+            new int[]{0}, new String[]{"OK."});
+    private RandomEvent AlienMapSellerTrue = new RandomEvent(40, "An independent alien ship is hailing us, offering to trade us knowledge of galactic hyperlanes for some of our shinyum.",
+            new int[]{0,41}, new String[]{"No thanks","Pay them 2 Shinium."});
+    private RandomEvent AlienMapSellerTrueResult = new RandomEvent(41, "We have integrated the alien coordinates into our own database. We are slightly closer to finding our way back to Earth.",
+            new int[]{0}, new String[]{"Onwards!"});
+    private RandomEvent AlienMapSellerFake = new RandomEvent(45, "An independent alien ship is hailing us, offering to trade us knowledge of galactic hyperlanes for some of our shinyum.",
+            new int[]{0,46}, new String[]{"No thanks","Pay them 2 Shinium."});
+    private RandomEvent AlienMapSellerFakeResult = new RandomEvent(46, "Sadly the alien coordinates turned out to be gibberish, but after all the time we spent trying to calculate, the scammers have fled.",
+            new int[]{0}, new String[]{"Damn them!"});
+    private RandomEvent GoodGrowingSeason = new RandomEvent(50, "Our hydroponic tanks have been flourishing the past week and we are ready to harvest an unusually large crop. +4 food.",
+            new int[]{0}, new String[]{"I just hope it's not broccoli."});
+    private RandomEvent CrewPlayingGames = new RandomEvent(60, "Your crew has been socializing happily over a lot of the games in the rec room recently. Morale has improved.",
+            new int[]{0}, new String[]{"Maybe I should join them."});
+    private RandomEvent WeaponDrillAccident = new RandomEvent(70, "One of your marines was injured in training during live weapons practice.",
+            new int[]{0}, new String[]{"Medic!"});
+
+    /* private RandomEvent name = new RandomEvent(, "",
+                                       new int[]{0}, new String[]{""}); */
+
     //Event texts can possibly be outsourced to external file for translation later
     //TODO: How to store prerequisites/conditionals?
     //TODO: What's the syntax to look out at ship state variables? (e.g. amount of resources, having a specific module)
@@ -115,5 +134,5 @@ Data that needs to be in an event:
 -Weight modifiers
 -Prerequisites to happening (could be folded into Weight *=0)
 -What happens immediately as the event fires
--What happens when a result is selected
+-What happens when an option is selected
  */
