@@ -1,5 +1,9 @@
 package unicus.spacegame.spaceship;
 
+import unicus.spacegame.crew.AbstractJob;
+import unicus.spacegame.crew.SpaceCrew;
+import unicus.spacegame.crew.Workplace;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -256,13 +260,18 @@ public class HomeShip {
 
 
     /** Prepares a module or section object for destruction
-     * This puts the reclaimed resources back in storage and displaces any crew and cargo that might be there.
+     * This puts the reclaimed resources back in storage, displaces any crew and cargo that might be there
+     * and removes any dependent jobs.
      * @param m
      */
     private void destroyModule(AbstractShipModule m) {
         for (abstractShipComponent c : m.getComponents()) {
             //This stores or destroys the components.
             c.onDestroy();
+            if(m instanceof Workplace) {
+                Workplace w = (Workplace) m;
+                SpaceCrew.getInstance().removeJobs(w.getDependentJobs());
+            }
         }
         m.onDestroy();
     }

@@ -5,17 +5,89 @@ import unicus.spacegame.crew.AdultCrewman;
 import unicus.spacegame.crew.SpaceCrew;
 import unicus.spacegame.crew.Workplace;
 
+import java.util.ArrayList;
+import java.util.Queue;
+
 public class HydroponicsModule extends AbstractShipModule implements Workplace {
     private HydroponicsJob job;
+    private ArrayList<FoodTask> taskList;
+
     public HydroponicsModule(HomeShip.ShipLoc loc) {
         super(loc);
         int jobKey = SpaceCrew.getInstance().getJobKeys().yieldKey();
-        job = new HydroponicsJob(jobKey)
-    }
-    public class HydroponicsJob extends AbstractJob {
+        //Note that the module and job are co-linked and have shared private access to each other.
+        job = new HydroponicsJob(jobKey);
+        SpaceCrew.getInstance().addJobs(job);
 
-        protected HydroponicsJob(int keyID) {
+        taskList = new ArrayList<>();
+
+    }
+
+    public ArrayList<FoodTask> getTaskList() {
+        return taskList;
+    }
+    public void addTask(FoodType type) {
+        taskList.add(new FoodTask(type));
+    }
+    public void removeTask(int index) {
+        if(index < 0 || index >= taskList.size())
+            return;
+        taskList.remove(index);
+    }
+
+    //The food-types are placeholders
+    enum FoodType{
+        gravityGrain(50,4, 200),
+        floatySalads(50,2, 300);
+
+        //expected amount of food to gain from harvest
+        public final int food;
+        //Growth-time before harvest
+        public final int growthTime;
+        //work needed per month for optimal harvest.
+        public final double workNeeded;
+
+        public static FoodType[] getGravityOptions(){
+            return new FoodType[]{gravityGrain};
+        }
+        public static FoodType[] getWeightlessOptions(){
+            return new FoodType[]{floatySalads};
+        }
+        FoodType(int food, int growthTime, double workNeeded) {
+            this.food = food;
+
+            this.growthTime = growthTime;
+            this.workNeeded = workNeeded;
+        }
+        public double getTotalWorkNeeded(){return growthTime * workNeeded;}
+    }
+
+    class FoodTask {
+        public double progress;
+        public int time;
+        public final FoodType type;
+
+        FoodTask(FoodType type) {
+            this.type = type;
+            progress = 0;
+            time = 0;
+        }
+
+        public boolean isDone() {
+            return time >= type.growthTime;
+        }
+    }
+
+    class HydroponicsJob extends AbstractJob {
+        private HydroponicsModule this0;
+
+
+
+        HydroponicsJob(int keyID) {
             super(keyID, 3);
+
+            //adds upper-class access.
+            this0 = HydroponicsModule.this;
         }
 
         /**
@@ -55,7 +127,16 @@ public class HydroponicsModule extends AbstractShipModule implements Workplace {
          */
         @Override
         public void endOfMonth(double workDone) {
-
+            FoodTask currentTask = taskList.get(0);
+            currentTask.progress += workDone;
+            currentTask.time ++;
+            if (currentTask.isDone()) {
+                double neededWork = currentTask.type.getTotalWorkNeeded();
+                double efficiency = currentTask.progress / neededWork;
+                int foodGain = (int) Math.ceil(currentTask.type.food * efficiency);
+                //TODO: store food gained
+                taskList.remove(0);
+            }
         }
     }
 
