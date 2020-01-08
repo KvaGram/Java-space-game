@@ -5,7 +5,15 @@ package unicus.spacegame.crew;
  * A job is a responsibility, a set of tasks, that needs to be done during each month.
  * A crewmembers needs to be assigned to a job for a job to function.
  *
- * Some jobs are temporary, and may disappear after its tasks have been completed, or event-chain expired.
+ * Some jobs are temporary. There are two types of temporary jobs.
+ *      * Recurring temporary jobs will be automatically disabled once the current task(s) are completed or aborted.
+ *          This includes jobs like ship-repair, refit jobs, research, diplomacy etc.
+ *          Jobs of this type are created at the start of a new game
+ *          These jobs will be disabled when not in use.
+ *      * Temporary jobs, spawned from events, eventchains and speacial needs.
+ *          This includes jobs like guarding an alien prisoner, childcare, planetary expeditions etc.
+ *          Jobs of this type are automatically created when needed, in case of childcare even automatically assigned.
+ *          These jobs will be deleted once their use has been fullfilled.
  * Other jobs are set from the configuration of the ship, ie the modules constructed.
  *
  * A job's function varies, and so does the consequences for a job not being done.
@@ -89,8 +97,8 @@ public abstract class AbstractJob {
 
     /**
      * Whatever this job is currently active.
-     * Some jobs can be disabled. This will shut down any functions this job provides.
-     * Some recurring temporary jobs mey be automatically disabled instead of removed.
+     * Jobs can be disabled. No crew will work the job.
+     * endOfMonth will still be called on a disabled job.
      * When a job is disabled, all assigned crewmen get unassigned from the job.
      * @return whatever the job is active.
      */
@@ -98,7 +106,13 @@ public abstract class AbstractJob {
         return active;
     }
 
-    protected void setActive(boolean active) {
+    public void setActive(boolean active) {
         this.active = active;
+        if (!active) {
+            //This unassigns all crewmen assigned to this job.
+            SpaceCrew.getInstance().unassignAllCrew(keyID);
+        }
     }
 }
+
+
