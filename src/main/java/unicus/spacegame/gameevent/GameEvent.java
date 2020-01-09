@@ -204,3 +204,34 @@ Data that needs to be associated an event:
 -What happens immediately as the event fires
 -What happens when an option is selected
  */
+//Potentially: options that are only sometimes available?
+
+//Draft
+class RandomEvent {
+    int e_ID;
+    String e_text;
+    //prerequisites to fire
+    int[] button_IDs;
+    String button_texts;
+    //button conditionals
+    int weight = 100;
+    private Object WeightModifiers;
+    //figure out how to store a boolean condition to evaluate later
+
+    public RandomEvent() {
+        //params
+    }
+    public double GetWeight() {
+        int adjusted_weight = weight;
+        for (Modifiers m: this.WeightModifiers
+             ) {
+            if (m.condition) : adjusted_weight = adjusted_weight * m.factor;
+        }
+    }
+    public ¿MatchedPairs? GetOptions() {
+        Option[] result = new Option[];
+        for (Option o: this.DialogueOptions) {
+            if (o.condition) : result.add(o);
+        }
+    }
+}
