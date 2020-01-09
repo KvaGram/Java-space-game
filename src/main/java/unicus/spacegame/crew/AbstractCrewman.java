@@ -98,4 +98,8 @@ public abstract class AbstractCrewman {
     public int getKeyID() {
         return keyID;
     }
+
+    public CrewmanState getState() {
+        return state;
+    }
 }

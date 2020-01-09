@@ -110,9 +110,8 @@ public abstract class AbstractJob {
         this.active = active;
         if (!active) {
             //This unassigns all crewmen assigned to this job.
-            SpaceCrew.getInstance().unassignAllCrew(keyID);
+            SpaceCrew.getInstance().unassignAllJobCrew(keyID);
         }
     }
 }
-
 

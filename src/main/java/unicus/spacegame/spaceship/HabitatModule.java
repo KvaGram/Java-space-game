@@ -1,8 +1,47 @@
 package unicus.spacegame.spaceship;
 
-public class HabitatModule extends AbstractShipModule {
+import unicus.spacegame.crew.AbstractHousing;
+import unicus.spacegame.crew.HousingPlace;
+import unicus.spacegame.crew.SpaceCrew;
+
+/*
+ * Idea:
+ * Split habitat housing into multiple. Maybe of different types.
+ * This to make a bigger point of social dynamics.
+ *
+ * Remote guardian penalty for childcare jobs should in that case take the module into account, and not the housing.
+ *
+ */
+
+public class HabitatModule extends AbstractShipModule implements HousingPlace {
     public HabitatModule(HomeShip.ShipLoc loc) {
         super(loc);
+        housing = new HabitatHousing(SpaceCrew.getInstance().getHousingKeys().yieldKey());
+        SpaceCrew.getInstance().addHousing(housing);
+    }
+    HabitatHousing housing;
+
+    @Override
+    public int[] getHousings() {
+        return new int[]{housing.getKeyID()};
+    }
+
+    class HabitatHousing extends AbstractHousing {
+
+        HabitatModule this0;
+        public HabitatHousing(int keyID) {
+            super(keyID, 5);
+            this0 = HabitatModule.this;
+        }
+
+        /**
+         * Things happening at the end of a month.
+         * May trigger events related to living situations.
+         */
+        @Override
+        public void endOfMonth() {
+
+        }
     }
 
     @Override
@@ -43,6 +82,6 @@ public class HabitatModule extends AbstractShipModule {
      */
     @Override
     public void onDestroy() {
-
+        SpaceCrew.getInstance().removeHousing(housing.getKeyID());
     }
 }

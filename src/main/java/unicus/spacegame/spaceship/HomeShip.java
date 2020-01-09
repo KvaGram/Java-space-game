@@ -1,8 +1,6 @@
 package unicus.spacegame.spaceship;
 
-import unicus.spacegame.crew.AbstractJob;
-import unicus.spacegame.crew.SpaceCrew;
-import unicus.spacegame.crew.Workplace;
+import unicus.spacegame.crew.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -458,14 +456,18 @@ public class HomeShip {
             return false;
         }
 
+
         //placeholder cargo objects
         ArrayList<CargoPlaceholder> cargoToMove = new ArrayList<>();
-        //placeholder crew housing assignment
-        ArrayList<HousingPlaceholder> housingToMove = new ArrayList<>();
+        //TODO: needs rework and cleanup
+        //ArrayList<AbstractHousing> housingToMove = new ArrayList<>();
 
-        if(module instanceof Habitat) {
-            Habitat hModule = (Habitat) module;
-            Collections.addAll(housingToMove, hModule.getHousingAssignments());
+        if(module instanceof HousingPlace) {
+            int[] housingKeys = ((HousingPlace) module).getHousings();
+            SpaceCrew spaceCrew = SpaceCrew.getInstance();
+            for (int housingKey : housingKeys) {
+                //housingToMove.add(spaceCrew.getHousing(housingKey));
+            }
         }
         Collections.addAll(cargoToMove, module.getCargoOnDestruction());
 
@@ -475,12 +477,12 @@ public class HomeShip {
         lockedModules.add(shipLoc);
 
         int numCargo = cargoToMove.size(); //STUB - TODO: should report the total cargo units
-        int numPeople = housingToMove.size();
-        if( !checkCanHouseCrew(housingToMove, lockedModules)) {
-            message.append("Cannot remove module. There is not enough crew-quarters to move all ");
-            message.append(numPeople + " crewmen. Please construct more habitats.");
-            return false;
-        }
+        //int numPeople = housingToMove.size();
+        //if( !checkCanHouseCrew(housingToMove, lockedModules)) {
+        //    message.append("Cannot remove module. There is not enough crew-quarters to move all ");
+        //    message.append(numPeople + " crewmen. Please construct more habitats.");
+        //    return false;
+        //}
         if( !checkStoreCargo(cargoToMove, lockedModules)) {
             message.append("Cannot remove module. There is not enough space to store all ");
             message.append(numCargo + " cargo units");
@@ -520,10 +522,10 @@ public class HomeShip {
         for (int i = 0, moduleLength = sModules.length; i < moduleLength; i++) {
             AbstractShipModule m = sModules[i].getModule();
             Collections.addAll(cargoToMove, m.getCargoOnDestruction());
-            if (m instanceof Habitat) {
-                Habitat h = (Habitat) m;
-                Collections.addAll(housingToMove, h.getHousingAssignments());
-            }
+            //if (m instanceof Habitat) {
+            //    Habitat h = (Habitat) m;
+            //    Collections.addAll(housingToMove, h.getHousingAssignments());
+            //}
         }
 
         //Adds this section's modules to the locked modules list.

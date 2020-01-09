@@ -22,6 +22,7 @@ public class SpaceCrew {
 
     private final ObjectKey crewKeys;
     private final ObjectKey jobKeys;
+    private final ObjectKey housingKeys;
 
     public SpaceCrew(){
         this.crewmen = new AbstractCrewman[0];
@@ -31,6 +32,7 @@ public class SpaceCrew {
 
         jobKeys = new ObjectKey();
         crewKeys = new ObjectKey();
+        housingKeys = new ObjectKey();
     }
 
     //TODO: Add constructor, crewGenerator (start scenarios), crew-lists
@@ -45,9 +47,33 @@ public class SpaceCrew {
      * All lists and references to jobs eventually refer to this list.
      */
     private AbstractJob[] jobs;
-
-
     private JobAssignment[] jobAssignments;
+
+    private AbstractHousing[] housing;
+    private HousingAssignment[] housingAssignments;
+
+    public AbstractJob getJob(int jobID){
+        for (AbstractJob j : jobs) {
+            if(j.getKeyID() == jobID)
+                return j;
+        }
+        return null;
+    }
+    public AbstractCrewman getCrew(int crewID){
+        for (AbstractCrewman c : crewmen) {
+            if(c.getKeyID() == crewID)
+                return c;
+        }
+        return null;
+    }
+    public AbstractHousing getHousing(int housingID){
+        for (AbstractHousing h : housing) {
+            if(h.getKeyID() == housingID) {
+                return h;
+            }
+        }
+        return null;
+    }
 
     /**
      * Adds new crewmen to the list of crewmen.
@@ -93,10 +119,28 @@ public class SpaceCrew {
             if (ArrayUtils.contains(jobKeys, jobs[i].getKeyID()))  toRemove = ArrayUtils.add(toRemove, i);
         jobs = ArrayUtils.removeAll(jobs, toRemove);
     }
-    public boolean canAssignCrew(int jobID, int crewID) {
-        return canAssignCrew(jobID, crewID, new StringBuffer());
+
+    public void addHousing(AbstractHousing... newHousingObjects) {
+        int[] toRemove = new int[0];
+        for (AbstractHousing h:newHousingObjects) {
+            for (int i = 0; i < housing.length; i++)
+                if (housing[i].getKeyID() == h.getKeyID()) toRemove = ArrayUtils.add(toRemove, i);
+        }
+        housing = ArrayUtils.removeAll(housing, toRemove);
+        housing = ArrayUtils.addAll(housing, newHousingObjects);
     }
-    public boolean canAssignCrew(int jobID, int crewID, StringBuffer message) {
+    public void removeHousing(int... housingKeys) {
+        int[] toRemove = new int[0];
+        for (int i = 0; i < housing.length; i++)
+            if (ArrayUtils.contains(housingKeys, housing[i].getKeyID()))  toRemove = ArrayUtils.add(toRemove, i);
+        housing = ArrayUtils.removeAll(housing, toRemove);
+    }
+
+
+    public boolean canAssignJobCrew(int jobID, int crewID) {
+        return canAssignJobCrew(jobID, crewID, new StringBuffer());
+    }
+    public boolean canAssignJobCrew(int jobID, int crewID, StringBuffer message) {
         AbstractJob job = getJob(jobID);
         AbstractCrewman crewman = getCrew(crewID);
         if(job == null) {
@@ -130,13 +174,13 @@ public class SpaceCrew {
         message.append("Crewman may be assigned.");
         return true;
     }
-    public void assignCrew(int jobID, int crewID) {
-        if(!canAssignCrew(jobID, crewID))
+    public void assignJobCrew(int jobID, int crewID) {
+        if(!canAssignJobCrew(jobID, crewID))
             return;
         JobAssignment newJA = new JobAssignment(jobID, crewID);
         jobAssignments = ArrayUtils.add(jobAssignments, newJA);
     }
-    public void unassignCrew(int jobID, int crewID) {
+    public void unassignJobCrew(int jobID, int crewID) {
         for (int i = 0; i < jobAssignments.length; i++) {
             if(jobAssignments[i].getJobID() == jobID && jobAssignments[i].getCrewID() == crewID) {
                 jobAssignments = ArrayUtils.remove(jobAssignments, i);
@@ -144,7 +188,7 @@ public class SpaceCrew {
             }
         }
     }
-    public void unassignAllCrew(int jobID) {
+    public void unassignAllJobCrew(int jobID) {
         int[] toRemove = new int[0];
         for (int i = 0; i < jobAssignments.length; i++) {
             if(jobAssignments[i].getJobID() == jobID) {
@@ -153,21 +197,9 @@ public class SpaceCrew {
         }
         jobAssignments = ArrayUtils.removeAll(jobAssignments, toRemove);
     }
-    public AbstractJob getJob(int jobID){
-        for (AbstractJob j : jobs) {
-            if(j.getKeyID() == jobID)
-                return j;
-        }
-        return null;
-    }
-    public AbstractCrewman getCrew(int crewID){
-        for (AbstractCrewman c : crewmen) {
-            if(c.getKeyID() == crewID)
-                return c;
-        }
-        return null;
-    }
-    public JobAssignment[] getAssignmentsByJob(int jobID){
+
+
+    public JobAssignment[] getJobAssignmentsByJob(int jobID){
         JobAssignment[] assignments = new JobAssignment[0];
         for (JobAssignment ja : jobAssignments) {
             if(ja.getJobID() == jobID)
@@ -176,7 +208,7 @@ public class SpaceCrew {
         return assignments;
 
     }
-    public JobAssignment[] getAssignmentsByCrewman(int crewID){
+    public JobAssignment[] getJobAssignmentsByCrewman(int crewID){
         JobAssignment[] assignments = new JobAssignment[0];
         for (JobAssignment ja : jobAssignments) {
             if(ja.getCrewID() == crewID)
@@ -184,13 +216,96 @@ public class SpaceCrew {
         }
         return assignments;
     }
-    public JobAssignment getAssignment(int jobID, int crewID) {
+    public JobAssignment getJobAssignment(int jobID, int crewID) {
         for (JobAssignment ja : jobAssignments) {
             if(ja.getJobID() == jobID && ja.getCrewID() == crewID)
                 return ja;
         }
         return null;
     }
+
+    public boolean canAssignHouseCrew(int housingID, int crewID) {
+        return canAssignHouseCrew(housingID, crewID, new StringBuffer());
+    }
+    public boolean canAssignHouseCrew(int housingID, int crewID, StringBuffer message) {
+        AbstractHousing h = getHousing(housingID);
+        AbstractCrewman c = getCrew(crewID);
+
+        if(h == null) {
+            message.append("Invalid housing selection");
+            return false;
+        }
+        if(c == null) {
+            message.append("Invalid crewman selection");
+            return false;
+        }
+        if(c.getState() == CrewmanState.corpse || c.getState() == CrewmanState.memorial) {
+            message.append("This crewman is dead. It simply would not be proper.");
+            return false;
+        }
+        if(getHouseAssignment(housingID, crewID) != null) {
+            message.append("This crewman already lives here.");
+            return false;
+        }
+        int numResidents = getResidentsOfHouse(housingID).length;
+        if(numResidents >= h.getCapacity()) {
+            message.append("The house is full of people already!");
+            return false;
+        }
+        message.append("The crewman can move here");
+        return true;
+    }
+    public void assignHousingCrew(int housingID, int crewID, boolean force) {
+        if(force || canAssignHouseCrew(housingID, crewID)){
+            evictCrewman(crewID); //remove crewman from any previous housing
+           HousingAssignment newHA = new HousingAssignment(housingID, crewID);
+           housingAssignments = ArrayUtils.add(housingAssignments, newHA);
+        }
+    }
+    public void evictCrewman(int crewID){
+        int[] toRemove = new int[0];
+        for (int i = 0; i < housingAssignments.length; i++) {
+            if(housingAssignments[i].getCrewID() == crewID) {
+                toRemove = ArrayUtils.add(toRemove, i);
+            }
+            housingAssignments = ArrayUtils.removeAll(housingAssignments, toRemove);
+        }
+    }
+    public void evictAllFromHousing(int housingID) {
+        int[] toRemove = new int[0];
+        for (int i = 0; i < housingAssignments.length; i++) {
+            if(housingAssignments[i].getHousingID() == housingID) {
+                toRemove = ArrayUtils.add(toRemove, i);
+            }
+            housingAssignments = ArrayUtils.removeAll(housingAssignments, toRemove);
+        }
+    }
+
+
+    public HousingAssignment[] getResidentsOfHouse(int housingID){
+        HousingAssignment[] assignments = new HousingAssignment[0];
+        for (HousingAssignment ha : housingAssignments) {
+            if(ha.getHousingID() == housingID)
+                assignments = ArrayUtils.add(assignments, ha);
+        }
+        return assignments;
+    }
+    public HousingAssignment getHousingByCrew(int crewID){
+        for (HousingAssignment ha : housingAssignments) {
+            if(ha.getCrewID() == crewID)
+                return ha;
+        }
+        return null; //home
+    }
+    public HousingAssignment getHouseAssignment(int housingID, int crewID) {
+        for (HousingAssignment ha : housingAssignments) {
+            if(ha.getHousingID() == housingID && ha.getCrewID() == crewID)
+                return ha;
+        }
+        return null;
+    }
+
+
 
 
     //TODO: rewrite tester to use the new AdultCrewman class and features
@@ -246,6 +361,10 @@ public class SpaceCrew {
 
     public ObjectKey getJobKeys() {
         return jobKeys;
+    }
+
+    public ObjectKey getHousingKeys() {
+        return housingKeys;
     }
 }
 
