@@ -218,8 +218,11 @@ class RandomEvent {
     private Object WeightModifiers;
     //figure out how to store a boolean condition to evaluate later
 
-    public RandomEvent() {
-        //params
+    public RandomEvent(int ID, String dialogtext, String optiontext) {
+        //Minimal simple constructor: shows text, the only option is "OK" or equivalent
+    }
+    public RandomEvent(int ID, String dialogtext, int[] option_IDs, String[] option_texts[], int starting_weight, boolean canTriggerRandomly) {
+        //Longer constructor for setting up more complicated events
     }
     public double GetWeight() {
         int adjusted_weight = weight;
