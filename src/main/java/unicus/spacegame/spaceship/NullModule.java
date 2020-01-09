@@ -35,4 +35,14 @@ public class NullModule extends AbstractShipModule {
     public CargoPlaceholder[] getCargoOnDestruction() {
         return new CargoPlaceholder[0];
     }
+
+    /**
+     * This function runs when the ship-part is removed or dismantled from the ship.
+     * This function only deals with this object itself, any ship-part depended on this,
+     * will be taken care of from HomeShip. .
+     */
+    @Override
+    public void onDestroy() {
+
+    }
 }
