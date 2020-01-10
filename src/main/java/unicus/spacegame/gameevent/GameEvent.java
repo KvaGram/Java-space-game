@@ -3,6 +3,7 @@ package unicus.spacegame.gameevent;
 import de.gurkenlabs.litiengine.IUpdateable;
 import unicus.spacegame.ui.DebugConsole;
 import java.util.Random;
+import java.util.function.Function;
 
 import java.lang.invoke.MethodType;
 import java.util.ArrayList;
@@ -186,6 +187,7 @@ public final class GameEvent implements IUpdateable {
                                        new int[]{0}, new String[]{""}); */
 
     //Event texts can possibly be outsourced to external file for translation later
+
     //TODO: How to store prerequisites/conditionals?
     //TODO: What's the syntax to look out at ship state variables? (e.g. amount of resources, having a specific module)
 
@@ -214,27 +216,32 @@ class RandomEvent {
     int[] button_IDs;
     String button_texts;
     //button conditionals
-    int weight = 100;
-    private Object WeightModifiers;
-    //figure out how to store a boolean condition to evaluate later
+    double weight = 100;
+    private ArrayList<Object> WeightModifiers;
+    boolean isRandom;
 
-    public RandomEvent(int ID, String dialogtext, String optiontext) {
-        //Minimal simple constructor: shows text, the only option is "OK" or equivalent
+    public RandomEvent(int ID, String dialogtext, String optiontext) { //Minimal simple constructor for one-option "info" event
+        this.e_ID = ID;
+        e_text = dialogtext;
     }
-    public RandomEvent(int ID, String dialogtext, int[] option_IDs, String[] option_texts[], int starting_weight, boolean canTriggerRandomly) {
-        //Longer constructor for setting up more complicated events
+    public RandomEvent(int ID, String dialogtext, int[] option_IDs, String[] option_texts[], double starting_weight, boolean canTriggerRandomly) { //Longer constructor for events with choices
+        this.e_ID = ID;
+        e_text = dialogtext;
+        this.weight = starting_weight;
+        this.isRandom = canTriggerRandomly;
+        //Install weights
     }
     public double GetWeight() {
         int adjusted_weight = weight;
-        for (Modifiers m: this.WeightModifiers
-             ) {
-            if (m.condition) : adjusted_weight = adjusted_weight * m.factor;
+        for (int i = 0; i<WeightModifiers.size(); i++) {
+            adjusted_weight = adjusted_weight * WeightModifiers.get(i)()(); //Please stop thinking that Object() is of type Object, damn syntax
         }
     }
-    public ¿MatchedPairs? GetOptions() {
-        Option[] result = new Option[];
-        for (Option o: this.DialogueOptions) {
+    /* public ¿MatchedPairs? GetOptions() {
+        FOption[] result = new FOption[];
+        for (FOption o: this.DialogueOptions) {
             if (o.condition) : result.add(o);
         }
-    }
+   } */
+
 }
