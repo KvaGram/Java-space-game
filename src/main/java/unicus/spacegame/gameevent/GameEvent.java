@@ -2,10 +2,9 @@ package unicus.spacegame.gameevent;
 
 import de.gurkenlabs.litiengine.IUpdateable;
 import unicus.spacegame.ui.DebugConsole;
-import java.util.Random;
-import java.util.function.Function;
 
-import java.lang.invoke.MethodType;
+import java.util.Random;
+
 import java.util.ArrayList;
 
 public final class GameEvent implements IUpdateable {
@@ -15,11 +14,45 @@ public final class GameEvent implements IUpdateable {
     private GameEvent() {
         INSTANCE = this;
         DebugConsole.getInstance().addGameEventCommands();
+
+
+        //Events should be private. External classes call event_by_ID(), not the event object itself.
+        RandomEvent ScientificDiscovery = new RandomEvent(10, "One of our crewmen has made a scientific breakthrough in his spare time! We have gained 5 research points.",
+                new int[]{0}, new String[]{"That's good."});
+        RandomEvent MinorAirLeak = new RandomEvent(20, "There was a minor leak in one of the airlocks. We found and patched it, but our oxygen supplies have been depleted slightly.",
+                new int[]{0}, new String[]{"Unfortunate."});
+        RandomEvent MetallicDeposit = new RandomEvent(30, "We have stumbled on an asteroid with a high purity metal deposit. The metal was easy to extract and has been added to our stores.",
+                new int[]{0}, new String[]{"OK."});
+        RandomEvent AlienMapSellerTrue = new RandomEvent(40, "An independent alien ship is hailing us, offering to trade us knowledge of galactic hyperlanes for some of our shinyum.",
+                new int[]{0,41}, new String[]{"No thanks","Pay them 2 Shinium."});
+        RandomEvent alienMapSellerTrueResult = new RandomEvent(41, "We have integrated the alien coordinates into our own database. We are slightly closer to finding our way back to Earth.",
+                new int[]{0}, new String[]{"Onwards!"});
+        alienMapSellerTrueResult.weight = 0; //Why is this a syntax error? Why is it an "Unknown class" syntax error??
+        RandomEvent AlienMapSellerFake = new RandomEvent(45, "An independent alien ship is hailing us, offering to trade us knowledge of galactic hyperlanes for some of our shinyum.",
+                new int[]{0,46}, new String[]{"No thanks","Pay them 2 Shinium."});
+        RandomEvent AlienMapSellerFakeResult = new RandomEvent(46, "Sadly the alien coordinates turned out to be gibberish, but after all the time we spent trying to calculate, the scammers have fled.",
+                new int[]{0}, new String[]{"Damn them!"});
+        AlienMapSellerFakeResult.weight = 0;
+        RandomEvent GoodGrowingSeason = new RandomEvent(50, "Our hydroponic tanks have been flourishing the past week and we are ready to harvest an unusually large crop. +4 food.",
+                new int[]{0}, new String[]{"I just hope it's not broccoli."});
+        RandomEvent CrewPlayingGames = new RandomEvent(60, "Your crew has been socializing happily over a lot of the games in the rec room recently. Morale has improved.",
+                new int[]{0}, new String[]{"Maybe I should join them."});
+        RandomEvent WeaponDrillAccident = new RandomEvent(70, "One of your marines was injured in training during live weapons practice.",
+                new int[]{0}, new String[]{"Medic!"});
+
+    /* private RandomEvent name = new RandomEvent(, "",
+                                       new int[]{0}, new String[]{""}); */
+
+        //Event texts can possibly be outsourced to external file for translation later
+
+        //TODO: How to store prerequisites/conditionals?
+        //TODO: What's the syntax to look out at ship state variables? (e.g. amount of resources, having a specific module)
+
         myEvents.add(ScientificDiscovery);
         myEvents.add(MinorAirLeak);
         myEvents.add(MetallicDeposit);
         myEvents.add(AlienMapSellerTrue);
-        myEvents.add(AlienMapSellerTrueResult);
+        myEvents.add(alienMapSellerTrueResult);
         myEvents.add(AlienMapSellerFake);
         myEvents.add(AlienMapSellerFakeResult);
         myEvents.add(GoodGrowingSeason);
@@ -159,37 +192,6 @@ public final class GameEvent implements IUpdateable {
         }
     }
 
-    //Events should be private. External classes call event_by_ID(), not the event object itself.
-    private RandomEvent ScientificDiscovery = new RandomEvent(10, "One of our crewmen has made a scientific breakthrough in his spare time! We have gained 5 research points.",
-            new int[]{0}, new String[]{"That's good."});
-    private RandomEvent MinorAirLeak = new RandomEvent(20, "There was a minor leak in one of the airlocks. We found and patched it, but our oxygen supplies have been depleted slightly.",
-            new int[]{0}, new String[]{"Unfortunate."});
-    private RandomEvent MetallicDeposit = new RandomEvent(30, "We have stumbled on an asteroid with a high purity metal deposit. The metal was easy to extract and has been added to our stores.",
-            new int[]{0}, new String[]{"OK."});
-    private RandomEvent AlienMapSellerTrue = new RandomEvent(40, "An independent alien ship is hailing us, offering to trade us knowledge of galactic hyperlanes for some of our shinyum.",
-            new int[]{0,41}, new String[]{"No thanks","Pay them 2 Shinium."});
-    private RandomEvent AlienMapSellerTrueResult = new RandomEvent(41, "We have integrated the alien coordinates into our own database. We are slightly closer to finding our way back to Earth.",
-            new int[]{0}, new String[]{"Onwards!"});
-    AlienMapSellerTrueResult.weight = 0; //Why is this a syntax error? Why is it an "Unknown class" syntax error??
-    private RandomEvent AlienMapSellerFake = new RandomEvent(45, "An independent alien ship is hailing us, offering to trade us knowledge of galactic hyperlanes for some of our shinyum.",
-            new int[]{0,46}, new String[]{"No thanks","Pay them 2 Shinium."});
-    private RandomEvent AlienMapSellerFakeResult = new RandomEvent(46, "Sadly the alien coordinates turned out to be gibberish, but after all the time we spent trying to calculate, the scammers have fled.",
-            new int[]{0}, new String[]{"Damn them!"});
-    AlienMapSellerFakeResult.weight = 0;
-    private RandomEvent GoodGrowingSeason = new RandomEvent(50, "Our hydroponic tanks have been flourishing the past week and we are ready to harvest an unusually large crop. +4 food.",
-            new int[]{0}, new String[]{"I just hope it's not broccoli."});
-    private RandomEvent CrewPlayingGames = new RandomEvent(60, "Your crew has been socializing happily over a lot of the games in the rec room recently. Morale has improved.",
-            new int[]{0}, new String[]{"Maybe I should join them."});
-    private RandomEvent WeaponDrillAccident = new RandomEvent(70, "One of your marines was injured in training during live weapons practice.",
-            new int[]{0}, new String[]{"Medic!"});
-
-    /* private RandomEvent name = new RandomEvent(, "",
-                                       new int[]{0}, new String[]{""}); */
-
-    //Event texts can possibly be outsourced to external file for translation later
-
-    //TODO: How to store prerequisites/conditionals?
-    //TODO: What's the syntax to look out at ship state variables? (e.g. amount of resources, having a specific module)
 
 }
 
@@ -205,37 +207,59 @@ Data that needs to be associated an event:
 -Prerequisites to happening (could be folded into Weight *=0)
 -What happens immediately as the event fires
 -What happens when an option is selected
- */
 //Potentially: options that are only sometimes available?
+ */
 
 //Draft
-class RandomEvent {
+class LargeRandomEvent {
     int e_ID;
     String e_text;
     //prerequisites to fire
     int[] button_IDs;
     String button_texts;
     //button conditionals
-    double weight = 100;
+    double weight = 100.0;
     private ArrayList<Object> WeightModifiers;
     boolean isRandom;
 
-    public RandomEvent(int ID, String dialogtext, String optiontext) { //Minimal simple constructor for one-option "info" event
+    /**
+     * Minimal simple constructor for one-option "info" event
+     * @param ID Event number
+     * @param dialogtext Text displayed to user
+     * @param optiontext Text on the 'OK' or similar button
+     */
+    public LargeRandomEvent(int ID, String dialogtext, String optiontext) {
         this.e_ID = ID;
         e_text = dialogtext;
     }
-    public RandomEvent(int ID, String dialogtext, int[] option_IDs, String[] option_texts[], double starting_weight, boolean canTriggerRandomly) { //Longer constructor for events with choices
+
+    /**
+     * Longer event constructor for events with choices
+     * @param ID Event number
+     * @param dialogtext Text displayed to user
+     * @param option_IDs Ordered list of subsequent events, where 0 means no further result on this choice
+     * @param option_texts Ordered list of dialog button choices leading to subsequent events, matched to option_IDs
+     * @param starting_weight Base likelihood weight of the event (default is 100)
+     * @param canTriggerRandomly Indicates whether this is a random event on the monthly pulse; otherwise a special event
+     */
+    public LargeRandomEvent(int ID, String dialogtext, int[] option_IDs, String[] option_texts[], double starting_weight, boolean canTriggerRandomly) {
         this.e_ID = ID;
         e_text = dialogtext;
         this.weight = starting_weight;
         this.isRandom = canTriggerRandomly;
         //Install weights
     }
+
+    /**
+     * Modified event weight calculator
+     * @return The weight of this event given the current game state (a normal event has 100)
+     */
     public double GetWeight() {
-        int adjusted_weight = weight;
+        double adjusted_weight = weight;
         for (int i = 0; i<WeightModifiers.size(); i++) {
-            adjusted_weight = adjusted_weight * WeightModifiers.get(i)()(); //Please stop thinking that Object() is of type Object, damn syntax
+            adjusted_weight = adjusted_weight * WeightModifiers.get(i).run(); //Please stop thinking that Object() is of type Object, damn syntax
         }
+        return adjusted_weight;
     }
     /* public ¿MatchedPairs? GetOptions() {
         FOption[] result = new FOption[];
