@@ -149,4 +149,43 @@ public class AdultCrewman extends AbstractCrewman {
             skillValues[i] = r.nextInt(RAND_SKILL) + MIN_SKILL;
         }
     }
+
+    //stress gained or lost at the end of month
+    protected double monthStressChange = 0;
+    protected double monthWorkload = 0;
+    protected double monthRest = 0;
+    //jobs assigned to the crewman (including month result)
+    protected JobAssignment[] monthJobAssignments = new JobAssignment[0];
+
+    /**
+     * Called at the beginning of the end of a month cycle.
+     * Planned feature:
+     *         1. For each assignment of the crewman
+     *             1. Store monthly workload (JobAssignment)
+     *             2. Store amount of work done (JobAssignment)
+     *                 1. (AbstarctJob) Calculate crewman’s general efficiency at the job by checking stats and relevant traits.
+     *                 2. (Adult/Able Crewman) calculate further efficiency based on general traits of crewman.
+     */
+    @Override
+    protected void endOfMonthStart() {
+
+    }
+
+    /**
+     * Called at the end of the end of month cycle.
+     * planned feature:
+     *         1. Consume resources based on crewman needs (rations?).
+     *         2. Apply change to stress
+     *             1. Applied according to morale-workload bonus and traits
+     *         3. If stress is high, or experiences lack of resources
+     *             1. Chance to trigger crewman illness or crewman stress event
+     *                 1. These events may result in negative traits, or damage to other crew or the homeship.
+     *         4. Chance to trigger crewman aging-event.
+     *             1. This is a minor event, where a crewman advances from one state to another.
+     *             2. In case of senior crewman, this typically mean death by old age.
+     */
+    @Override
+    protected void endOfMonthEnd() {
+
+    }
 }
