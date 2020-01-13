@@ -207,7 +207,7 @@ Data that needs to be associated an event:
 -Prerequisites to happening (could be folded into Weight *=0)
 -What happens immediately as the event fires
 -What happens when an option is selected
-//Potentially: options that are only sometimes available?
+//Potentially: options that are only sometimes available? Complicates event construction.
  */
 
 //Draft
@@ -219,7 +219,8 @@ class LargeRandomEvent {
     String button_texts;
     //button conditionals
     double weight = 100.0;
-    private ArrayList<Object> WeightModifiers;
+    private ArrayList<Runnable> WeightModifierConditions;
+    private ArrayList<double> WeightModifierValues;
     boolean isRandom;
 
     /**
@@ -234,7 +235,7 @@ class LargeRandomEvent {
     }
 
     /**
-     * Longer event constructor for events with choices
+     * Longer event constructor for events with choices. Still does not include weight modifiers.
      * @param ID Event number
      * @param dialogtext Text displayed to user
      * @param option_IDs Ordered list of subsequent events, where 0 means no further result on this choice
@@ -250,14 +251,26 @@ class LargeRandomEvent {
         //Install weights
     }
 
+    @FunctionalInterface
+    private interface WeightModifierInterface {
+        // potentially replacing Runnable
+    }
+
+    public AddWeightModifier(double factor, Runnable condition) {
+        // bah
+    }
+
     /**
      * Modified event weight calculator
      * @return The weight of this event given the current game state (a normal event has 100)
      */
     public double GetWeight() {
         double adjusted_weight = weight;
-        for (int i = 0; i<WeightModifiers.size(); i++) {
-            adjusted_weight = adjusted_weight * WeightModifiers.get(i).run(); //Please stop thinking that Object() is of type Object, damn syntax
+        for (int i = 0; i<WeightModifierConditions.size(); i++) {
+            if ( WeightModifierConditions.get(i).run() ) {
+                adjusted_weight *= WeightModifierValues.get(i);
+            }
+            //blah
         }
         return adjusted_weight;
     }
