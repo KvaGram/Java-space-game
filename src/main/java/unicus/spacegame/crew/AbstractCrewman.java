@@ -109,4 +109,17 @@ public abstract class AbstractCrewman {
         //sets assumed gender to either male or female until genes are implemented
         selfID.gender = new CrewGender[]{CrewGender.male, CrewGender.female}[r.nextInt(2)];
     }
+
+    /**
+     * Called at the beginning of the end of a month cycle.
+     * To be implemented in child classes.
+     */
+    protected abstract void endOfMonthStart();
+
+    /**
+     * Called at the end of the end of month cycle.
+     * To be implemented in child classes.
+     */
+    protected abstract void endOfMonthEnd();
+
 }
