@@ -122,13 +122,12 @@ public class HydroponicsModule extends AbstractShipModule implements Workplace {
          * Completes work required for the month.
          * Completes task list and or operations.
          * May triggers events related to what has been worked on.
-         *
-         * @param workDone how much work has been done in total
          */
         @Override
-        public void endOfMonth(double workDone) {
+        public void endOfMonth() {
+            super.endOfMonth();
             FoodTask currentTask = taskList.get(0);
-            currentTask.progress += workDone;
+            currentTask.progress += monthWorkDone;
             currentTask.time ++;
             if (currentTask.isDone()) {
                 double neededWork = currentTask.type.getTotalWorkNeeded();

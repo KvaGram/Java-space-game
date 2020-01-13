@@ -52,10 +52,16 @@ public abstract class AbstractJob {
     private final int numWorkerSlots;
     private boolean active;
 
+    protected double monthWorkDone;
+    protected int monthWorstCrewman;
+    protected int monthBestCrewman;
+    protected JobAssignment[] monthJobAssignments;
+
     protected AbstractJob(int keyID, int numWorkerSlots){
         this.keyID = keyID;
         this.numWorkerSlots = numWorkerSlots;
         active = true;
+        monthWorkDone = 0;
     }
 
     public int getKeyID() {
@@ -73,7 +79,8 @@ public abstract class AbstractJob {
     public abstract double getMonthlyWorkload();
 
     /**
-     * Calculates how much work this worker will normally produce.
+     * Calculates how much work this worker will normally produce based on their stats and traits relating this this job.
+     * The end result may differ from workload.
      * This is used to:
      *      show efficiency percentage (work divided by workload)
      *      used as first step to calculate how muc work this assigned crewman will do.
@@ -91,9 +98,48 @@ public abstract class AbstractJob {
      * Completes work required for the month.
      * Completes task list and or operations.
      * May triggers events related to what has been worked on.
-     * @param workDone how much work has been done in total
+     *
+     * planned feature:
+     *         1. From each assignment of the job, get the total amount of work done.
+     *         2. Calculate resulting product, operation,  service quality, and or amenities the job does.
+     *             1. Consume resources required for the job.
+     *             2. Reduce work done if resources are missing
+     *
      */
-    public abstract void endOfMonth(double workDone);
+    public void endOfMonth() {
+        double max = 0;
+        double min = 0;
+        monthWorkDone = 0;
+        monthJobAssignments = SpaceCrew.getInstance().getJobAssignmentsByJob(keyID);
+        for (int i = 0; i < monthJobAssignments.length; i++) {
+            JobAssignment ja = monthJobAssignments[i];
+            int crewID = ja.getCrewID();
+            if (ja.getWorkshare() == WorkShare.vacation)
+                continue;
+            double w = ja.getMonthWork();
+            monthWorkDone += w;
+
+            if(i == 0)
+            {
+                monthBestCrewman = crewID;
+                monthWorstCrewman = crewID;
+                max = w;
+                min = w;
+            }
+            else if(w > max) {
+                max = w;
+                monthBestCrewman = crewID;
+            }
+            else if(w < min) {
+                min = w;
+                monthWorstCrewman = crewID;
+            }
+        }
+        /*Leave it up the sub-classes on how to use
+        monthBestCrewman, monthWorstCrewman and monthWorkDone
+        */
+
+    }
 
     /**
      * Whatever this job is currently active.
@@ -111,6 +157,42 @@ public abstract class AbstractJob {
         if (!active) {
             //This unassigns all crewmen assigned to this job.
             SpaceCrew.getInstance().unassignAllJobCrew(keyID);
+        }
+    }
+
+    /**
+     * Total amount of work done by the end of the month.
+     * Set in {@link #endOfMonth()}.
+     * @return
+     */
+    public double getMonthWorkDone() {
+        return monthWorkDone;
+    }
+
+    /**
+     * Gets the crewman that did the least work this month (does not count vacation)
+     * @return
+     */
+    public AdultCrewman getMonthWorstCrewman() {
+        try {
+            return (AdultCrewman) SpaceCrew.getInstance().getCrew(monthWorstCrewman);
+        } catch (Exception err) {
+            System.err.println(err);
+            return null;
+        }
+    }
+
+    /**
+     * Gets the crewman that did the most work this month
+     * @return
+     */
+
+    public AdultCrewman getMonthBestCrewman() {
+        try {
+            return (AdultCrewman) SpaceCrew.getInstance().getCrew(monthBestCrewman);
+        } catch (Exception err) {
+            System.err.println(err);
+            return null;
         }
     }
 }
