@@ -54,13 +54,7 @@ public abstract class AbstractCrewman {
         this.selfID = new CrewSelfID();
         this.birthDate = birthDate;
         this.geneData = new CrewmanGeneData(parents);
-        Random r = new Random(randomSeed);
-        //TODO: geneData.randomize(r);
-        selfID.giveSkiffyName(r);
-        //TODO: selfID.gender = geneData.getAssumedGender();
-
-        //sets assumed gender to either male or female until genes are implemented
-        selfID.gender = new CrewGender[]{CrewGender.male, CrewGender.female}[r.nextInt(2)];
+        onRandomize(new Random(randomSeed));
     }
 
     /**
@@ -101,5 +95,18 @@ public abstract class AbstractCrewman {
 
     public CrewmanState getState() {
         return state;
+    }
+
+    /**
+     * Randomize properties of the crewman
+     * @param r random instance
+     */
+    protected void onRandomize(Random r) {
+        //TODO: geneData.randomize(r);
+        selfID.giveSkiffyName(r);
+        //TODO: selfID.gender = geneData.getAssumedGender();
+
+        //sets assumed gender to either male or female until genes are implemented
+        selfID.gender = new CrewGender[]{CrewGender.male, CrewGender.female}[r.nextInt(2)];
     }
 }

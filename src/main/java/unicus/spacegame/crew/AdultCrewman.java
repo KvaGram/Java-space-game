@@ -8,11 +8,44 @@ import java.util.Random;
 
 /**
  * A typical adult crewman.
+ * TODO: split into AbstractAbleCrewman
  */
 public class AdultCrewman extends AbstractCrewman {
 
+
+
     //Maximum obtainable level in a skill.
     private static final int SKILL_CAP = 100;
+
+    //Randomizer constants for crewman skills
+    private static final int MIN_SKILL = 5;
+    private static final int MAX_SKILL = 60;
+    private static final int RAND_SKILL = MAX_SKILL - MIN_SKILL;
+
+    //Maximum obtainable base intelligence (traits may increase final intelligence)
+    private static final double BASE_INT_CAP = 100;
+
+    //randomizer constants for crewman intelligence
+    private static final int MIN_BASE_INT = 5;
+    private static final int MAX_BASE_INT = 90;
+    private static final int RAND_INT = MAX_BASE_INT - MIN_BASE_INT;
+
+    //Maximum obtainable base morale
+    private static final double BASE_MORALE_CAP = 10000; //10'000
+
+    //randomizer obtainable base morale
+    private static final int MIN_BASE_MORALE = -1000; //-1'000
+    private static final int MAX_BASE_MORALE = 5000;  //5'000
+    private static final int RAND_MORALE = MAX_BASE_MORALE - MIN_BASE_MORALE;
+
+    //Note: yes, base morale can be as bad as -1000. This represents a rather indolent crewman (might replace with trait)
+    //Note: current plan is for UI to display morale divided by 1'000
+
+
+
+
+
+
     //Stress-level where a stress-related crisis event will trigger.
     private static final double CRISIS_TRIGGER_STRESS = 100.0;
 
@@ -25,6 +58,9 @@ public class AdultCrewman extends AbstractCrewman {
     //Base value intelligence for the crewman.
     protected double base_intelligence;
 
+    //base value morale of a crewman.
+    public double base_morale;
+
     /**
      * Gets the intelligence of the crewman, including traits modifying it.
      * Intelligence is used to calculate the chance of gaining a bonus skill-points when learning.
@@ -35,6 +71,15 @@ public class AdultCrewman extends AbstractCrewman {
     public double getIntelligence(){
         return base_intelligence; //todo: add or subtract value according to traits
     }
+
+    /**
+     * Inspired by the morale system in Oxygen Not Included, crewmen have a system of morale and stress.
+     * A crewman with a negative morale will accumulate stress over time.
+     * A crewman with positive morale will lose stress over time.
+     * @return
+     */
+    public double getMorale() {return base_morale;} //todo: add and subtract morale based on workload, traits and amenities.
+
     public int getSkill(SkillTypes skillType) {
         int skillIndex = SkillTypes.GetIndexByType(skillType);
         if(skillIndex < 0 || skillIndex >= skillValues.length)
@@ -64,31 +109,44 @@ public class AdultCrewman extends AbstractCrewman {
     }
 
     public AdultCrewman(int keyID, int birthDate, long randomSeed, int[] parents) {
-        //Note: Super-function generates random name and gender
+        //Note: see onRandomize.
         super(keyID, CrewmanState.adult, birthDate, randomSeed, parents);
-        this.skillValues = new int[SkillTypes.values().length];
-
-        //Randomize each skill with a minimum of 5 and a maximum of 60.
-        int MIN_SKILL = 5;
-        int MAX_SKILL = 60;
-        int RAND_SKILL = MAX_SKILL - MIN_SKILL;
-        Random r = new Random(randomSeed);
-        for (int i = 0; i < skillValues.length; i++) {
-            skillValues[i] = r.nextInt(RAND_SKILL) + MIN_SKILL;
-        }
     }
 
-    public AdultCrewman(int keyID, int birthDate, CrewSelfID selfID, CrewmanGeneData geneData, int[] skillValues) {
+    public AdultCrewman(int keyID, int birthDate, CrewSelfID selfID, CrewmanGeneData geneData, int[] skillValues, double base_intelligence, double base_morale) {
         super(keyID, CrewmanState.adult, birthDate, selfID, geneData);
         this.skillValues = skillValues;
+        this.base_intelligence = base_intelligence;
+        this.base_morale = base_morale;
     }
 
     protected AdultCrewman(AdultCrewman crewman) {
         super(crewman, CrewmanState.adult);
         this.skillValues = crewman.skillValues;
+        this.base_morale = crewman.base_morale;
+        this.base_intelligence = crewman.base_morale;
     }
     protected AdultCrewman(AbstractCrewman crewman) {
         super(crewman, CrewmanState.adult);
+        //TODO: calculate skills, morale and intelligence based on previous state.
         this.skillValues = new int[SkillTypes.values().length];
+        this.base_morale = 1000;
+        this.base_intelligence = 50;
+
+    }
+
+    @Override
+    protected void onRandomize(Random r) {
+        super.onRandomize(r);
+
+        //randomizing crewman stats
+        base_intelligence = r.nextInt(RAND_INT) + MIN_BASE_INT;
+        base_morale = r.nextInt(RAND_MORALE) + MIN_BASE_MORALE;
+
+        //Randomize each skill with a minimum of 5 and a maximum of 60.
+        this.skillValues = new int[SkillTypes.values().length];
+        for (int i = 0; i < skillValues.length; i++) {
+            skillValues[i] = r.nextInt(RAND_SKILL) + MIN_SKILL;
+        }
     }
 }
