@@ -37,13 +37,11 @@ public class AdultCrewman extends AbstractCrewman {
     private static final int MIN_BASE_MORALE = -1000; //-1'000
     private static final int MAX_BASE_MORALE = 5000;  //5'000
     private static final int RAND_MORALE = MAX_BASE_MORALE - MIN_BASE_MORALE;
-
     //Note: yes, base morale can be as bad as -1000. This represents a rather indolent crewman (might replace with trait)
     //Note: current plan is for UI to display morale divided by 1'000
 
-
-
-
+    //much much monthly rest or overwork will add or reduce stress.
+    private static final double MORALE_TO_STRESS_RATIO = 0.01;
 
 
     //Stress-level where a stress-related crisis event will trigger.
@@ -150,6 +148,16 @@ public class AdultCrewman extends AbstractCrewman {
         }
     }
 
+    /**
+     * (STUB) Gets modifiers to amount of work done by this crewman,
+     * according to general traits and situation affecting most jobs.
+     *
+     * @return An added modifier of efficiency for the crewman's work.
+     */
+    public double getGeneralWorkModifier() {
+        return 0.0;
+    }
+
     //stress gained or lost at the end of month
     protected double monthStressChange = 0;
     protected double monthWorkload = 0;
@@ -158,21 +166,7 @@ public class AdultCrewman extends AbstractCrewman {
     protected JobAssignment[] monthJobAssignments = new JobAssignment[0];
 
     /**
-     * Called at the beginning of the end of a month cycle.
-     * Planned feature:
-     *         1. For each assignment of the crewman
-     *             1. Store monthly workload (JobAssignment)
-     *             2. Store amount of work done (JobAssignment)
-     *                 1. (AbstarctJob) Calculate crewman’s general efficiency at the job by checking stats and relevant traits.
-     *                 2. (Adult/Able Crewman) calculate further efficiency based on general traits of crewman.
-     */
-    @Override
-    protected void endOfMonthStart() {
-
-    }
-
-    /**
-     * Called at the end of the end of month cycle.
+     * Called last at the end of month cycle.
      * planned feature:
      *         1. Consume resources based on crewman needs (rations?).
      *         2. Apply change to stress
@@ -185,7 +179,27 @@ public class AdultCrewman extends AbstractCrewman {
      *             2. In case of senior crewman, this typically mean death by old age.
      */
     @Override
-    protected void endOfMonthEnd() {
+    protected void endOfMonth() {
+        monthRest = 0;
+        monthWorkload = 0;
+        monthStressChange = 0;
+        monthJobAssignments = SpaceCrew.getInstance().getJobAssignmentsByCrewman(keyID);
+        for (JobAssignment ja: monthJobAssignments ) {
+            monthWorkload += ja.getMonthWorkloadShare();
+        }
 
+        //TODO: add ship amenities to monthRest.
+        //TODO: add effects from traits to monthStressChange and monthRest.
+
+        monthRest = base_morale;
+        monthStressChange = (monthWorkload - monthRest) * MORALE_TO_STRESS_RATIO;
+
+        stress += monthStressChange;
+        if(false) { //TODO: if age/criteria in range of advancing CrewmanState (eg. adult crewman to senior crewman)
+            //TODO: chance to trigger crewman aging event - force trigger event if at far end of age-range.
+        }
+        if(stress >= CRISIS_TRIGGER_STRESS) {
+            //TODO: trigger crewman stress crisis event
+        }
     }
 }
