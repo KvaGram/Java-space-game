@@ -211,12 +211,12 @@ Data that needs to be associated an event:
  */
 
 //Draft
-class LargeRandomEvent {
+class LargeGameEvent {
     int e_ID;
     String e_text;
     //prerequisites to fire
     int[] button_IDs;
-    String button_texts;
+    String[] button_texts;
     //button conditionals
     double weight = 100.0;
     private ArrayList<Runnable> WeightModifierConditions;
@@ -229,9 +229,12 @@ class LargeRandomEvent {
      * @param dialogtext Text displayed to user
      * @param optiontext Text on the 'OK' or similar button
      */
-    public LargeRandomEvent(int ID, String dialogtext, String optiontext) {
+    public LargeGameEvent(int ID, String dialogtext, String optiontext) {
         this.e_ID = ID;
-        e_text = dialogtext;
+        this.e_text = dialogtext;
+        this.button_IDs = new int[]{0};
+        this.button_texts = new String[]{optiontext};
+        this.isRandom = true;
     }
 
     /**
@@ -243,9 +246,11 @@ class LargeRandomEvent {
      * @param starting_weight Base likelihood weight of the event (default is 100)
      * @param canTriggerRandomly Indicates whether this is a random event on the monthly pulse; otherwise a special event
      */
-    public LargeRandomEvent(int ID, String dialogtext, int[] option_IDs, String[] option_texts[], double starting_weight, boolean canTriggerRandomly) {
+    public LargeGameEvent(int ID, String dialogtext, int[] option_IDs, String[] option_texts, double starting_weight, boolean canTriggerRandomly) {
         this.e_ID = ID;
-        e_text = dialogtext;
+        this.e_text = dialogtext;
+        this.button_IDs = option_IDs;
+        this.button_texts = option_texts;
         this.weight = starting_weight;
         this.isRandom = canTriggerRandomly;
         //Install weights
@@ -274,11 +279,4 @@ class LargeRandomEvent {
         }
         return adjusted_weight;
     }
-    /* public ¿MatchedPairs? GetOptions() {
-        FOption[] result = new FOption[];
-        for (FOption o: this.DialogueOptions) {
-            if (o.condition) : result.add(o);
-        }
-   } */
-
 }
