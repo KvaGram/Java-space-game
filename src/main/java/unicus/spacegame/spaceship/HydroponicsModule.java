@@ -5,6 +5,7 @@ import unicus.spacegame.crew.AdultCrewman;
 import unicus.spacegame.crew.SpaceCrew;
 import unicus.spacegame.crew.Workplace;
 
+import java.sql.SQLSyntaxErrorException;
 import java.util.ArrayList;
 import java.util.Queue;
 
@@ -101,21 +102,24 @@ public class HydroponicsModule extends AbstractShipModule implements Workplace {
         }
 
         /**
-         * Calculates how much work this worker will normally produce.
-         * This is used to:
-         * show efficiency percentage (work divided by workload)
-         * used as first step to calculate how muc work this assigned crewman will do.
-         * NOTE: Implementation must be calculation only, and not alter any data, as this may be called multiple times.
+         * Calculates a base efficiency for how well a crewman will do this job.
+         * Used in UI to show percentage efficiency.
+         * Note: implementation should include the result from {@link AdultCrewman#getGeneralWorkModifier()},
+         * unless implementation has an alternative.
          *
-         * @param crewman  The assigned crewman
-         * @param workload The amount of workload assigned to this crewman for this job.
-         * @return An estimated amount of work a crewman will do on the job.
-         * <p>
-         * NOTE: class AdultCrewman may be replaced with a more general class of all crewmen who can take jobs.
+         * @param crewID The ID of the crewman
+         * @return The base efficiency of the crewman, where 1.0 equals 100%.
          */
         @Override
-        public double evaluateWorker(AdultCrewman crewman, double workload) {
-            return 0;
+        public double getWorkModifierOfCrewman(int crewID) {
+            AdultCrewman c;
+            try {
+                c = (AdultCrewman) SpaceCrew.getInstance().getCrew(crewID);
+            }catch (Error err) {
+                System.err.println(err);
+                return 0.0;
+            }
+            return 1.0 + getMonthBestCrewman().getGeneralWorkModifier(); //TODO add checks and calculations for crewman stats and traits
         }
 
         /**

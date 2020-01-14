@@ -79,20 +79,16 @@ public abstract class AbstractJob {
     public abstract double getMonthlyWorkload();
 
     /**
-     * Calculates how much work this worker will normally produce based on their stats and traits relating this this job.
-     * The end result may differ from workload.
-     * This is used to:
-     *      show efficiency percentage (work divided by workload)
-     *      used as first step to calculate how muc work this assigned crewman will do.
-     * NOTE: Implementation must be calculation only, and not alter any data, as this may be called multiple times.
+     * Calculates a base efficiency for how well a crewman will do this job.
+     * Used in UI to show percentage efficiency.
+     * Note: implementation should include the result from {@link AdultCrewman#getGeneralWorkModifier()},
+     *      unless implementation has an alternative.
      *
-     * @param crewman The assigned crewman
-     * @param workload The amount of workload assigned to this crewman for this job.
-     * @return An estimated amount of work a crewman will do on the job.
+     * @param crewID The ID of the crewman
+     * @return The base efficiency of the crewman, where 1.0 equals 100%.
      *
-     * NOTE: class AdultCrewman may be replaced with a more general class of all crewmen who can take jobs.
      */
-    public abstract double evaluateWorker(AdultCrewman crewman, double workload);
+    public abstract double getWorkModifierOfCrewman(int crewID);
 
     /**
      * Completes work required for the month.
@@ -116,7 +112,7 @@ public abstract class AbstractJob {
             int crewID = ja.getCrewID();
             if (ja.getWorkshare() == WorkShare.vacation)
                 continue;
-            double w = ja.getMonthWork();
+            double w = ja.getMonthWorkProduced();
             monthWorkDone += w;
 
             if(i == 0)
