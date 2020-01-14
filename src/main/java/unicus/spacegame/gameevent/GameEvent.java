@@ -220,7 +220,7 @@ class LargeGameEvent {
     //button conditionals
     double weight = 100.0;
     private ArrayList<Runnable> WeightModifierConditions;
-    private ArrayList<double> WeightModifierValues;
+    private ArrayList<Double> WeightModifierValues;
     boolean isRandom;
 
     /**
@@ -260,9 +260,11 @@ class LargeGameEvent {
     private interface WeightModifierInterface {
         // potentially replacing Runnable
     }
-
-    public AddWeightModifier(double factor, Runnable condition) {
+    public void AddWeightModifier(double factor, Runnable condition) {
         // bah
+    }
+    public void onTriggered() {
+        // placeholder
     }
 
     /**
