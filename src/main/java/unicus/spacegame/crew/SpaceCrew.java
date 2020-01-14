@@ -35,7 +35,7 @@ public class SpaceCrew {
         housingKeys = new ObjectKey();
     }
 
-    //TODO: Add constructor, crewGenerator (start scenarios), crew-lists
+    //TODO: crewGenerator (start scenarios), crew-lists
 
     /**
      * List of all crewman objects that can be referenced in game, living or dead.
