@@ -111,15 +111,9 @@ public abstract class AbstractCrewman {
     }
 
     /**
-     * Called at the beginning of the end of a month cycle.
+     * Called last at the end of month cycle.
      * To be implemented in child classes.
      */
-    protected abstract void endOfMonthStart();
-
-    /**
-     * Called at the end of the end of month cycle.
-     * To be implemented in child classes.
-     */
-    protected abstract void endOfMonthEnd();
+    protected abstract void endOfMonth();
 
 }

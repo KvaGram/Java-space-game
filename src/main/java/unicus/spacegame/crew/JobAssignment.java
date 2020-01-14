@@ -6,8 +6,8 @@ public class JobAssignment {
     private WorkShare workshare;
 
     //temporary stored values.
-    private double monthWorkload;
-    private double monthWork;
+    private double monthWorkloadShare;
+    private double monthWorkProduced;
 
     public JobAssignment(int jobID, int crewID){
 
@@ -15,9 +15,63 @@ public class JobAssignment {
         this.crewID = crewID;
         this.workshare = WorkShare.full;
 
-        this.monthWorkload = 0;
-        this.monthWork = 0;
+        this.monthWorkloadShare = 0;
+        this.monthWorkProduced = 0;
     }
+
+    /**
+     * Called first in the end of month cycle.
+     * Update the month's workload and workProduced
+     *
+     * Planned feature:
+     *  1. Store monthly workload (JobAssignment)
+     *  2. Store amount of work done (JobAssignment)
+     *      1. (AbstarctJob) Calculate crewman’s general efficiency at the job by checking stats and relevant traits.
+     *      2. (Adult/Able Crewman) calculate further efficiency based on general traits of crewman.
+     */
+    public void endOfMonth() {
+        monthWorkloadShare = getWorkloadShare();
+        monthWorkProduced = getMonthWorkProduced();
+        //TODO: chance to trigger workplace event
+    }
+
+    /**
+     * Calculate the amount of work this assigned crewman will contribute to the job.
+     * @return An amount of work that will be produced by this crewman on this assignment.
+     */
+    public double calculateWork() {
+        //Get modifier
+        double m = SpaceCrew.getInstance().getJob(jobID).getWorkModifierOfCrewman(crewID);
+        return m * getWorkloadShare();
+    }
+
+    /**
+     * Gets the share of workload (impact on morale) put on this crewmember on the job.
+     * Notes: * the final morale impact may be affected by an workplace event.
+     *        * The final amount of work done is calculated in {@link #calculateWork()}.
+     *        * work points and morale points work on the same scale, and is displayed in the 1'000's in the UI.
+     *        * For estimates and EOM functions, use {@link #calculateWork()} for final amount of work.
+     * @return A base value amount of work, used for calculating production and morale impact.
+     */
+    public double getWorkloadShare() {
+        double w = SpaceCrew.getInstance().getJob(jobID).getMonthlyWorkload();
+        return w * getWorkloadShare();
+    }
+
+    /**
+     * Gets the share modifier of the workload.
+     * This value is based on the number of crewmen assigned to this job, and their {@link #workshare} state.
+     * @return A modifier value between 0.0 and 1.0
+     */
+    public double getWorkloadShareModifier() {
+        int totalShares = 0;
+        for (JobAssignment ja:SpaceCrew.getInstance().getJobAssignmentsByJob(jobID)) {
+            totalShares += ja.workshare.share;
+        }
+        return (double)workshare.share / (double)totalShares;
+    }
+
+
 
     public WorkShare getWorkshare() {
         return workshare;
@@ -35,43 +89,30 @@ public class JobAssignment {
         return jobID;
     }
 
-    /**
-     * Gets the amount of workload shared for this assignment.
-     * @return
-     */
-    public double getWorkload(){
-        int totalShares = 0;
-        for (JobAssignment ja:SpaceCrew.getInstance().getJobAssignmentsByJob(jobID)) {
-            totalShares += ja.workshare.share;
-        }
-        double WorkLoadShare = (double)workshare.share / (double)totalShares;
-        AbstractJob j = SpaceCrew.getInstance().getJob(jobID);
-        return WorkLoadShare * j.getMonthlyWorkload();
-    }
 
     /**
      * The amount of work done by this assignment by the end of the month.
      * To be called only by {@link AbstractJob#endOfMonth() }
      * @return
      */
-    public double getMonthWork() {
-        return monthWork;
+    public double getMonthWorkProduced() {
+        return monthWorkProduced;
     }
 
-    public void setMonthWork(double monthWork) {
-        this.monthWork = monthWork;
+    public void setMonthWorkProduced(double monthWorkProduced) {
+        this.monthWorkProduced = monthWorkProduced;
     }
 
     /**
      * Amount of workload from this assignment this month. This impacts a crewman's crewman's morale.
      * @return
      */
-    public double getMonthWorkload() {
-        return monthWorkload;
+    public double getMonthWorkloadShare() {
+        return monthWorkloadShare;
     }
 
-    public void setMonthWorkload(double monthWorkload) {
-        this.monthWorkload = monthWorkload;
+    public void setMonthWorkloadShare(double monthWorkloadShare) {
+        this.monthWorkloadShare = monthWorkloadShare;
     }
 
 }
