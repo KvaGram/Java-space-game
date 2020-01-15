@@ -127,7 +127,7 @@ public class DebugConsole implements IUpdateable {
                                 SpaceCrew spaceCrew = SpaceCrew.getInstance();
                                 int key = spaceCrew.getCrewKeys().yieldKey();
                                 int birthday = context.getArgument("birthdate", int.class);
-                                String name = context.getArgument("name", String.class);
+                                //String name = context.getArgument("name", String.class);
                                 AdultCrewman c = new AdultCrewman(key, birthday, random.nextLong(), new int[0]);
                                 spaceCrew.addReplaceCrewmen(c);
                                 out.println("Created a new adult crewman. ID: " + key);
