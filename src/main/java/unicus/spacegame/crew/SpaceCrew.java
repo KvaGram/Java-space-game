@@ -28,6 +28,8 @@ public class SpaceCrew {
         this.crewmen = new AbstractCrewman[0];
         this.jobs = new AbstractJob[0];
         this.jobAssignments = new JobAssignment[0];
+        this.housing = new AbstractHousing[0];
+        this.housingAssignments = new HousingAssignment[0];
         instace = this;
 
         jobKeys = new ObjectKey();
@@ -51,6 +53,11 @@ public class SpaceCrew {
 
     private AbstractHousing[] housing;
     private HousingAssignment[] housingAssignments;
+
+    //STUB!
+    public static SpaceCrew GenerateStart1() {
+        return new SpaceCrew();
+    }
 
     public AbstractJob getJob(int jobID){
         for (AbstractJob j : jobs) {
@@ -91,13 +98,17 @@ public class SpaceCrew {
         crewmen = ArrayUtils.addAll(crewmen, newCrewObjects);
     }
 
-    private void removeCrewmen(int... crewKeys) {
-        int[] toRemove = new int[0];
-        for (int key:crewKeys)
-            for (int i = 0; i < crewmen.length; i++)
-                if (crewmen[i].keyID == key) toRemove = ArrayUtils.add(toRemove, i);
-        crewmen = ArrayUtils.removeAll(crewmen, toRemove);
-    }
+    //NOTE: for now, removing crewmen should be considered impossible.
+    //in-game, the last CrewState, memorial, may be considered the closest thing to 'removed'.
+
+    //public void removeCrewmen(int... crewKeys) {
+    //    int[] toRemove = new int[0];
+    //    for (int key:crewKeys)
+    //        for (int i = 0; i < crewmen.length; i++)
+    //            if (crewmen[i].keyID == key) toRemove = ArrayUtils.add(toRemove, i);
+    //    crewmen = ArrayUtils.removeAll(crewmen, toRemove);
+    //
+    //}
     /**
      * Adds new job to the list of jobs.
      * If a job already exists (same keyID), it should not, the old object will be replaced with the new.

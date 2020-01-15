@@ -6,6 +6,7 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.gui.screens.GameScreen;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
+import unicus.spacegame.crew.SpaceCrew;
 import unicus.spacegame.spaceship.HomeShip;
 import unicus.spacegame.ui.DebugConsole;
 import unicus.spacegame.ui.Homeship.HomeshipUI;
@@ -86,6 +87,7 @@ class Demo2 implements IUpdateable {
         }
 
         Random r = new Random(0);
+        SpaceCrew spaceCrew = SpaceCrew.GenerateStart1(); //(STUB!)
         HomeShip homeship = HomeShip.GenerateStart1(r, 8, 20, .2f, .8f);
         Game.init();
         Game.window().cursor().set(cursor, 8, 8);
