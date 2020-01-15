@@ -129,6 +129,7 @@ public class DebugConsole implements IUpdateable {
                                 int birthday = context.getArgument("birthdate", int.class);
                                 String name = context.getArgument("name", String.class);
                                 AdultCrewman c = new AdultCrewman(key, birthday, random.nextLong(), new int[0]);
+                                spaceCrew.addReplaceCrewmen(c);
                                 out.println("Created a new adult crewman. ID: " + key);
                                 return key;
                             }
@@ -157,7 +158,7 @@ public class DebugConsole implements IUpdateable {
                     literal("all").executes(
                         context -> {
                             AbstractCrewman[] crewlist =  SpaceCrew.getInstance().getCrewmen();
-                            String separator = "--------------\n";
+                            String separator = "\n--------------\n";
                             StringBuffer text = new StringBuffer();
                             text.append(separator);
                             for (AbstractCrewman c : crewlist) {
@@ -194,7 +195,7 @@ public class DebugConsole implements IUpdateable {
                     literal("all").executes(
                         context -> {
                             AbstractJob[] joblist =  SpaceCrew.getInstance().getJobs();
-                            String separator = "--------------\n";
+                            String separator = "\n--------------\n";
                             StringBuffer text = new StringBuffer();
                             text.append(separator);
                             for (AbstractJob j : joblist) {

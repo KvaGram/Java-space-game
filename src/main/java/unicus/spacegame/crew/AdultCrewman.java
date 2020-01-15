@@ -203,6 +203,7 @@ public class AdultCrewman extends AbstractCrewman {
 
     @Override
     public StringBuffer toString(StringBuffer text) {
+        text = super.toString(text);
         text.append("Intelligence: ").append(getIntelligence()).append("\n");
         text.append("Stress: ").append(stress).append("\n");
 
@@ -213,6 +214,6 @@ public class AdultCrewman extends AbstractCrewman {
         text.append("Number of jobs: ").append(monthJobAssignments.length);
         text.append("Stress-change: ").append(monthStressChange);
 
-        return super.toString(text);
+        return text;
     }
 }

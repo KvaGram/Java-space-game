@@ -7,3 +7,5 @@ target/
 
 classes/
 crash.txt
+game.log.lck
+game.log

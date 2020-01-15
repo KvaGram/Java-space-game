@@ -97,6 +97,7 @@ class Demo2 implements IUpdateable {
 
         DebugConsole console = new DebugConsole(homeship);
         console.run();
+        console.addCrewCommands();
         Game.loop().attach(console);
     }
 
