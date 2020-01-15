@@ -191,5 +191,22 @@ public abstract class AbstractJob {
             return null;
         }
     }
+
+    @Override
+    public String toString() {
+        return toString(new StringBuffer()).toString();
+    }
+    public StringBuffer toString(StringBuffer text) {
+        text.append("Job ID: ").append(keyID).append("/n");
+        text.append("Monthly workload: ").append(getMonthlyWorkload()).append("\n");
+        JobAssignment[] workers = SpaceCrew.getInstance().getJobAssignmentsByJob(keyID);
+        text.append("The job has ").append(workers.length).append(" assigned workers.\n");
+        for (JobAssignment ja :
+                workers) {
+            text.append("\t*CrewID ").append(ja.getCrewID()).append(", assigned with a ").append(ja.getWorkshare()).append(" workshare.\n");
+        }
+
+        return text;
+    }
 }
 

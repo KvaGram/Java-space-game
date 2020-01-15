@@ -12,8 +12,6 @@ import java.util.Random;
  */
 public class AdultCrewman extends AbstractCrewman {
 
-
-
     //Maximum obtainable level in a skill.
     private static final int SKILL_CAP = 100;
 
@@ -201,5 +199,20 @@ public class AdultCrewman extends AbstractCrewman {
         if(stress >= CRISIS_TRIGGER_STRESS) {
             //TODO: trigger crewman stress crisis event
         }
+    }
+
+    @Override
+    public StringBuffer toString(StringBuffer text) {
+        text.append("Intelligence: ").append(getIntelligence()).append("\n");
+        text.append("Stress: ").append(stress).append("\n");
+
+        for (SkillTypes s : SkillTypes.values()) {
+            text.append(s.toString()).append(": ").append(getSkill(s)).append("\n");
+        }
+        text.append("Status update last month:\n");
+        text.append("Number of jobs: ").append(monthJobAssignments.length);
+        text.append("Stress-change: ").append(monthStressChange);
+
+        return super.toString(text);
     }
 }

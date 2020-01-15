@@ -2,12 +2,14 @@ package unicus.spacegame.ui;
 
 import com.mojang.brigadier.Message;
 import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandExceptionType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import de.gurkenlabs.litiengine.IUpdateable;
+import unicus.spacegame.crew.*;
 import unicus.spacegame.spaceship.AbstractShipModule;
 import unicus.spacegame.spaceship.HomeShip;
 
@@ -40,6 +42,9 @@ public class DebugConsole implements IUpdateable {
     PrintStream out;
     JTextArea ta;
     JTextField tf;
+
+    Random random;
+
     CommandDispatcher<Object> dispatcher;
     private static Object dummySender = new Object();
 
@@ -53,6 +58,7 @@ public class DebugConsole implements IUpdateable {
         TextAreaOutputStream taos = new TextAreaOutputStream(ta, 60);
         out = new PrintStream(taos);
 
+        random = new Random();
 
         dispatcher = new CommandDispatcher<Object>();
         dispatcher.register(literal("print").then(literal("ship").executes( context -> {
@@ -100,7 +106,169 @@ public class DebugConsole implements IUpdateable {
         refit build component [ShipLoc] [index] [partType] force
          */
     }
+    public void addCrewCommands() {
+        /*
+        crew add [crewmanstate] [birthdate] (creates a new crewman, with random characteristics)
+        crew remove [crewID] (Converts a crewman to a forgotten memorial, functionally dead and removed from the game)
+        crew print all (prints out a detailed list of all crewmembers on the homeship, living or dead.)
+        crew print [crewID] (prints details of the selected crewman.)
 
+        job assign [jobID] [crewID] (attempts to assign the job to the crewman)
+        job unassign [jobID] [crewID] (unassigns the job from the crewman)
+        job print all (prints a detailed list of all jobs)
+        job print [jobID] (prints detailed info of the job)
+         */
+        dispatcher.register(
+            literal("crew").then(
+                literal("add").then(
+                    literal("adult").then(
+                        argument("birthdate", integer()).executes(
+                            context -> {
+                                SpaceCrew spaceCrew = SpaceCrew.getInstance();
+                                int key = spaceCrew.getCrewKeys().yieldKey();
+                                int birthday = context.getArgument("birthdate", int.class);
+                                String name = context.getArgument("name", String.class);
+                                AdultCrewman c = new AdultCrewman(key, birthday, random.nextLong(), new int[0]);
+                                out.println("Created a new adult crewman. ID: " + key);
+                                return key;
+                            }
+                        )
+                    )
+                )
+            ).then(
+                literal("remove").then(
+                    argument("crewID", integer()).executes(
+                        context -> {
+                            SpaceCrew spaceCrew = SpaceCrew.getInstance();
+                            int key = context.getArgument("crewID", int.class);
+                            AbstractCrewman crewman = spaceCrew.getCrew(key);
+                            if(crewman == null) {
+                                out.println("CrewID " + key + " was not found!");
+                                return 0;
+                            }
+                            out.println(crewman.getSelfID().name + " will be turned into a memorial, and considered dead!");
+                            out.println("function not implemented yet!");
+                            return key;
+                        }
+                    )
+                )
+            ).then(
+                literal("print").then(
+                    literal("all").executes(
+                        context -> {
+                            AbstractCrewman[] crewlist =  SpaceCrew.getInstance().getCrewmen();
+                            String separator = "--------------\n";
+                            StringBuffer text = new StringBuffer();
+                            text.append(separator);
+                            for (AbstractCrewman c : crewlist) {
+                                c.toString(text);
+                                text.append(separator);
+                            }
+                            out.print(text);
+                            return crewlist.length;
+                        }
+                    )
+                ).then(
+                    argument("crewID", integer()).executes(
+                        context -> {
+                            SpaceCrew spaceCrew = SpaceCrew.getInstance();
+                            int key = context.getArgument("crewID", int.class);
+                            AbstractCrewman crewman = spaceCrew.getCrew(key);
+                            if(crewman == null) {
+                                out.println("CrewID " + key + " was not found!");
+                                return 0;
+                            }
+                            else {
+                                out.println(crewman.toString());
+                                return key;
+                            }
+
+                        }
+                    )
+                )
+            )
+        );
+        dispatcher.register(
+            literal("job").then(
+                literal("print").then(
+                    literal("all").executes(
+                        context -> {
+                            AbstractJob[] joblist =  SpaceCrew.getInstance().getJobs();
+                            String separator = "--------------\n";
+                            StringBuffer text = new StringBuffer();
+                            text.append(separator);
+                            for (AbstractJob j : joblist) {
+                                j.toString(text);
+                                text.append(separator);
+                            }
+                            out.print(text);
+                            return joblist.length;
+                        }
+                    )
+                ).then(
+                    argument("jobID", integer()).executes(
+                        context -> {
+                            SpaceCrew spaceCrew = SpaceCrew.getInstance();
+                            int key = context.getArgument("jobID", int.class);
+                            AbstractJob job = spaceCrew.getJob(key);
+                            if(job == null) {
+                                out.println("jobID " + key + " was not found!");
+                                return 0;
+                            }
+                            else {
+                                out.println(job.toString());
+                                return key;
+                            }
+                        }
+                    )
+                )
+            ).then(
+                literal("assign").then(
+                    argument("jobID", integer()).then(
+                        argument("crewID", integer()).executes(
+                            context -> {
+                                SpaceCrew spaceCrew = SpaceCrew.getInstance();
+                                int jobID = context.getArgument("jobID", int.class);
+                                int crewID = context.getArgument("crewID", int.class);
+                                StringBuffer message = new StringBuffer();
+                                if (spaceCrew.canAssignJobCrew(jobID, crewID, message)) {
+                                    spaceCrew.assignJobCrew(jobID, crewID);
+                                    out.println("Job has been assigned!");
+                                    return jobID;
+                                }
+                                else {
+                                    out.println(message);
+                                    return 0;
+                                }
+                            }
+                        )
+                    )
+                )
+            ).then(
+                literal("unassign").then(
+                    argument("jobID", integer()).then(
+                        argument("crewID", integer()).executes(
+                            context -> {
+                                SpaceCrew spaceCrew = SpaceCrew.getInstance();
+                                int jobID = context.getArgument("jobID", int.class);
+                                int crewID = context.getArgument("crewID", int.class);
+                                JobAssignment ja = spaceCrew.getJobAssignment(jobID, crewID);
+                                if(ja == null) {
+                                    out.println("This job assignment don't exist.");
+                                    return 0;
+                                }
+                                else {
+                                    out.println("Job assignment removed!");
+                                    spaceCrew.unassignJobCrew(jobID, crewID);
+                                    return jobID;
+                                }
+                            }
+                        )
+                    )
+                )
+            )
+        );
+    }
 
     public void run() {
         JFrame frame = new JFrame();

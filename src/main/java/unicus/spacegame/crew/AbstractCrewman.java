@@ -110,10 +110,28 @@ public abstract class AbstractCrewman {
         selfID.gender = new CrewGender[]{CrewGender.male, CrewGender.female}[r.nextInt(2)];
     }
 
+    public CrewSelfID getSelfID() {
+        return selfID;
+    }
+
     /**
      * Called last at the end of month cycle.
      * To be implemented in child classes.
      */
     protected abstract void endOfMonth();
 
+    @Override
+    public String toString() {
+        return toString(new StringBuffer()).toString();
+    }
+
+    //Placeholder constant
+    private static final int CURRENT_DATE = 0;
+
+    public StringBuffer toString(StringBuffer text) {
+        text.append("Crewman ID ").append(keyID).append("\n");
+        text.append(selfID.getFullName()).append(", age ").append(getAgeYears(CURRENT_DATE)).append("\n");
+
+        return text;
+    }
 }

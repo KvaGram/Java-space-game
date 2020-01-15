@@ -319,4 +319,8 @@ public class SpaceCrew {
     public ObjectKey getHousingKeys() {
         return housingKeys;
     }
+
+    public AbstractJob[] getJobs() {
+        return jobs;
+    }
 }
