@@ -11,6 +11,7 @@ public final class GameEvent implements IUpdateable {
     private static GameEvent INSTANCE;
     private String info = "Magic singleton class";
     ArrayList<RandomEvent> myEvents = new ArrayList<RandomEvent>();
+    ArrayList<LargeGameEvent> gameEvents = new ArrayList<LargeGameEvent>();
     private GameEvent() {
         INSTANCE = this;
         DebugConsole.getInstance().addGameEventCommands();
@@ -55,21 +56,18 @@ public final class GameEvent implements IUpdateable {
         LargeGameEvent dummy = new LargeGameEvent(999, "dummy text", "dummy option") {
             @Override
             public void onTriggered() {
-                //Make things happen
+                System.out.println("Hello, space!"); //Make things happen
             }
             @Override
             public double getWeight() {
                 //Calculate modifiers
-                return 0;
+                // *0.9 to *0.1 for unlikely factors. *0 for hard prerequisites failed.
+                return 100;
             }
         };
 
-    /* private RandomEvent name = new RandomEvent(, "",
-                                       new int[]{0}, new String[]{""}); */
-
         //Event texts can possibly be outsourced to external file for translation later
 
-        //TODO: How to store prerequisites/conditionals?
         //TODO: What's the syntax to look out at ship state variables? (e.g. amount of resources, having a specific module)
 
         myEvents.add(ScientificDiscovery);
@@ -82,6 +80,7 @@ public final class GameEvent implements IUpdateable {
         myEvents.add(GoodGrowingSeason);
         myEvents.add(CrewPlayingGames);
         myEvents.add(WeaponDrillAccident);
+        gameEvents.add(dummy);
     }
 
     /** Data structure for the event list is in flux. Possibly an external file, possibly a series of constructors.
