@@ -18,11 +18,23 @@ public final class GameEvent implements IUpdateable {
 
         //Events should be private. External classes call event_by_ID(), not the event object itself.
         RandomEvent ScientificDiscovery = new RandomEvent(10, "One of our crewmen has made a scientific breakthrough in his spare time! We have gained 5 research points.",
-                new int[]{0}, new String[]{"That's good."});
+                new int[]{0}, new String[]{"That's good."}) {
+            public void onTriggered() {
+                //Science increase goes here
+            }
+        };
         RandomEvent MinorAirLeak = new RandomEvent(20, "There was a minor leak in one of the airlocks. We found and patched it, but our oxygen supplies have been depleted slightly.",
-                new int[]{0}, new String[]{"Unfortunate."});
+                new int[]{0}, new String[]{"Unfortunate."}) {
+            public void onTriggered() {
+                //Air decrease goes here
+            }
+        };
         RandomEvent MetallicDeposit = new RandomEvent(30, "We have stumbled on an asteroid with a high purity metal deposit. The metal was easy to extract and has been added to our stores.",
-                new int[]{0}, new String[]{"OK."});
+                new int[]{0}, new String[]{"OK."}) {
+            public void onTriggered() {
+                //TODO: each of these events should have their own OnTriggered method defined to make changes happen, and possibly an @Override marker.
+            }
+        };
         RandomEvent AlienMapSellerTrue = new RandomEvent(40, "An independent alien ship is hailing us, offering to trade us knowledge of galactic hyperlanes for some of our shinyum.",
                 new int[]{0,41}, new String[]{"No thanks","Pay them 2 Shinium."});
         RandomEvent alienMapSellerTrueResult = new RandomEvent(41, "We have integrated the alien coordinates into our own database. We are slightly closer to finding our way back to Earth.",
@@ -143,6 +155,7 @@ public final class GameEvent implements IUpdateable {
         //for i in (0,event_options) : {UI.button = event_choice_text, event_choice_ID}
         //return ID of clicked button
         return currentEventID; //return current event ID to give the console some context on what the f- it just did - Lars
+        //TODO: myEvents.get(eventID).onTriggered once event do-something functionality is in place
     }
     public int handle_option(int option) {
         if(!eventIsWaiting())
@@ -190,6 +203,8 @@ public final class GameEvent implements IUpdateable {
             this.event_choice_ids = choice_ids;
             this.event_choice_texts = choice_texts;
         }
+        public String getEvent_text() { return event_text; }
+        public int getEvent_id() { return event_id; }
     }
 
 
@@ -281,4 +296,7 @@ class LargeGameEvent {
         }
         return adjusted_weight;
     }
+
+    public String getEvent_text() { return e_text; }
+    public int getEvent_id() { return e_ID; }
 }
