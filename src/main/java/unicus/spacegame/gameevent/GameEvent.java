@@ -52,6 +52,18 @@ public final class GameEvent implements IUpdateable {
         RandomEvent WeaponDrillAccident = new RandomEvent(70, "One of your marines was injured in training during live weapons practice.",
                 new int[]{0}, new String[]{"Medic!"});
 
+        LargeGameEvent dummy = new LargeGameEvent(999, "dummy text", "dummy option") {
+            @Override
+            public void onTriggered() {
+                //Make things happen
+            }
+            @Override
+            public double getWeight() {
+                //Calculate modifiers
+                return 0;
+            }
+        };
+
     /* private RandomEvent name = new RandomEvent(, "",
                                        new int[]{0}, new String[]{""}); */
 
@@ -143,9 +155,10 @@ public final class GameEvent implements IUpdateable {
         //temporary write to debug console
         DebugConsole c = DebugConsole.getInstance();
         c.write("Hello? Yes this is event text...");
+        c.write("Triggered event number "+eventID);
         //NOTE: please put the events in an easy to access list. - Lars
         c.write("type event option # to respond:");
-        c.write("0 - option 0");
+        c.write("0 - option 1");
         c.write("1 - option 2");
         c.write("2 - option 3");
 
@@ -160,7 +173,9 @@ public final class GameEvent implements IUpdateable {
     public int handle_option(int option) {
         if(!eventIsWaiting())
             return 0;
-
+        if (nextEventID != 0) {
+            execute_event(nextEventID);
+        }
         //do option stuff
         nextEventID = 0; //whatever next id is, if there is one.
         currentEventID = 0;
@@ -226,7 +241,7 @@ Data that needs to be associated an event:
  */
 
 //Draft
-class LargeGameEvent {
+abstract class LargeGameEvent {
     int e_ID;
     String e_text;
     //prerequisites to fire
@@ -234,8 +249,6 @@ class LargeGameEvent {
     String[] button_texts;
     //button conditionals
     double weight = 100.0;
-    private ArrayList<Runnable> WeightModifierConditions;
-    private ArrayList<Double> WeightModifierValues;
     boolean isRandom;
 
     /**
@@ -271,31 +284,15 @@ class LargeGameEvent {
         //Install weights
     }
 
-    @FunctionalInterface
+    //@FunctionalInterface
     private interface WeightModifierInterface {
         // potentially replacing Runnable
     }
     public void AddWeightModifier(double factor, Runnable condition) {
         // bah
     }
-    public void onTriggered() {
-        // placeholder
-    }
-
-    /**
-     * Modified event weight calculator
-     * @return The weight of this event given the current game state (a normal event has 100)
-     */
-    public double GetWeight() {
-        double adjusted_weight = weight;
-        for (int i = 0; i<WeightModifierConditions.size(); i++) {
-            if ( WeightModifierConditions.get(i).run() ) {
-                adjusted_weight *= WeightModifierValues.get(i);
-            }
-            //blah
-        }
-        return adjusted_weight;
-    }
+    public abstract void onTriggered();
+    public abstract double getWeight();
 
     public String getEvent_text() { return e_text; }
     public int getEvent_id() { return e_ID; }
