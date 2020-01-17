@@ -2,9 +2,7 @@ package unicus.spacegame.gameevent;
 
 import de.gurkenlabs.litiengine.IUpdateable;
 import unicus.spacegame.ui.DebugConsole;
-
 import java.util.Random;
-
 import java.util.ArrayList;
 
 public final class GameEvent implements IUpdateable {
@@ -15,7 +13,6 @@ public final class GameEvent implements IUpdateable {
     private GameEvent() {
         INSTANCE = this;
         DebugConsole.getInstance().addGameEventCommands();
-
 
         //Events should be private. External classes call event_by_ID(), not the event object itself.
         RandomEvent ScientificDiscovery = new RandomEvent(10, "One of our crewmen has made a scientific breakthrough in his spare time! We have gained 5 research points.",
@@ -161,7 +158,6 @@ public final class GameEvent implements IUpdateable {
         c.write("1 - option 2");
         c.write("2 - option 3");
 
-
         //Pop up a UI dialog box:
         //UI.text = event_text;
         //for i in (0,event_options) : {UI.button = event_choice_text, event_choice_ID}
@@ -170,6 +166,7 @@ public final class GameEvent implements IUpdateable {
         //TODO: myEvents.get(eventID).onTriggered once event do-something functionality is in place
     }
     public int handle_option(int option) {
+        System.out.println("Handling");
         if(!eventIsWaiting())
             return 0;
         if (nextEventID != 0) {
@@ -192,10 +189,9 @@ public final class GameEvent implements IUpdateable {
     public void update() {
         if(!eventIsWaiting() && nextEventID != 0)
             execute_event(nextEventID);
-
     }
 
-    /** Current base class for events.
+    /** Current base class for events. Deprecated by LargeGameEvent.
      * Contains its own ID and text for a dialog box, text on dialog choice options, ID of each dialog choice.
      * If the ID of a dialog choice is nonzero, that will be the followup event triggered.
      * Initial events should be numbered like BASIC: ID 10, 20, 30, 40...
@@ -251,7 +247,7 @@ abstract class LargeGameEvent {
     boolean isRandom;
 
     /**
-     * Minimal simple constructor for one-option "info" event
+     * Minimal simple constructor for one-option common event
      * @param ID Event number
      * @param dialogtext Text displayed to user
      * @param optiontext Text on the 'OK' or similar button
@@ -265,7 +261,7 @@ abstract class LargeGameEvent {
     }
 
     /**
-     * Longer event constructor for events with choices. Still does not include weight modifiers.
+     * Longer event constructor for events with choices.
      * @param ID Event number
      * @param dialogtext Text displayed to user
      * @param option_IDs Ordered list of subsequent events, where 0 means no further result on this choice
@@ -280,16 +276,8 @@ abstract class LargeGameEvent {
         this.button_texts = option_texts;
         this.weight = starting_weight;
         this.isRandom = canTriggerRandomly;
-        //Install weights
     }
 
-    //@FunctionalInterface
-    private interface WeightModifierInterface {
-        // potentially replacing Runnable
-    }
-    public void AddWeightModifier(double factor, Runnable condition) {
-        // bah
-    }
     public abstract void onTriggered();
     public abstract double getWeight();
 
