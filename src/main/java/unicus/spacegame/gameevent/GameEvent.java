@@ -282,5 +282,7 @@ abstract class LargeGameEvent {
     public abstract double getWeight();
 
     public String getEvent_text() { return e_text; }
-    public int getEvent_id() { return e_ID; }
+    public int getEvent_ID() { return e_ID; }
+    public String[] getEvent_optionTexts() { return button_texts; }
+    public int[] getEvent_optionIDs() { return button_IDs; }
 }
