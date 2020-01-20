@@ -30,7 +30,7 @@ public final class GameEvent implements IUpdateable {
         RandomEvent MetallicDeposit = new RandomEvent(30, "We have stumbled on an asteroid with a high purity metal deposit. The metal was easy to extract and has been added to our stores.",
                 new int[]{0}, new String[]{"OK."}) {
             public void onTriggered() {
-                //TODO: each of these events should have their own OnTriggered method defined to make changes happen, and possibly an @Override marker.
+                //TODO: each of these events should be replaced by LargeGameEvents
             }
         };
         RandomEvent AlienMapSellerTrue = new RandomEvent(40, "An independent alien ship is hailing us, offering to trade us knowledge of galactic hyperlanes for some of our shinyum.",
@@ -101,7 +101,7 @@ public final class GameEvent implements IUpdateable {
         //Weighted random selection algorithm. Akin to picking off a D&D random table with entries like 00-22, 22-30, 31-80, 81-99.
         int sum_weights=0;
         for (RandomEvent r: myEvents) {
-            sum_weights += r.weight;
+            sum_weights += r.weight; //TODO: should be r.getWeight() to function after LargeGameEvent comes in place
         }
         int i = 0;
         int r = new Random().nextInt(sum_weights); //To pick based on relative weight, we have to select from sum of weights, not number of events
@@ -220,8 +220,7 @@ public final class GameEvent implements IUpdateable {
 
 }
 
-/*
-Data that needs to be associated an event:
+/* Data that needs to be associated an event:
 -ID
 -Dialog text
 -whether it is an initial or a follow-up event (i.e. can it happen on its own).
