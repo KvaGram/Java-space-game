@@ -8,10 +8,7 @@ import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderType;
-import unicus.spacegame.spaceship.AbstractShipModule;
-import unicus.spacegame.spaceship.AbstractShipSection;
-import unicus.spacegame.spaceship.HomeShip;
-import unicus.spacegame.spaceship.SectionType;
+import unicus.spacegame.spaceship.*;
 
 import java.awt.*;
 
@@ -103,7 +100,7 @@ public class HomeshipGUI extends Entity implements IRenderable {
             int y = middle - SECTION_HEIGHT/2;
 
             Graphics2D partG = (Graphics2D) g.create(x, y, width, height);
-            renderSection(loc, partG);
+            renderSection(partG, loc);
             partG.dispose();
 
             if(drawMode != HomeShipDrawMode.closed) {
@@ -129,7 +126,7 @@ public class HomeshipGUI extends Entity implements IRenderable {
                     loc = homeShip.getShipLoc(s, m);
 
                     partG = (Graphics2D) g.create(x, y, width, height);
-                    renderModule(loc, partG);
+                    renderModule(partG, loc);
                     partG.dispose();
                 }
                 //draw below
@@ -139,7 +136,7 @@ public class HomeshipGUI extends Entity implements IRenderable {
                     loc = homeShip.getShipLoc(s, m);
 
                     partG = (Graphics2D) g.create(x, y, width, height);
-                    renderModule(loc, partG);
+                    renderModule(partG, loc);
                     partG.dispose();
                 }
             }
@@ -165,9 +162,20 @@ public class HomeshipGUI extends Entity implements IRenderable {
             System.err.println(err);
             sectionType = SectionType.None;
         }
-
-
-
+        g.setColor(sectionType.getColor());
+        g.fillRect(0,0,SECTION_WIDTH, SECTION_HEIGHT);
+    }
+    private void renderModule(Graphics2D g, HomeShip.ShipLoc loc) {
+        ModuleType moduleType;
+        try {
+            moduleType = loc.getModule().getModuleType();
+        }
+        catch (Error err) {
+            System.err.println(err);
+            moduleType = ModuleType.Empty;
+        }
+        g.setColor(moduleType.getColor());
+        g.fillRect(5, 5, MODULE_WIDTH, MODULE_HEIGHT);
     }
 
 

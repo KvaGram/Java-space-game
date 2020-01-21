@@ -18,7 +18,7 @@ public enum ModuleType {
             return false;
         }
         @Override
-        public Color getPaintColor() {
+        public Color getColor() {
             return new Color(50,50,70);
         }
     },
@@ -31,7 +31,7 @@ public enum ModuleType {
             return false;
         }
         @Override
-        public Color getPaintColor() {
+        public Color getColor() {
             return new Color(160,82,45);
         }
     },
@@ -44,7 +44,7 @@ public enum ModuleType {
         return true;
         }
         @Override
-        public Color getPaintColor() {
+        public Color getColor() {
             return new Color(0, 44, 241);
         }
     },
@@ -58,13 +58,13 @@ public enum ModuleType {
         }
 
         @Override
-        public Color getPaintColor() {
+        public Color getColor() {
             return new Color(30, 168, 0);
         }
     };
 
     public abstract boolean getNeedGravity();
-    public abstract Color getPaintColor();
+    public abstract Color getColor();
     public static final ModuleType[] buildable = new ModuleType[] {
             Empty, Cargo, Habitat, Hydroponics
     };

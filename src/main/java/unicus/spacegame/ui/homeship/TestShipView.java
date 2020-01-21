@@ -15,6 +15,8 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Random;
+
 public class TestShipView extends Screen implements IUpdateable {
     Environment shipViewEnv;
     HomeshipGUI homeshipGUI;
@@ -39,6 +41,8 @@ public class TestShipView extends Screen implements IUpdateable {
         URL spaceshipURL = TestShipView.class.getResource("spaceship.litidata");
         Resources.load(spaceshipURL);
         Input.mouse().setGrabMouse(false);
+
+        HomeShip hs = HomeShip.GenerateStart1(new Random(0), 3, 10, 0.4f, 0.8f);
         TestShipView view = new TestShipView();
         Game.screens().display(view);
         Game.start();
