@@ -8,47 +8,122 @@ import java.util.ArrayList;
 public final class GameEvent implements IUpdateable {
     private static GameEvent INSTANCE;
     private String info = "Magic singleton class";
-    ArrayList<RandomEvent> myEvents = new ArrayList<RandomEvent>();
+    // ArrayList<RandomEvent> myEvents = new ArrayList<RandomEvent>();
     ArrayList<LargeGameEvent> gameEvents = new ArrayList<LargeGameEvent>();
     private GameEvent() {
         INSTANCE = this;
         DebugConsole.getInstance().addGameEventCommands();
 
         //Events should be private. External classes call event_by_ID(), not the event object itself.
-        RandomEvent ScientificDiscovery = new RandomEvent(10, "One of our crewmen has made a scientific breakthrough in his spare time! We have gained 5 research points.",
-                new int[]{0}, new String[]{"That's good."}) {
+
+        LargeGameEvent ScientificDiscovery = new LargeGameEvent(10, "One of our crewmen has made a scientific breakthrough in his spare time! We have gained 5 research points.",
+                "That's good.") {
+            @Override
             public void onTriggered() {
-                //Science increase goes here
+                //TODO: Award science points
+            }
+            @Override
+            public double getWeight() {
+                //TODO: Increase weight if you have crewmen with the right traits
+                return 100;
             }
         };
-        RandomEvent MinorAirLeak = new RandomEvent(20, "There was a minor leak in one of the airlocks. We found and patched it, but our oxygen supplies have been depleted slightly.",
-                new int[]{0}, new String[]{"Unfortunate."}) {
+        LargeGameEvent MinorAirLeak = new LargeGameEvent(20, "There was a minor leak in one of the airlocks. We found and patched it, but our oxygen supplies have been depleted slightly.",
+                "Unfortunate.") {
+            @Override
             public void onTriggered() {
-                //Air decrease goes here
+                //TODO: Lose some air
+            }
+            @Override
+            public double getWeight() {
+                //TODO: Reduce weight if air is low and crew have to be more careful
+                return 100;
             }
         };
-        RandomEvent MetallicDeposit = new RandomEvent(30, "We have stumbled on an asteroid with a high purity metal deposit. The metal was easy to extract and has been added to our stores.",
-                new int[]{0}, new String[]{"OK."}) {
+        LargeGameEvent MetallicDeposit = new LargeGameEvent(30, "We have stumbled on an asteroid with a high purity metal deposit. The metal was easy to extract and has been added to our stores.",
+                "OK.") {
+            @Override
             public void onTriggered() {
-                //TODO: each of these events should be replaced by LargeGameEvents
+                //TODO: add metal to ship stores
             }
+            @Override
+            public double getWeight() { return 100; }
         };
-        RandomEvent AlienMapSellerTrue = new RandomEvent(40, "An independent alien ship is hailing us, offering to trade us knowledge of galactic hyperlanes for some of our shinyum.",
-                new int[]{0,41}, new String[]{"No thanks","Pay them 2 Shinium."});
-        RandomEvent alienMapSellerTrueResult = new RandomEvent(41, "We have integrated the alien coordinates into our own database. We are slightly closer to finding our way back to Earth.",
-                new int[]{0}, new String[]{"Onwards!"});
-        alienMapSellerTrueResult.weight = 0; //Why is this a syntax error? Why is it an "Unknown class" syntax error??
-        RandomEvent AlienMapSellerFake = new RandomEvent(45, "An independent alien ship is hailing us, offering to trade us knowledge of galactic hyperlanes for some of our shinyum.",
-                new int[]{0,46}, new String[]{"No thanks","Pay them 2 Shinium."});
-        RandomEvent AlienMapSellerFakeResult = new RandomEvent(46, "Sadly the alien coordinates turned out to be gibberish, but after all the time we spent trying to calculate, the scammers have fled.",
-                new int[]{0}, new String[]{"Damn them!"});
-        AlienMapSellerFakeResult.weight = 0;
-        RandomEvent GoodGrowingSeason = new RandomEvent(50, "Our hydroponic tanks have been flourishing the past week and we are ready to harvest an unusually large crop. +4 food.",
-                new int[]{0}, new String[]{"I just hope it's not broccoli."});
-        RandomEvent CrewPlayingGames = new RandomEvent(60, "Your crew has been socializing happily over a lot of the games in the rec room recently. Morale has improved.",
-                new int[]{0}, new String[]{"Maybe I should join them."});
-        RandomEvent WeaponDrillAccident = new RandomEvent(70, "One of your marines was injured in training during live weapons practice.",
-                new int[]{0}, new String[]{"Medic!"});
+
+        LargeGameEvent AlienMapSellerTrue = new LargeGameEvent(40,
+                "An independent alien ship is hailing us, offering to trade us knowledge of galactic hyperlanes for some of our shinyum.",
+                new int[]{0,41}, //option_IDs
+                new String[]{"No thanks","Pay them 2 Shinium"}, //option_texts
+                100, true) {
+            @Override
+            public void onTriggered() { }
+            @Override
+            public double getWeight() { return 100; }
+        };
+        LargeGameEvent AlienMapSellerTrueResult = new LargeGameEvent(41,
+                "We have integrated the alien coordinates into our own database. We are slightly closer to finding our way back to Earth.",
+                new int[]{0}, //option_IDs
+                new String[] {"Onwards!"}, //option_texts
+                0, false ) {
+            @Override
+            public void onTriggered() {
+                //TODO: Lose 2 Shinium
+                //TODO: Directions to Earth
+            }
+            @Override
+            public double getWeight() { return 0; }
+        };
+
+        LargeGameEvent AlienMapSellerFake = new LargeGameEvent(45,
+                "An independent alien ship is hailing us, offering to trade us knowledge of galactic hyperlanes for some of our shinyum.",
+                new int[]{0,46}, //option_IDs
+                new String[]{"No thanks","Pay them 2 Shinium."},
+                100, true) {
+            @Override
+            public void onTriggered() { }
+            @Override
+            public double getWeight() { return 100; }
+        };
+        LargeGameEvent AlienMapSellerFakeResult = new LargeGameEvent(46,
+                "Sadly the alien coordinates turned out to be gibberish, but after all the time we spent trying to calculate, the scammers have fled.",
+                new int[]{0}, //option_IDs
+                new String[] {"Damn them!"}, //option_texts
+                0, false ) {
+            @Override
+            public void onTriggered() {
+                //TODO: Lose 2 Shinium
+                }
+            @Override
+            public double getWeight() { return 0; }
+        };
+
+        LargeGameEvent GoodGrowingSeason = new LargeGameEvent(50, "Our hydroponic tanks have been flourishing the past week and we are ready to harvest an unusually large crop. +4 food.",
+                "I just hope it's not broccoli.") {
+            @Override
+            public void onTriggered() {
+                //TODO: Add food
+            }
+            @Override
+            public double getWeight() { return 100; }
+        };
+        LargeGameEvent CrewPlayingGames = new LargeGameEvent(60, "Your crew has been socializing happily over a lot of the games in the rec room recently. Morale has improved.",
+                "Maybe I should join them.") {
+            @Override
+            public void onTriggered() {
+                //TODO: Raise morale
+            }
+            @Override
+            public double getWeight() { return 100; }
+        };
+        LargeGameEvent WeaponDrillAccident = new LargeGameEvent(70, "One of your marines was injured in training during live weapons practice.",
+                "Medic!") {
+            @Override
+            public void onTriggered() {
+                //TODO: Injure a crewmember
+            }
+            @Override
+            public double getWeight() { return 100; }
+        };
 
         LargeGameEvent dummy = new LargeGameEvent(999, "dummy text", "dummy option") {
             @Override
@@ -67,16 +142,16 @@ public final class GameEvent implements IUpdateable {
 
         //TODO: What's the syntax to look out at ship state variables? (e.g. amount of resources, having a specific module)
 
-        myEvents.add(ScientificDiscovery);
-        myEvents.add(MinorAirLeak);
-        myEvents.add(MetallicDeposit);
-        myEvents.add(AlienMapSellerTrue);
-        myEvents.add(alienMapSellerTrueResult);
-        myEvents.add(AlienMapSellerFake);
-        myEvents.add(AlienMapSellerFakeResult);
-        myEvents.add(GoodGrowingSeason);
-        myEvents.add(CrewPlayingGames);
-        myEvents.add(WeaponDrillAccident);
+        gameEvents.add(ScientificDiscovery);
+        gameEvents.add(MinorAirLeak);
+        gameEvents.add(MetallicDeposit);
+        gameEvents.add(AlienMapSellerTrue);
+        gameEvents.add(AlienMapSellerTrueResult);
+        gameEvents.add(AlienMapSellerFake);
+        gameEvents.add(AlienMapSellerFakeResult);
+        gameEvents.add(GoodGrowingSeason);
+        gameEvents.add(CrewPlayingGames);
+        gameEvents.add(WeaponDrillAccident);
         gameEvents.add(dummy);
     }
 
@@ -96,20 +171,20 @@ public final class GameEvent implements IUpdateable {
     Pick one of them and hand off execution to avoid code duplication.
      */
     public int event_Random() {
-        //Prerequisite verifier algorithm go here
-
         //Weighted random selection algorithm. Akin to picking off a D&D random table with entries like 00-22, 22-30, 31-80, 81-99.
+        //Prerequisite verifier algorithm go here
         double sum_weights=0;
-        for (RandomEvent r: myEvents) {
-            sum_weights += r.weight; //TODO: should be r.getWeight() to function after LargeGameEvent comes in place
+        for (LargeGameEvent r: gameEvents) {
+            //if event.canTriggerRandomly? or is that part of weight?
+            sum_weights += r.getWeight(); //TODO: should be r.getWeight() to function after LargeGameEvent comes in place
         }
         int i = 0;
         double r = sum_weights * new Random().nextDouble(); //To pick based on relative weight, we have to select from sum of weights, not number of events
-        while (r > myEvents.get(i).weight) {
-            r -= myEvents.get(i).weight;
+        while (r > gameEvents.get(i).getWeight()) {
+            r -= gameEvents.get(i).getWeight();
             i++;
         }
-        execute_event(myEvents.get(i).event_id); //convert index-in-list to index-by-ID
+        execute_event(gameEvents.get(i).e_ID); //convert index-in-list to index-by-ID
 
         return event_byID(0);
     }
@@ -220,7 +295,7 @@ public final class GameEvent implements IUpdateable {
 
 }
 
-/* Data that needs to be associated an event:
+/* Data that needs to be associated with an event:
 -ID
 -Dialog text
 -whether it is an initial or a follow-up event (i.e. can it happen on its own).
