@@ -26,7 +26,7 @@ public class JobAssignment {
      * Planned feature:
      *  1. Store monthly workload (JobAssignment)
      *  2. Store amount of work done (JobAssignment)
-     *      1. (AbstarctJob) Calculate crewman’s general efficiency at the job by checking stats and relevant traits.
+     *      1. (AbstractJob) Calculate crewman’s general efficiency at the job by checking stats and relevant traits.
      *      2. (Adult/Able Crewman) calculate further efficiency based on general traits of crewman.
      */
     public void endOfMonth() {
