@@ -99,12 +99,12 @@ public final class GameEvent implements IUpdateable {
         //Prerequisite verifier algorithm go here
 
         //Weighted random selection algorithm. Akin to picking off a D&D random table with entries like 00-22, 22-30, 31-80, 81-99.
-        int sum_weights=0;
+        double sum_weights=0;
         for (RandomEvent r: myEvents) {
             sum_weights += r.weight; //TODO: should be r.getWeight() to function after LargeGameEvent comes in place
         }
         int i = 0;
-        int r = new Random().nextInt(sum_weights); //To pick based on relative weight, we have to select from sum of weights, not number of events
+        double r = sum_weights * new Random().nextDouble(); //To pick based on relative weight, we have to select from sum of weights, not number of events
         while (r > myEvents.get(i).weight) {
             r -= myEvents.get(i).weight;
             i++;
