@@ -7,7 +7,7 @@ public class GravityFrame extends AbstractShipSection {
     }
 
     public GravityFrame(HomeShip.ShipLoc sectionLoc) {
-        super(sectionLoc);
+        super(sectionLoc, SectionType.GravityPlated);
     }
 
     @Override

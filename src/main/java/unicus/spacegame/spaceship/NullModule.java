@@ -27,6 +27,11 @@ public class NullModule extends AbstractShipModule {
     }
 
     @Override
+    public ModuleType getModuleType() {
+        return ModuleType.Empty;
+    }
+
+    @Override
     public String GetName() {
         return "Empty space for a module "  +  loc.toString();
     }

@@ -7,7 +7,7 @@ public class WheelFrame extends AbstractShipSection {
     }
 
     public WheelFrame(HomeShip.ShipLoc sectionLoc) {
-        super(sectionLoc);
+        super(sectionLoc, SectionType.Wheel);
     }
 
     @Override

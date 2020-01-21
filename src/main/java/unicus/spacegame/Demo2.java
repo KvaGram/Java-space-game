@@ -1,6 +1,5 @@
 package unicus.spacegame;
 
-import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.gui.screens.GameScreen;
@@ -9,8 +8,8 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import unicus.spacegame.crew.SpaceCrew;
 import unicus.spacegame.spaceship.HomeShip;
 import unicus.spacegame.ui.DebugConsole;
-import unicus.spacegame.ui.Homeship.HomeshipUI;
-import unicus.spacegame.ui.Homeship.HomeshipUIController;
+import unicus.spacegame.ui.homeship.HomeshipUI;
+import unicus.spacegame.ui.homeship.HomeshipUIController;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

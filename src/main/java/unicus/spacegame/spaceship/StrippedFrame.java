@@ -3,7 +3,7 @@ package unicus.spacegame.spaceship;
 public class StrippedFrame extends AbstractShipSection {
 
     public StrippedFrame(HomeShip.ShipLoc loc) {
-        super(loc);
+        super(loc, SectionType.None);
     }
 
     @Override

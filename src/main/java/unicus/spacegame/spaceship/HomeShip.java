@@ -14,18 +14,18 @@ import java.util.Random;
 public class HomeShip {
 
     private static HomeShip instance;
+
     public static HomeShip getInstance() {
         return instance;
     }
 
-    public final int headLocation;
-    public int middleLength;
-    public final int tailLocation;
+    private int headLocation;
+    private int middleLength;
+    private int tailLocation;
+    private int fullLength;
     //lists the type of sections currently installed. 0 is near bridge, other end near engineering.
     //public SectionType[] sectionTypes; //<- to remove
-    public AbstractShipModule[][] modules;
-
-
+    private AbstractShipModule[][] modules;
 
     //public ShipWeapon[][] weaponTypes; //<- to remove
 
@@ -64,11 +64,11 @@ public class HomeShip {
             this.s = s; this.m = m;
         }
 
-        public boolean isValidSection() {return s >= 0 && s < modules.length;}
+        public boolean isValidSection() {return s >= 0 && s < getModules().length;}
         public boolean isValidModule() {
             if (!isValidSection() || m < 0)
                 return false;
-            return m < modules[s].length;
+            return m < getModules()[s].length;
         }
 
         /**
@@ -79,17 +79,17 @@ public class HomeShip {
         /**
          * @return If this is the tail section.
          */
-        public boolean isTail(){return s == middleLength;}
+        public boolean isTail(){return s == getMiddleLength();}
 
 
         public AbstractShipModule getModule() {
             if(isValidModule())
-                return modules[s][m];
+                return getModules()[s][m];
             return null;
         }
         public AbstractShipSection getSection() {
             if (isValidSection())
-                return (AbstractShipSection) modules[s][0];
+                return (AbstractShipSection) getModules()[s][0];
             return null;
         }
         public ShipLoc[] getModuleLocList() {
@@ -146,24 +146,24 @@ public class HomeShip {
         this.headLocation = 0; //It's always 0, but hey, now the code might be more readable.
         this.middleLength = middleLength;
         this.tailLocation = 1 + middleLength; //The tail's index is right after the middle sections.
-
+        this.fullLength = middleLength + 2;
 
         //sectionTypes = new SectionType[length];
-        modules = new AbstractShipModule[middleLength +2][1];
+        modules = new AbstractShipModule[getFullLength()][1];
 
         int i = 0;
         //TODO: add head section
         //placeholder head section
-        modules[i][0] = new StrippedFrame(new ShipLoc(i, 0));
+        getModules()[i][0] = new StrippedFrame(new ShipLoc(i, 0));
         i++;
         for (; i < middleLength + 1; i++)
         {
             //Stripped sections
-            modules[i][0] = new StrippedFrame(new ShipLoc(i, 0));
+            getModules()[i][0] = new StrippedFrame(new ShipLoc(i, 0));
         }
         //TODO add tail section
         //placeholder tail section
-        modules[i][0] = new StrippedFrame(new ShipLoc(i, 0));
+        getModules()[i][0] = new StrippedFrame(new ShipLoc(i, 0));
 
         instance = this;
     }
@@ -180,7 +180,7 @@ public class HomeShip {
      */
     private AbstractShipSection forceBuildSection(int index, SectionType sectionType)
     {
-        if (index < 1 || index > middleLength) {
+        if (index < 1 || index > getMiddleLength()) {
             throw new IllegalArgumentException("Whoops.. that location is invalid for construction.\n" +
                     "Someone did a programming woopsie, because of that, the game will now quit.");
         }
@@ -206,10 +206,10 @@ public class HomeShip {
         int sLength = newSection.getNumModules();
         //sectionTypes[index] = sectionType;
         destroySection(index);
-        modules[index] = new AbstractShipModule[sLength +1];
-        modules[index][0] = newSection;
+        getModules()[index] = new AbstractShipModule[sLength +1];
+        getModules()[index][0] = newSection;
         for(int i = 1; i < sLength+1; i++){
-            modules[index][i] = new NullModule(new ShipLoc(index, i));
+            getModules()[index][i] = new NullModule(new ShipLoc(index, i));
         }
         return newSection;
     }
@@ -242,7 +242,7 @@ public class HomeShip {
                 break;
         }
         destroyModule(loc.getModule());
-        modules[loc.s][loc.m] = newModule;
+        getModules()[loc.s][loc.m] = newModule;
 
         return newModule;
     }
@@ -251,7 +251,7 @@ public class HomeShip {
      * @param index
      */
     private void destroySection(int index) {
-        for (AbstractShipModule m : modules[index]) {
+        for (AbstractShipModule m : getModules()[index]) {
             destroyModule(m);
         }
     }
@@ -317,7 +317,7 @@ public class HomeShip {
 
         System.out.println("Total cargo space: " + totCargoSpace + ", target cargo: " + targetFilled);
 
-        for(int i = 2; i < ship.modules.length-1; i++){
+        for(int i = 2; i < ship.getModules().length-1; i++){
             //If none of the modules are used, can targetFilled still be reached?
             boolean canBeEmpty = (usedCargoSpace + normSize * (length - i - 1)) > targetFilled;
             float sectionEmptyChance = rand.nextFloat();
@@ -577,14 +577,14 @@ public class HomeShip {
 
     public ArrayList<ShipLoc> getLockedModules() {
         ArrayList<ShipLoc> ret = new ArrayList<>();
-        for (RefitTask task : taskchain) {
+        for (RefitTask task : getTaskchain()) {
             Collections.addAll(ret, task.targets);
         }
         return ret;
     }
 
 
-    public ArrayList<RefitTask> taskchain;
+    private ArrayList<RefitTask> taskchain;
 
 
     //STUB TODO: integrate with the job system
@@ -636,72 +636,6 @@ public class HomeShip {
     enum RefitType{build, remove}
 
 
-
-
-
-
-
-
-
-
-/*    public CanBuildResult canBuildWeapon(int sectionID, int slotID, WeaponType type) {
-        CanBuildResult result = new CanBuildResult();
-        if (!validateWeaponSlot(sectionID, slotID)) {
-            result.possible = false;
-            result.message = "Invalid selection.";
-            return result;
-        }
-
-        //STUB. TODO: check if player can afford to construct this.
-        result.possible = true;
-        result.message = String.format("A test-weapon will be built on section %1$s's weapon slot number %2$s.", sectionID, slotID);
-        return result;
-    }
-    public CanBuildResult canBuildModule(int sectionID, int moduleID, ModuleType type) {
-        CanBuildResult result = new CanBuildResult();
-        if (validateModuleSlot(sectionID, moduleID)) {
-            result.possible = false;
-            result.message = "Invalid selection.";
-            return result;
-        }
-        ShipModule module = modules[sectionID][moduleID];
-        //This is a STUB - No care is made for cargo or crew quarters yet
-
-        if (module.moduleType == ModuleType.Empty) {
-            if(type == ModuleType.Empty) {
-                result.possible = true;
-                result.message = "";
-                return result;
-            }
-            //STUB. TODO: check if player can afford to construct this.
-            result.possible = true;
-            result.message = String.format("A %1$s module will be constructed at section 2$s's module slot number 3$s", type, sectionID, moduleID);
-
-        }
-
-
-        if(type == ModuleType.Empty) {
-            result.possible = true;
-            if (module.moduleType == ModuleType.Empty) {
-                result.message = "";
-            }
-            result.message = "Module at ";
-        }
-
-
-
-    }*/
-    /** --- end of refit section ----**/
-
-
-
-
-
-
-
-
-
-
     /**
      * Test-creates a spaceship, then prints the structure to console.
      * @param args
@@ -709,6 +643,30 @@ public class HomeShip {
     public static void main(String[] args) {
         HomeShip ship = HomeShip.GenerateStart1(new Random(0), 2, 10, 0.0f, 1.0f);
         System.out.println(ship.toString());
+    }
+
+    public int getHeadLocation() {
+        return headLocation;
+    }
+
+    public int getMiddleLength() {
+        return middleLength;
+    }
+
+    public int getTailLocation() {
+        return tailLocation;
+    }
+
+    public int getFullLength() {
+        return fullLength;
+    }
+
+    public AbstractShipModule[][] getModules() {
+        return modules;
+    }
+
+    public ArrayList<RefitTask> getTaskchain() {
+        return taskchain;
     }
 }
 

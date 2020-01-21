@@ -190,6 +190,11 @@ public class HydroponicsModule extends AbstractShipModule implements Workplace {
     }
 
     @Override
+    public ModuleType getModuleType() {
+        return ModuleType.Hydroponics;
+    }
+
+    @Override
     public String GetName() {
         return null;
     }

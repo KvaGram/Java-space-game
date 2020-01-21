@@ -7,7 +7,7 @@ public class BasicFrame extends AbstractShipSection {
     }
 
     public BasicFrame(HomeShip.ShipLoc loc) {
-        super(loc);
+        super(loc, SectionType.Normal);
     }
 
     @Override

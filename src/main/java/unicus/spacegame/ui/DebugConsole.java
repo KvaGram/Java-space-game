@@ -2,7 +2,6 @@ package unicus.spacegame.ui;
 
 import com.mojang.brigadier.Message;
 import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandExceptionType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -321,9 +320,9 @@ public class DebugConsole implements IUpdateable {
         b.append("\nSummary of " + name);
         b.append("\nNumber of crew - " + numCrew);
         b.append("\nNumber of jobs - " + numJobs);
-        b.append("\nNumber of buildable sections - " + homeship.middleLength);
+        b.append("\nNumber of buildable sections - " + homeship.getMiddleLength());
         b.append("\n------------------------------------");
-        for (AbstractShipModule[] s : homeship.modules) {
+        for (AbstractShipModule[] s : homeship.getModules()) {
             for (AbstractShipModule m : s) {
                 m.getInfo(b);
             }

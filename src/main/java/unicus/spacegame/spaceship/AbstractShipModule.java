@@ -4,8 +4,7 @@ package unicus.spacegame.spaceship;
  * A datastructure that a Spaceship is full of.
  * Needs to know what ModuleType it is, and what SectionType it is hosted in.
  */
-public abstract class AbstractShipModule extends AbstractShipPart{
-
+public abstract class AbstractShipModule extends AbstractShipPart {
     public AbstractShipModule(HomeShip.ShipLoc loc) {
         super(ShipPartType.Module, loc);
     }
@@ -23,6 +22,8 @@ public abstract class AbstractShipModule extends AbstractShipPart{
      * @return
      */
     public abstract boolean useGravity();
+
+    public abstract ModuleType getModuleType();
 }
 
 
