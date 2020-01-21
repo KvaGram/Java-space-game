@@ -312,6 +312,7 @@ public class DebugConsole implements IUpdateable {
         loc.getModule().getInfo(b);
         out.println(b.toString());
     }
+
     private void printShip(){
         StringBuffer b = new StringBuffer();
         String name = "The Homeship";

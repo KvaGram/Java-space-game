@@ -104,29 +104,21 @@ public abstract class AbstractJob {
      */
     public void endOfMonth() {
         double max = 0;
-        double min = 0;
+        double min = Integer.MAX_VALUE;
         monthWorkDone = 0;
         monthJobAssignments = SpaceCrew.getInstance().getJobAssignmentsByJob(keyID);
-        for (int i = 0; i < monthJobAssignments.length; i++) {
-            JobAssignment ja = monthJobAssignments[i];
+        for (JobAssignment ja : monthJobAssignments) {
             int crewID = ja.getCrewID();
             if (ja.getWorkshare() == WorkShare.vacation)
                 continue;
             double w = ja.getMonthWorkProduced();
             monthWorkDone += w;
 
-            if(i == 0)
-            {
-                monthBestCrewman = crewID;
-                monthWorstCrewman = crewID;
-                max = w;
-                min = w;
-            }
-            else if(w > max) {
+            if (w > max) {
                 max = w;
                 monthBestCrewman = crewID;
             }
-            else if(w < min) {
+            if (w < min) {
                 min = w;
                 monthWorstCrewman = crewID;
             }

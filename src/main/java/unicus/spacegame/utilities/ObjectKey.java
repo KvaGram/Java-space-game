@@ -8,25 +8,23 @@ import org.apache.commons.lang3.ArrayUtils;
  * as they are used to locate objects in lists.
  */
 public class ObjectKey {
-    private int nextKey;
+    private int lastKey;
     private int[] reserved;
 
     public ObjectKey() {
         this(Integer.MIN_VALUE);
     }
 
-    public ObjectKey(int nextKey){
-        this.nextKey = nextKey;
+    public ObjectKey(int lastKey){
+        this.lastKey = lastKey;
         setReserved();
     }
     public int yieldKey() {
-        int ret = nextKey;
-
         do {
-            nextKey++;
+            lastKey++;
         }
-        while(ArrayUtils.contains(reserved, nextKey));
-        return nextKey;
+        while(ArrayUtils.contains(reserved, lastKey));
+        return lastKey;
     }
 
     /**

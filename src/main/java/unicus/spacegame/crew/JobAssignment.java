@@ -26,12 +26,12 @@ public class JobAssignment {
      * Planned feature:
      *  1. Store monthly workload (JobAssignment)
      *  2. Store amount of work done (JobAssignment)
-     *      1. (AbstarctJob) Calculate crewman’s general efficiency at the job by checking stats and relevant traits.
+     *      1. (AbstractJob) Calculate crewman’s general efficiency at the job by checking stats and relevant traits.
      *      2. (Adult/Able Crewman) calculate further efficiency based on general traits of crewman.
      */
     public void endOfMonth() {
         monthWorkloadShare = getWorkloadShare();
-        monthWorkProduced = getMonthWorkProduced();
+        monthWorkProduced = calculateWork();
         //TODO: chance to trigger workplace event
     }
 
@@ -40,8 +40,10 @@ public class JobAssignment {
      * @return An amount of work that will be produced by this crewman on this assignment.
      */
     public double calculateWork() {
-        //Get modifier
+        //Get modifier - crewman efficiency on job. factors in skill, traits, etc.
+        //NOTE: getWorkModifierOfCrewman may or may not call AdultCrewman#getGeneralWorkModifier(), depending on implementation.
         double m = SpaceCrew.getInstance().getJob(jobID).getWorkModifierOfCrewman(crewID);
+        //multiplies with the crewman's share in the job
         return m * getWorkloadShare();
     }
 
@@ -54,8 +56,10 @@ public class JobAssignment {
      * @return A base value amount of work, used for calculating production and morale impact.
      */
     public double getWorkloadShare() {
+        // Get how much work is expected or required on the job
         double w = SpaceCrew.getInstance().getJob(jobID).getMonthlyWorkload();
-        return w * getWorkloadShare();
+        // Get a share of how much of this work is on the assigned crewman
+        return w * getWorkloadShareModifier();
     }
 
     /**
@@ -64,10 +68,11 @@ public class JobAssignment {
      * @return A modifier value between 0.0 and 1.0
      */
     public double getWorkloadShareModifier() {
-        int totalShares = 0;
+        int totalShares = 0; //total 'shares' of the job.
         for (JobAssignment ja:SpaceCrew.getInstance().getJobAssignmentsByJob(jobID)) {
             totalShares += ja.workshare.share;
         }
+        //Divide the crewman's share with the total amount to get their share of the workload.
         return (double)workshare.share / (double)totalShares;
     }
 

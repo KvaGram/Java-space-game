@@ -1,11 +1,6 @@
 package unicus.spacegame.crew;
 import org.apache.commons.lang3.ArrayUtils;
 import unicus.spacegame.utilities.ObjectKey;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Random;
 /*
  * Refactor notes:
  * Crew.java is renamed to SpaceCrew.java.
@@ -15,9 +10,10 @@ import java.util.Random;
  * */
 
 public class SpaceCrew {
-    private static SpaceCrew instace;
+
+    private static SpaceCrew instance;
     public static SpaceCrew getInstance() {
-        return instace;
+        return instance;
     }
 
     private final ObjectKey crewKeys;
@@ -30,7 +26,7 @@ public class SpaceCrew {
         this.jobAssignments = new JobAssignment[0];
         this.housing = new AbstractHousing[0];
         this.housingAssignments = new HousingAssignment[0];
-        instace = this;
+        instance = this;
 
         jobKeys = new ObjectKey();
         crewKeys = new ObjectKey();
@@ -39,6 +35,9 @@ public class SpaceCrew {
 
     //TODO: crewGenerator (start scenarios), crew-lists
 
+    /*
+    Note: consider replacing array with hash map of key ids
+     */
     /**
      * List of all crewman objects that can be referenced in game, living or dead.
      * All lists and references of crewmen eventually refer to this list.
@@ -126,9 +125,16 @@ public class SpaceCrew {
     }
     public void removeJobs(int... jobKeys) {
         int[] toRemove = new int[0];
-        for (int i = 0; i < jobs.length; i++)
-            if (ArrayUtils.contains(jobKeys, jobs[i].getKeyID()))  toRemove = ArrayUtils.add(toRemove, i);
+        int i;
+        for (i = 0; i < jobs.length; i++)
+            if (ArrayUtils.contains(jobKeys, jobs[i].getKeyID()))
+                toRemove = ArrayUtils.add(toRemove, i);
         jobs = ArrayUtils.removeAll(jobs, toRemove);
+        toRemove = new int[0];
+        for (i = 0; i < jobAssignments.length; i++)
+            if(ArrayUtils.contains(jobKeys, jobAssignments[i].getJobID()))
+                toRemove = ArrayUtils.add(toRemove, i);
+        jobAssignments = ArrayUtils.removeAll(jobAssignments, toRemove);
     }
 
     public void addHousing(AbstractHousing... newHousingObjects) {
@@ -140,17 +146,26 @@ public class SpaceCrew {
         housing = ArrayUtils.removeAll(housing, toRemove);
         housing = ArrayUtils.addAll(housing, newHousingObjects);
     }
+
     public void removeHousing(int... housingKeys) {
         int[] toRemove = new int[0];
-        for (int i = 0; i < housing.length; i++)
-            if (ArrayUtils.contains(housingKeys, housing[i].getKeyID()))  toRemove = ArrayUtils.add(toRemove, i);
+        int i;
+        for (i = 0; i < housing.length; i++)
+            if (ArrayUtils.contains(housingKeys, housing[i].getKeyID()))
+                toRemove = ArrayUtils.add(toRemove, i);
         housing = ArrayUtils.removeAll(housing, toRemove);
+        toRemove = new int[0];
+        for (i = 0; i < housingAssignments.length; i++)
+            if (ArrayUtils.contains(housingKeys, housingAssignments[i].getHousingID()))
+                toRemove = ArrayUtils.add(toRemove, i);
+        housingAssignments = ArrayUtils.removeAll(housingAssignments, toRemove);
     }
 
 
     public boolean canAssignJobCrew(int jobID, int crewID) {
         return canAssignJobCrew(jobID, crewID, new StringBuffer());
     }
+
     public boolean canAssignJobCrew(int jobID, int crewID, StringBuffer message) {
         AbstractJob job = getJob(jobID);
         AbstractCrewman crewman = getCrew(crewID);
@@ -162,11 +177,11 @@ public class SpaceCrew {
             message.append("Cannot assign crewman, invalid crewman ID");
             return false;
         }
-        //noinspection ConstantConditions <- placeholder
-        if(false) { //TODO: check for illegible for work
-            message.append("Cannot assign crewman, this crewman can't work.");
-            return false;
-        }
+        //TODO: check for illegible for work
+        //if(false) {
+        //    message.append("Cannot assign crewman, this crewman can't work.");
+        //    return false;
+        //}
         int numAssigned = 0;
         for (JobAssignment a : jobAssignments) {
             if(a.getJobID() == jobID) {
@@ -185,12 +200,14 @@ public class SpaceCrew {
         message.append("Crewman may be assigned.");
         return true;
     }
+
     public void assignJobCrew(int jobID, int crewID) {
         if(!canAssignJobCrew(jobID, crewID))
             return;
         JobAssignment newJA = new JobAssignment(jobID, crewID);
         jobAssignments = ArrayUtils.add(jobAssignments, newJA);
     }
+
     public void unassignJobCrew(int jobID, int crewID) {
         for (int i = 0; i < jobAssignments.length; i++) {
             if(jobAssignments[i].getJobID() == jobID && jobAssignments[i].getCrewID() == crewID) {
@@ -199,6 +216,7 @@ public class SpaceCrew {
             }
         }
     }
+
     public void unassignAllJobCrew(int jobID) {
         int[] toRemove = new int[0];
         for (int i = 0; i < jobAssignments.length; i++) {
@@ -208,7 +226,6 @@ public class SpaceCrew {
         }
         jobAssignments = ArrayUtils.removeAll(jobAssignments, toRemove);
     }
-
 
     public JobAssignment[] getJobAssignmentsByJob(int jobID){
         JobAssignment[] assignments = new JobAssignment[0];
@@ -266,6 +283,7 @@ public class SpaceCrew {
         message.append("The crewman can move here");
         return true;
     }
+
     public void assignHousingCrew(int housingID, int crewID, boolean force) {
         if(force || canAssignHouseCrew(housingID, crewID)){
             evictCrewman(crewID); //remove crewman from any previous housing
@@ -273,6 +291,7 @@ public class SpaceCrew {
            housingAssignments = ArrayUtils.add(housingAssignments, newHA);
         }
     }
+
     public void evictCrewman(int crewID){
         int[] toRemove = new int[0];
         for (int i = 0; i < housingAssignments.length; i++) {
@@ -282,6 +301,7 @@ public class SpaceCrew {
             housingAssignments = ArrayUtils.removeAll(housingAssignments, toRemove);
         }
     }
+
     public void evictAllFromHousing(int housingID) {
         int[] toRemove = new int[0];
         for (int i = 0; i < housingAssignments.length; i++) {
@@ -292,7 +312,6 @@ public class SpaceCrew {
         }
     }
 
-
     public HousingAssignment[] getResidentsOfHouse(int housingID){
         HousingAssignment[] assignments = new HousingAssignment[0];
         for (HousingAssignment ha : housingAssignments) {
@@ -301,6 +320,7 @@ public class SpaceCrew {
         }
         return assignments;
     }
+
     public HousingAssignment getHousingByCrew(int crewID){
         for (HousingAssignment ha : housingAssignments) {
             if(ha.getCrewID() == crewID)
@@ -308,6 +328,7 @@ public class SpaceCrew {
         }
         return null; //home
     }
+
     public HousingAssignment getHouseAssignment(int housingID, int crewID) {
         for (HousingAssignment ha : housingAssignments) {
             if(ha.getHousingID() == housingID && ha.getCrewID() == crewID)
@@ -315,23 +336,22 @@ public class SpaceCrew {
         }
         return null;
     }
+
     public AbstractCrewman[] getCrewmen() {
         return crewmen;
+    }
+    public AbstractJob[] getJobs() {
+        return jobs;
     }
 
     public ObjectKey getCrewKeys() {
         return crewKeys;
     }
-
     public ObjectKey getJobKeys() {
         return jobKeys;
     }
-
     public ObjectKey getHousingKeys() {
         return housingKeys;
     }
 
-    public AbstractJob[] getJobs() {
-        return jobs;
-    }
 }
