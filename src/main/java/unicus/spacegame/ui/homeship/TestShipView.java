@@ -3,9 +3,11 @@ package unicus.spacegame.ui.homeship;
 import de.gurkenlabs.litiengine.*;
 import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
 import de.gurkenlabs.litiengine.environment.Environment;
+import de.gurkenlabs.litiengine.graphics.RenderType;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
+import unicus.spacegame.crew.SpaceCrew;
 import unicus.spacegame.spaceship.HomeShip;
 
 import javax.imageio.ImageIO;
@@ -41,7 +43,9 @@ public class TestShipView extends Screen implements IUpdateable {
         URL spaceshipURL = TestShipView.class.getResource("spaceship.litidata");
         Resources.load(spaceshipURL);
         Input.mouse().setGrabMouse(false);
+        Game.graphics().setBaseRenderScale(2.0f);
 
+        SpaceCrew sc = SpaceCrew.GenerateStart1();
         HomeShip hs = HomeShip.GenerateStart1(new Random(0), 3, 10, 0.4f, 0.8f);
         TestShipView view = new TestShipView();
         Game.screens().display(view);
@@ -55,9 +59,7 @@ public class TestShipView extends Screen implements IUpdateable {
 
     protected TestShipView() {
         super("TEST_SHIP_VIEW");
-        homeshipGUI = new HomeshipGUI();
         shipViewEnv = Game.world().getEnvironment("Spaceship");
-        shipViewEnv.add(homeshipGUI);
     }
 
     /**
@@ -93,8 +95,14 @@ public class TestShipView extends Screen implements IUpdateable {
     @Override
     public void prepare() {
         super.prepare();
-        Game.world().loadEnvironment(shipViewEnv);
-        homeshipGUI.refresh();
+        Game.world().reset("Spaceship");
+        Game.world().loadEnvironment("Spaceship");
+        homeshipGUI = new HomeshipGUI();
+        shipViewEnv = Game.world().environment();
+        shipViewEnv.add(homeshipGUI, RenderType.GROUND);
+        Point2D focus = homeshipGUI.getCenterLocationOfSection(4);
+        homeshipGUI.drawMode = HomeshipGUI.HomeShipDrawMode.extruded;
+        Game.world().camera().setFocus(focus);
     }
 }
 abstract class ShipPart {

@@ -11,6 +11,8 @@ import de.gurkenlabs.litiengine.graphics.RenderType;
 import unicus.spacegame.spaceship.*;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 import static unicus.spacegame.utilities.Math.rollClamp;
 
@@ -23,17 +25,18 @@ Idea: show closed version of the ship (only the section-frames)
 @EntityInfo(renderType = RenderType.GROUND )
 public class HomeshipGUI extends Entity implements IRenderable {
 
-    private static int START_X = 50;
-    private static int HEAD_HEIGHT = 500;
-    private static int HEAD_WIDTH = 300;
-    private static int TAIL_HEIGHT = 500;
-    private static int TAIL_WIDTH = 300;
-    private static int SECTION_WIDTH = 300;
-    private static int SECTION_HEIGHT = 600;
-    private static int MODULE_WIDTH = 200;
-    private static int MODULE_HEIGHT = 100;
-    private static int WEAPON_WIDTH = 50;
-    private static int WEAPON_HEIGHT = 50;
+    private static int START_X = 128;
+    private static int HEAD_HEIGHT = 304;
+    private static int HEAD_WIDTH = 208;
+    private static int TAIL_HEIGHT = 304;
+    private static int TAIL_WIDTH = 112;
+    private static int SECTION_WIDTH = 112;
+    private static int SECTION_HEIGHT = 208;
+    private static int MODULE_WIDTH = 112;
+    private static int MODULE_HEIGHT = 80;
+    private static int WEAPON_WIDTH = 32;
+    private static int WEAPON_HEIGHT = 32;
+    private static int SPINE_HEIGHT = 48;
 
     public int getRotation() {
         return rotation;
@@ -62,6 +65,44 @@ public class HomeshipGUI extends Entity implements IRenderable {
         super();
     }
 
+
+
+    public Point.Double getCenterLocationOfSection(int section) {
+        Point.Double ret = getTopLeftLocationOfSection(section);
+        ret.y = Game.world().environment().getCenter().getY();
+
+        if(section == HomeShip.getInstance().getHeadLocation())
+            ret.x +=  HEAD_WIDTH/2.0;
+        else if(section == HomeShip.getInstance().getTailLocation())
+            ret.x += TAIL_WIDTH/2.0;
+        else
+            ret.x += SECTION_WIDTH/2.0;
+        return ret;
+
+    }
+    public Point.Double getTopLeftLocationOfSection(int section){
+        Point.Double ret = new Point.Double();
+        ret.y = Game.world().environment().getCenter().getY();
+
+        if(section == HomeShip.getInstance().getHeadLocation())
+            ret.y -= HEAD_HEIGHT / 2.0;
+        else if(section == HomeShip.getInstance().getTailLocation())
+            ret.y -= TAIL_HEIGHT / 2.0;
+        else
+            ret.y -= SECTION_HEIGHT / 2.0;
+
+        ret.x = START_X;
+        for (int i = 0; i < section-1; i++) {
+            if(i == HomeShip.getInstance().getHeadLocation())
+                ret.x +=  HEAD_WIDTH;
+            else if(i == HomeShip.getInstance().getTailLocation())
+                ret.x += TAIL_WIDTH;
+            else
+                ret.x += SECTION_WIDTH;
+        }
+        return ret;
+    }
+
     /**
      * Renders the visual contents of this instance onto the provided graphics context.
      *
@@ -79,16 +120,14 @@ public class HomeshipGUI extends Entity implements IRenderable {
      */
     @Override
     public void render(Graphics2D _g) {
-        ICamera cam = Game.world().camera();
-        int width = Game.window().getWidth();
-        int height = Game.window().getHeight();
-        Graphics2D g = (Graphics2D) _g.create((int)cam.getPixelOffsetX(), (int)cam.getPixelOffsetY(), width, height);
 
-        int middle = height/2;
+        Graphics2D g = (Graphics2D) _g.create();
 
-        //test-render a small white box
-        g.setColor(new Color(255, 255, 255));
-        g.fillRect(0, 100, 50, 50);
+        int middle = (int)Game.world().environment().getCenter().getY();
+
+        ////test-render a small white box
+        //g.setColor(new Color(255, 255, 255));
+        //g.fillRect(0, 0, 50, 50);
 
         HomeShip homeShip = HomeShip.getInstance();
         //AbstractShipModule[][] modules = homeShip.getModules();
@@ -99,44 +138,38 @@ public class HomeshipGUI extends Entity implements IRenderable {
             loc = homeShip.getShipLoc(s, 0);
             int y = middle - SECTION_HEIGHT/2;
 
-            Graphics2D partG = (Graphics2D) g.create(x, y, width, height);
-            renderSection(partG, loc);
+            Graphics2D partG = (Graphics2D) g.create();
+            renderSection(partG, loc, x, y);
             partG.dispose();
-
-            if(drawMode != HomeShipDrawMode.closed) {
-                //If outline mode, draw one module above and below. If extruded, draw 3 above and below.
+            /*
+            Module-drawing.
+            Do not draw modules if:
+            Draw-mode is set to closed.
+            current section is the head (first) or tail (last).
+            Module-graphics for tail and head (will be) built into the section graphics.
+            */
+            if (drawMode != HomeShipDrawMode.closed && (s != homeShip.getHeadLocation() && s != homeShip.getTailLocation())) {
+                //If cutout mode, draw one module above and below. If extruded, draw 3 above and below.
                 int numToDraw = drawMode == HomeShipDrawMode.extruded ? 3 : 1;
-                //draw above
+                //draw above spine
                 int i;
-                /*
-                        int i;
-                        for(i = 0; i < numToDraw; i++) {
-                            int m = rollClamp(i + rotation, 6)+1;
-                            output[middle + i] = m;
-                        }
-                        for(i = -1; i >= -numToDraw; i--) {
-                            int m = rollClamp(i + 6 + rotation, 6)+1;
-                            output[middle + i] = m;
-                        }
-                 */
-
                 for(i = 0; i < numToDraw; i++) {
-                    y = middle - MODULE_HEIGHT*(i); //top edge of module draw area
+                    y = middle - SPINE_HEIGHT/2 - MODULE_HEIGHT*(i+1); //top edge of module draw area
                     int m = rollClamp(i + rotation, 6) + 1;
                     loc = homeShip.getShipLoc(s, m);
 
-                    partG = (Graphics2D) g.create(x, y, width, height);
-                    renderModule(partG, loc);
+                    partG = (Graphics2D) g.create();
+                    renderModule(partG, loc, x, y);
                     partG.dispose();
                 }
                 //draw below
                 for(i = 0; i > -numToDraw; i--) {
-                    y = middle - MODULE_HEIGHT*(i); //top edge of module draw area
+                    y = middle + SPINE_HEIGHT/2 - MODULE_HEIGHT*(i); //top edge of module draw area
                     int m = rollClamp(i + 6 + rotation, 6)+1;
                     loc = homeShip.getShipLoc(s, m);
 
-                    partG = (Graphics2D) g.create(x, y, width, height);
-                    renderModule(partG, loc);
+                    partG = (Graphics2D) g.create();
+                    renderModule(partG, loc, x, y);
                     partG.dispose();
                 }
             }
@@ -153,31 +186,36 @@ public class HomeshipGUI extends Entity implements IRenderable {
         g.dispose();
     }
 
-    private void renderSection(Graphics2D g, HomeShip.ShipLoc loc) {
+    private void renderSection(Graphics2D g, HomeShip.ShipLoc loc, int x, int y) {
         SectionType sectionType;
         try {
             sectionType = loc.getSection().getSectionType();
         }
-        catch (Error err) {
-            System.err.println(err);
+        catch (NullPointerException err) {
+            //System.err.println(err);
             sectionType = SectionType.None;
         }
+        x += Game.world().camera().getPixelOffsetX();
+        y += Game.world().camera().getPixelOffsetY();
+
         g.setColor(sectionType.getColor());
-        g.fillRect(0,0,SECTION_WIDTH, SECTION_HEIGHT);
+        g.fillRect(x,y,SECTION_WIDTH, SECTION_HEIGHT);
     }
-    private void renderModule(Graphics2D g, HomeShip.ShipLoc loc) {
+    private void renderModule(Graphics2D g, HomeShip.ShipLoc loc, int x, int y) {
         ModuleType moduleType;
         try {
             moduleType = loc.getModule().getModuleType();
         }
-        catch (Error err) {
-            System.err.println(err);
+        catch (NullPointerException err) {
+            //System.err.println(err);
             moduleType = ModuleType.Empty;
         }
-        g.setColor(moduleType.getColor());
-        g.fillRect(5, 5, MODULE_WIDTH, MODULE_HEIGHT);
-    }
 
+        x += Game.world().camera().getPixelOffsetX();
+        y += Game.world().camera().getPixelOffsetY();
+        g.setColor(moduleType.getColor());
+        g.fillRect(x+5, y+5, MODULE_WIDTH-10, MODULE_HEIGHT-10);
+    }
 
 
     public void refresh() {
