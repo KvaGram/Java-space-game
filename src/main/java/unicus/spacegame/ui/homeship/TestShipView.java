@@ -100,7 +100,7 @@ public class TestShipView extends Screen implements IUpdateable {
         homeshipGUI = new HomeshipGUI();
         shipViewEnv = Game.world().environment();
         shipViewEnv.add(homeshipGUI, RenderType.GROUND);
-        Point2D focus = homeshipGUI.getCenterLocationOfSection(4);
+        Point2D focus = homeshipGUI.getSectionFocusPoint(4);
         homeshipGUI.drawMode = HomeshipGUI.HomeShipDrawMode.extruded;
         Game.world().camera().setFocus(focus);
     }

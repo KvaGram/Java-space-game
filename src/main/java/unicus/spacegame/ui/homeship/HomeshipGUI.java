@@ -65,42 +65,79 @@ public class HomeshipGUI extends Entity implements IRenderable {
         super();
     }
 
-
-
-    public Point.Double getCenterLocationOfSection(int section) {
-        Point.Double ret = getTopLeftLocationOfSection(section);
-        ret.y = Game.world().environment().getCenter().getY();
-
-        if(section == HomeShip.getInstance().getHeadLocation())
-            ret.x +=  HEAD_WIDTH/2.0;
-        else if(section == HomeShip.getInstance().getTailLocation())
-            ret.x += TAIL_WIDTH/2.0;
-        else
-            ret.x += SECTION_WIDTH/2.0;
-        return ret;
-
+    /**
+     * The x-coordinate on the map where drawing starts.
+     * @return
+     */
+    public double getStartX() {
+        double x = Game.world().environment().getCenter().getX();
+        x -= getShipDrawWidth() / 2;
+        return x - x % 16;
     }
-    public Point.Double getTopLeftLocationOfSection(int section){
-        Point.Double ret = new Point.Double();
-        ret.y = Game.world().environment().getCenter().getY();
+
+    /**
+     * returns the draw width of the ship on screen.
+     * @return
+     */
+    private double getShipDrawWidth() {
+        double size = HomeShip.getInstance().getMiddleLength() * SECTION_WIDTH;
+        size += HEAD_WIDTH;
+        size += TAIL_WIDTH;
+        return size;
+    }
+
+    private double getSectionDrawX(int section) {
+        double x = getStartX();
+        if(section == HomeShip.getInstance().getHeadLocation())
+            return x;
+        x += HEAD_WIDTH;
+        x += (section-1) * SECTION_WIDTH;
+        return x;
+    }
+
+
+    public Point.Double getSectionFocusPoint(int section) {
+        double y = Game.world().environment().getCenter().getY();
+        double x = getSectionDrawX(section);
+        if(section == HomeShip.getInstance().getHeadLocation())
+            x+= HEAD_WIDTH/2.0;
+        else if (section == HomeShip.getInstance().getTailLocation())
+            x+= TAIL_WIDTH/2.0;
+        else
+            x+= SECTION_WIDTH/2.0;
+        return new Point2D.Double(x, y);
+    }
+    private double getSectionDrawY(int section){
+        double y = Game.world().environment().getCenter().getY();
 
         if(section == HomeShip.getInstance().getHeadLocation())
-            ret.y -= HEAD_HEIGHT / 2.0;
+            y -= HEAD_HEIGHT / 2.0;
         else if(section == HomeShip.getInstance().getTailLocation())
-            ret.y -= TAIL_HEIGHT / 2.0;
+            y -= TAIL_HEIGHT / 2.0;
         else
-            ret.y -= SECTION_HEIGHT / 2.0;
+            y -= SECTION_HEIGHT / 2.0;
+        return y;
+    }
 
-        ret.x = START_X;
-        for (int i = 0; i < section-1; i++) {
-            if(i == HomeShip.getInstance().getHeadLocation())
-                ret.x +=  HEAD_WIDTH;
-            else if(i == HomeShip.getInstance().getTailLocation())
-                ret.x += TAIL_WIDTH;
-            else
-                ret.x += SECTION_WIDTH;
+    /**
+     * Gets the draw Y coordinate for a module.
+     *
+     * @param spineDist is the distance from the spine. a value of 0 means it is connected to the spine.
+     * @param above If the module is above or below the spine.
+     * @return pixel Y coordinate on map for drawing module.
+     */
+    private double getModuleDrawY(int spineDist, boolean above) {
+        assert(0 <= spineDist && spineDist < 3);
+        double y = Game.world().environment().getCenter().getY();
+        if(above) {
+            y -= SPINE_HEIGHT / 2.0;
+            y -= (spineDist+1) * MODULE_HEIGHT;
         }
-        return ret;
+        else {
+            y += SPINE_HEIGHT / 2.0;
+            y += (spineDist) * MODULE_HEIGHT;
+        }
+        return y;
     }
 
     /**
@@ -132,14 +169,12 @@ public class HomeshipGUI extends Entity implements IRenderable {
         HomeShip homeShip = HomeShip.getInstance();
         //AbstractShipModule[][] modules = homeShip.getModules();
 
-        int x = START_X;
         HomeShip.ShipLoc loc;
         for(int s = 0; s < homeShip.getFullLength(); s++) {
             loc = homeShip.getShipLoc(s, 0);
-            int y = middle - SECTION_HEIGHT/2;
 
             Graphics2D partG = (Graphics2D) g.create();
-            renderSection(partG, loc, x, y);
+            renderSection(partG, loc);
             partG.dispose();
             /*
             Module-drawing.
@@ -151,42 +186,30 @@ public class HomeshipGUI extends Entity implements IRenderable {
             if (drawMode != HomeShipDrawMode.closed && (s != homeShip.getHeadLocation() && s != homeShip.getTailLocation())) {
                 //If cutout mode, draw one module above and below. If extruded, draw 3 above and below.
                 int numToDraw = drawMode == HomeShipDrawMode.extruded ? 3 : 1;
-                //draw above spine
-                int i;
-                for(i = 0; i < numToDraw; i++) {
-                    y = middle - SPINE_HEIGHT/2 - MODULE_HEIGHT*(i+1); //top edge of module draw area
+                for(int i = 0; i < numToDraw; i++) {
+                    //Render module above spine
                     int m = rollClamp(i + rotation, 6) + 1;
                     loc = homeShip.getShipLoc(s, m);
 
                     partG = (Graphics2D) g.create();
-                    renderModule(partG, loc, x, y);
+
+                    renderModule(partG, loc, i, true);
                     partG.dispose();
-                }
-                //draw below
-                for(i = 0; i > -numToDraw; i--) {
-                    y = middle + SPINE_HEIGHT/2 - MODULE_HEIGHT*(i); //top edge of module draw area
-                    int m = rollClamp(i + 6 + rotation, 6)+1;
+
+                    //Render module below spine
+                    m = rollClamp(i + 6 + rotation, 6)+1;
                     loc = homeShip.getShipLoc(s, m);
 
                     partG = (Graphics2D) g.create();
-                    renderModule(partG, loc, x, y);
+                    renderModule(partG, loc, i, false);
                     partG.dispose();
                 }
-            }
-            if(s == homeShip.getHeadLocation()){
-                x += HEAD_WIDTH;
-            }
-            else if(s== homeShip.getTailLocation()) {
-                x += TAIL_WIDTH;
-            }
-            else {
-                x += SECTION_WIDTH;
             }
         }
         g.dispose();
     }
 
-    private void renderSection(Graphics2D g, HomeShip.ShipLoc loc, int x, int y) {
+    private void renderSection(Graphics2D g, HomeShip.ShipLoc loc) {
         SectionType sectionType;
         try {
             sectionType = loc.getSection().getSectionType();
@@ -195,13 +218,15 @@ public class HomeshipGUI extends Entity implements IRenderable {
             //System.err.println(err);
             sectionType = SectionType.None;
         }
+        int x = (int)getSectionDrawX(loc.getS());
+        int y = (int)getSectionDrawY(loc.getS());
         x += Game.world().camera().getPixelOffsetX();
         y += Game.world().camera().getPixelOffsetY();
 
         g.setColor(sectionType.getColor());
         g.fillRect(x,y,SECTION_WIDTH, SECTION_HEIGHT);
     }
-    private void renderModule(Graphics2D g, HomeShip.ShipLoc loc, int x, int y) {
+    private void renderModule(Graphics2D g, HomeShip.ShipLoc loc, int spineDist, boolean above) {
         ModuleType moduleType;
         try {
             moduleType = loc.getModule().getModuleType();
@@ -210,6 +235,8 @@ public class HomeshipGUI extends Entity implements IRenderable {
             //System.err.println(err);
             moduleType = ModuleType.Empty;
         }
+        int x = (int)getSectionDrawX(loc.getS());
+        int y = (int)getModuleDrawY(spineDist, above);
 
         x += Game.world().camera().getPixelOffsetX();
         y += Game.world().camera().getPixelOffsetY();
