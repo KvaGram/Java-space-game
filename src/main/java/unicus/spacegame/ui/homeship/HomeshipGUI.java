@@ -26,9 +26,9 @@ Idea: show closed version of the ship (only the section-frames)
 public class HomeshipGUI extends Entity implements IRenderable {
 
     private static int START_X = 128;
-    private static int HEAD_HEIGHT = 304;
+    private static int HEAD_HEIGHT = 208;
     private static int HEAD_WIDTH = 208;
-    private static int TAIL_HEIGHT = 304;
+    private static int TAIL_HEIGHT = 208;
     private static int TAIL_WIDTH = 112;
     private static int SECTION_WIDTH = 112;
     private static int SECTION_HEIGHT = 208;
@@ -96,8 +96,12 @@ public class HomeshipGUI extends Entity implements IRenderable {
     }
 
 
-    public Point.Double getSectionFocusPoint(int section) {
+    public void setSelectionFocus(int section, int panFrames, boolean menuMode) {
         double y = Game.world().environment().getCenter().getY();
+        //If in menu-mode, move the camera up a bit, so the ship appears below
+        //the configuration menu.
+        if (menuMode)
+            y -= SECTION_WIDTH;
         double x = getSectionDrawX(section);
         if(section == HomeShip.getInstance().getHeadLocation())
             x+= HEAD_WIDTH/2.0;
@@ -105,7 +109,11 @@ public class HomeshipGUI extends Entity implements IRenderable {
             x+= TAIL_WIDTH/2.0;
         else
             x+= SECTION_WIDTH/2.0;
-        return new Point2D.Double(x, y);
+
+        if(panFrames > 0)
+            Game.world().camera().pan(x, y, panFrames);
+        else
+            Game.world().camera().setFocus(x, y);
     }
     private double getSectionDrawY(int section){
         double y = Game.world().environment().getCenter().getY();
