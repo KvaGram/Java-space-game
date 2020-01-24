@@ -11,6 +11,7 @@ import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
 import unicus.spacegame.crew.SpaceCrew;
 import unicus.spacegame.spaceship.HomeShip;
+import unicus.spacegame.ui.crew.CrewMenu;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -114,6 +115,12 @@ public class TestShipView extends Screen implements IUpdateable {
     class ConfigMenu extends GuiComponent {
         Menu menu;
         HomeShip.ShipLoc loc;
+
+        CrewMenu testCrewMenu;
+        int[] testCrewList = new int[]{0,0,0};
+        int testMenuColumns = 2;
+        int testMenuRows = 3;
+
         /**
          * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
          *
@@ -129,20 +136,24 @@ public class TestShipView extends Screen implements IUpdateable {
         void open(HomeShip.ShipLoc loc) {
             menu = new Menu(0, 0, getWidth()/5, getHeight(), "test1", "test2", "test3", "test4");
             this.loc = loc;
-            this.prepare();
             this.getComponents().add(menu);
-            menu.prepare();
             homeshipGUI.drawMode = HomeshipGUI.HomeShipDrawMode.cutout;
             //Point2D focus = homeshipGUI.getSectionFocusPoint(loc.getS());
             homeshipGUI.setSelectionFocus(6, 30, true);
 
             //focus.setLocation(focus.getX(), focus.getY() - getHeight()/4);
             //Game.world().camera().setFocus(focus);
+
+            //This is a test:
+            testCrewMenu = new CrewMenu(getWidth() / 5, 0, getWidth() / 5, getHeight(), testMenuRows, testMenuColumns, testCrewList);
+            this.getComponents().add(testCrewMenu);
+            this.prepare();
         }
         void close() {
-            this.getComponents().remove(menu);
             this.suspend();
+            this.getComponents().clear();
             this.menu = null;
+            this.testCrewMenu = null;
 
             //Point2D focus = homeshipGUI.getSectionFocusPoint(loc.getS());
             //Game.world().camera().setFocus(focus);
