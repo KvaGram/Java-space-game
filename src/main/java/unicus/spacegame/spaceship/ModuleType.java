@@ -8,6 +8,9 @@ import java.awt.*;
  * The type of Module a section may have.
  * A module may require gravity to be constructed.
  * A module has a color associated with it.
+ *
+ * An Empty type is either an empty spot, or a ship section
+ * An Special type is something like the hangar or the main bridge. Special rules apply.
  */
 public enum ModuleType {
     Empty{
@@ -35,6 +38,16 @@ public enum ModuleType {
         @Override
         public Color getPaintColor() {
             return new Color(100,200,0);
+        }
+    }, Special {
+        @Override
+        public boolean getNeedGravity() {
+            return false;
+        }
+
+        @Override
+        public Color getPaintColor() {
+            return Color.BLACK;
         }
     };
 

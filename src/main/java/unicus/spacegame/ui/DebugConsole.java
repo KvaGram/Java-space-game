@@ -322,12 +322,10 @@ public class DebugConsole implements IUpdateable {
         b.append("\nSummary of " + name);
         b.append("\nNumber of crew - " + numCrew);
         b.append("\nNumber of jobs - " + numJobs);
-        b.append("\nNumber of buildable sections - " + homeship.middleLength);
+        b.append("\nNumber of buildable sections - " + HomeShip.getMiddleLength());
         b.append("\n------------------------------------");
-        for (AbstractShipModule[] s : homeship.modules) {
-            for (AbstractShipModule m : s) {
-                m.getInfo(b);
-            }
+        for (AbstractShipModule m : homeship.modules.values()) {
+            m.getInfo(b);
         }
         out.println(b.toString());
     }

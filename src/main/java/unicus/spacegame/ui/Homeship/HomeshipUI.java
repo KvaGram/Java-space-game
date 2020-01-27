@@ -44,14 +44,14 @@ public class HomeshipUI extends GuiComponent {
         this.viewArea.setSize((int)width, (int)height);
 
         //number of sections will not change (might refactor to allow this later)
-        int numSections = homeship.middleLength;
-        sections = new SectionComponentUI[homeship.middleLength];
+        int numSections = HomeShip.getMiddleLength();
+        sections = new SectionComponentUI[HomeShip.getMiddleLength()];
         //There can be up to 6 modules per section
         int sectionNumModules = 6;
-        modules = new ModuleComponentUI[homeship.middleLength * 6];
+        modules = new ModuleComponentUI[HomeShip.getMiddleLength() * 6];
         //There can be up to 6 gun slots per section
         int SectionNumGunSlots = 6;
-        gunSlots = new GunSlotComponentUI[homeship.middleLength * 6];
+        gunSlots = new GunSlotComponentUI[HomeShip.getMiddleLength() * 6];
 
         this.scrollbar = new Scrollbar(40, height - 80, width-80, 40, horizontal, area, viewArea);
 
@@ -123,7 +123,7 @@ public class HomeshipUI extends GuiComponent {
     //TODO: needs update due to the ShipLoc change.
     void updateLayout() {
         area.height = SECTION_HEIGHT;
-        area.width = HEAD_WIDTH + homeship.middleLength * SECTION_WIDTH + TAIL_WIDTH;
+        area.width = HEAD_WIDTH + HomeShip.getMiddleLength() * SECTION_WIDTH + TAIL_WIDTH;
 
         int newX;
         int newY;

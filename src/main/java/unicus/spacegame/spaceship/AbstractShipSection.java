@@ -6,7 +6,8 @@ public abstract class AbstractShipSection extends AbstractShipModule{
     public AbstractShipSection(HomeShip.ShipLoc loc) {
         super(ShipPartType.Section, loc);
     }
-    public abstract int getNumModules();
+    @Deprecated
+    public final int getNumModules(){return 6;};
 
     public abstract boolean canBuildModule(ModuleType typeToBuild, StringBuffer message);
 }

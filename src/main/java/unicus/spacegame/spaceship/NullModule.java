@@ -1,5 +1,10 @@
 package unicus.spacegame.spaceship;
 
+import unicus.spacegame.CargoCollection;
+import unicus.spacegame.CargoContainer;
+
+import java.util.Collection;
+
 public class NullModule extends AbstractShipModule {
 
     public NullModule(HomeShip.ShipLoc loc) {
@@ -32,8 +37,8 @@ public class NullModule extends AbstractShipModule {
     }
 
     @Override
-    public CargoPlaceholder[] getCargoOnDestruction() {
-        return new CargoPlaceholder[0];
+    public Collection<CargoCollection> getCargoOnDestruction() {
+        return CargoContainer.Null.getCollection();
     }
 
     /**
