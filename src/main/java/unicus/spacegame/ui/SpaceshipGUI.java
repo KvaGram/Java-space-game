@@ -11,9 +11,9 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-/**NOTE: This UI is obsolete, and is kept only for reference.
+/**NOTE: This UI is obsolete, and the code is kept only for reference.
  * Some vital function-calls and properties have been
- * disabled or replaced by placeholders, as they have become obsolete.*/
+ * disabled or replaced by placeholders, as they have become obsolete, hindering compilation.*/
 
 /**
  * SpaceshipGUI renders a model of Spaceship
@@ -276,14 +276,14 @@ public class SpaceshipGUI extends JPanel
 //        Rectangle bounds = this.getBounds();
 //        g.fillRect (0, 0, bounds.width, bounds.height);
 
-        //Paint modules
-        for(int i = 0; i < homeShip.getMiddleLength(); i++) {
-            int sLength = homeShip.getModules()[i].length;
-            if(sLength < 1)
-                paintEmptySec(i, g);
-            for (int j = 0; j < sLength; j++)
-                PaintShipModule(i, j, g);
-        }
+        ////Paint modules
+        //for(int i = 0; i < homeShip.middleLength; i++) {
+        //    int sLength = homeShip.modules[i].length;
+        //    if(sLength < 1)
+        //        paintEmptySec(i, g);
+        //    for (int j = 0; j < sLength; j++)
+        //        PaintShipModule(i, j, g);
+        //}
         g.setStroke(new BasicStroke(4));
         //Paint bridge
         Rectangle bridge = getBridgeRect();
@@ -377,18 +377,19 @@ public class SpaceshipGUI extends JPanel
      * @return
      */
     public Rectangle getShipModuleRect(int sIndex, int mIndex){
-        Rectangle bounds = getBounds();
-
-        int baseWidth = bounds.width / (homeShip.getMiddleLength() + 2);
-        int baseHeight = 100;//bounds.height / (spaceship.sectionTypes[sIndex].getNumModules());
-
-        Rectangle drawRect = new Rectangle();
-        drawRect.width  = baseWidth - 20;
-        drawRect.height = baseHeight - 20;
-        drawRect.x = baseWidth * (sIndex + 1) + 10;// + bounds.x;
-        drawRect.y = baseHeight * mIndex + 10;// + bounds.y;
-
-        return drawRect;
+//        Rectangle bounds = getBounds();
+//
+//        int baseWidth = bounds.width / (homeShip.middleLength + 2);
+//        int baseHeight = 100;//bounds.height / (spaceship.sectionTypes[sIndex].getNumModules());
+//
+//        Rectangle drawRect = new Rectangle();
+//        drawRect.width  = baseWidth - 20;
+//        drawRect.height = baseHeight - 20;
+//        drawRect.x = baseWidth * (sIndex + 1) + 10;// + bounds.x;
+//        drawRect.y = baseHeight * mIndex + 10;// + bounds.y;
+//
+//        return drawRect;
+        return null;
     }
 
     /**
@@ -417,15 +418,16 @@ public class SpaceshipGUI extends JPanel
      * @return
      */
     public Rectangle getShipEmptySecRect(int sIndex){
-        Rectangle bounds = getBounds();
-        Rectangle drawRect = new Rectangle();
-        int baseWidth = bounds.width / (homeShip.getMiddleLength() + 2);
-        drawRect.height = bounds.height / 10;
-        drawRect.width = bounds.width / (homeShip.getMiddleLength() + 2) - 10;
-        drawRect.x = baseWidth * (sIndex + 1) + 10;
-        drawRect.y = bounds.height / 2 - bounds.height / 20;
-
-        return drawRect;
+//        Rectangle bounds = getBounds();
+//        Rectangle drawRect = new Rectangle();
+//        int baseWidth = bounds.width / (homeShip.middleLength + 2);
+//        drawRect.height = bounds.height / 10;
+//        drawRect.width = bounds.width / (homeShip.middleLength + 2) - 10;
+//        drawRect.x = baseWidth * (sIndex + 1) + 10;
+//        drawRect.y = bounds.height / 2 - bounds.height / 20;
+//
+//        return drawRect;
+        return null;
     }
 
     /**Generates a Rectangle representing the size and location of
@@ -434,14 +436,15 @@ public class SpaceshipGUI extends JPanel
      * @return
      */
     public Rectangle getBridgeRect(){
-        Rectangle bounds = getBounds();
-        Rectangle drawRect = new Rectangle();
-        drawRect.width = bounds.width / (homeShip.getMiddleLength() + 2) - 10;
-        drawRect.height = bounds.height / 2;
-        drawRect.x = 10;
-        drawRect.y = bounds.height / 4;
-
-        return drawRect;
+//        Rectangle bounds = getBounds();
+//        Rectangle drawRect = new Rectangle();
+//        drawRect.width = bounds.width / (homeShip.middleLength + 2) - 10;
+//        drawRect.height = bounds.height / 2;
+//        drawRect.x = 10;
+//        drawRect.y = bounds.height / 4;
+//
+//        return drawRect;
+        return null;
     }
 
     /**Generates a Rectangle representing the size and location of
@@ -450,16 +453,17 @@ public class SpaceshipGUI extends JPanel
      * @return
      */
     public Rectangle getEngineRect(){
-        Rectangle bounds = getBounds();
-        int baseWidth = bounds.width / (homeShip.getMiddleLength() + 2);
-
-        Rectangle drawRect = new Rectangle();
-        drawRect.width = bounds.width / (homeShip.getMiddleLength() + 2) - 10;
-        drawRect.height = bounds.height / 2;
-        drawRect.x = (homeShip.getMiddleLength() +1) * baseWidth;
-        drawRect.y = bounds.height / 4;
-
-        return drawRect;
+//        Rectangle bounds = getBounds();
+//        int baseWidth = bounds.width / (homeShip.middleLength + 2);
+//
+//        Rectangle drawRect = new Rectangle();
+//        drawRect.width = bounds.width / (homeShip.middleLength + 2) - 10;
+//        drawRect.height = bounds.height / 2;
+//        drawRect.x = (homeShip.middleLength +1) * baseWidth;
+//        drawRect.y = bounds.height / 4;
+//
+//        return drawRect;
+        return null;
     }
 
 
@@ -470,41 +474,41 @@ public class SpaceshipGUI extends JPanel
      */
     public void buildMouseTargets()
     {
-        //System.out.println("Re-calculating mouse targets");
-        mouseTargets = new ArrayList<MouseTarget>();
-        mouseTargets.add(new MouseTarget(
-                MouseTargetType.staticModule, "bridge",
-                getBridgeRect(), new Point()
-        ));
-        mouseTargets.add(new MouseTarget(
-                MouseTargetType.staticModule, "engine",
-                getEngineRect(), new Point()
-        ));
-        for(int i = 0; i < homeShip.getMiddleLength(); i++) {
-            if (homeShip.getModules()[i].length < 1) {
-                mouseTargets.add(new MouseTarget(
-                        MouseTargetType.section,
-                        "empty section",
-                        getShipEmptySecRect(i), new Point(i, -1)
-                ));
-            }
-            for (int j = 0; j < homeShip.getModules()[i].length; j++) {
-                mouseTargets.add(new MouseTarget(
-                        MouseTargetType.module,
-                        homeShip.getModules()[i][j].GetName(),
-                        getShipModuleRect(i, j), new Point(i, j)
-                ));
-            }
-        }
-
-        //force-update the mouse target. (warning: breaks out of function if target was found)
-        for (MouseTarget t : mouseTargets) {
-            if (t.rect.contains(mousePoint)){
-                mouseTarget = t;
-                return;
-            }
-        }
-        mouseTarget = null;
+//        //System.out.println("Re-calculating mouse targets");
+//        mouseTargets = new ArrayList<MouseTarget>();
+//        mouseTargets.add(new MouseTarget(
+//                MouseTargetType.staticModule, "bridge",
+//                getBridgeRect(), new Point()
+//        ));
+//        mouseTargets.add(new MouseTarget(
+//                MouseTargetType.staticModule, "engine",
+//                getEngineRect(), new Point()
+//        ));
+//        for(int i = 0; i < homeShip.middleLength; i++) {
+//            if (homeShip.modules[i].length < 1) {
+//                mouseTargets.add(new MouseTarget(
+//                        MouseTargetType.section,
+//                        "empty section",
+//                        getShipEmptySecRect(i), new Point(i, -1)
+//                ));
+//            }
+//            for (int j = 0; j < homeShip.modules[i].length; j++) {
+//                mouseTargets.add(new MouseTarget(
+//                        MouseTargetType.module,
+//                        homeShip.modules[i][j].GetName(),
+//                        getShipModuleRect(i, j), new Point(i, j)
+//                ));
+//            }
+//        }
+//
+//        //force-update the mouse target. (warning: breaks out of function if target was found)
+//        for (MouseTarget t : mouseTargets) {
+//            if (t.rect.contains(mousePoint)){
+//                mouseTarget = t;
+//                return;
+//            }
+//        }
+//        mouseTarget = null;
     }
 
     /**

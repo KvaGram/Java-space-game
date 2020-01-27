@@ -1,5 +1,10 @@
 package unicus.spacegame.spaceship;
 
+import unicus.spacegame.CargoCollection;
+import unicus.spacegame.CargoContainer;
+
+import java.util.Collection;
+
 public class GravityFrame extends AbstractShipSection {
     @Override
     public AbstractShipModule[] GetModuleTypes() {
@@ -31,11 +36,6 @@ public class GravityFrame extends AbstractShipSection {
     }
 
     @Override
-    public int getNumModules() {
-        return 6;
-    }
-
-    @Override
     public boolean canBuildModule(ModuleType typeToBuild, StringBuffer message) {
         return false;
     }
@@ -46,8 +46,8 @@ public class GravityFrame extends AbstractShipSection {
     }
 
     @Override
-    public CargoPlaceholder[] getCargoOnDestruction() {
-        return new CargoPlaceholder[0];
+    public Collection<CargoCollection> getCargoOnDestruction() {
+        return CargoContainer.Null.getCollection();
     }
 
     /**

@@ -1,5 +1,7 @@
 package unicus.spacegame.spaceship;
 
+import unicus.spacegame.CargoCollection;
+import unicus.spacegame.CargoContainer;
 import unicus.spacegame.crew.AbstractJob;
 import unicus.spacegame.crew.AdultCrewman;
 import unicus.spacegame.crew.SpaceCrew;
@@ -7,6 +9,7 @@ import unicus.spacegame.crew.Workplace;
 
 import java.sql.SQLSyntaxErrorException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Queue;
 
 public class HydroponicsModule extends AbstractShipModule implements Workplace {
@@ -200,8 +203,8 @@ public class HydroponicsModule extends AbstractShipModule implements Workplace {
     }
 
     @Override
-    public CargoPlaceholder[] getCargoOnDestruction() {
-        return new CargoPlaceholder[0];
+    public Collection<CargoCollection> getCargoOnDestruction() {
+        return CargoContainer.Null.getCollection();
     }
 
     /**

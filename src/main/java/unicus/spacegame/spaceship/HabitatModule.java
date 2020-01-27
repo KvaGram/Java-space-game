@@ -1,8 +1,12 @@
 package unicus.spacegame.spaceship;
 
+import unicus.spacegame.CargoCollection;
+import unicus.spacegame.CargoContainer;
 import unicus.spacegame.crew.AbstractHousing;
 import unicus.spacegame.crew.HousingPlace;
 import unicus.spacegame.crew.SpaceCrew;
+
+import java.util.Collection;
 
 /*
  * Idea:
@@ -76,8 +80,8 @@ public class HabitatModule extends AbstractShipModule implements HousingPlace {
     }
 
     @Override
-    public CargoPlaceholder[] getCargoOnDestruction() {
-        return new CargoPlaceholder[0];
+    public Collection<CargoCollection> getCargoOnDestruction() {
+        return CargoContainer.Null.getCollection();
     }
 
     /**
