@@ -10,6 +10,7 @@ import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
 import unicus.spacegame.crew.SpaceCrew;
+import unicus.spacegame.spaceship.AbstractShipModule;
 import unicus.spacegame.spaceship.HomeShip;
 import unicus.spacegame.ui.crew.CrewMenu;
 
@@ -25,6 +26,8 @@ public class TestShipView extends Screen implements IUpdateable {
     Environment shipViewEnv;
     HomeshipGUI homeshipGUI;
     ConfigMenu configMenu;
+
+    HomeShip.ShipLoc selectionLoc;
 
     public static void main(String[] args) {
         Image cursor;
@@ -112,9 +115,14 @@ public class TestShipView extends Screen implements IUpdateable {
         configMenu.open(HomeShip.getInstance().getShipLoc(1, 2));
     }
 
+    public void rollUpModule(){
+        selectionLoc
+    }
+
+
+
     class ConfigMenu extends GuiComponent {
         Menu menu;
-        HomeShip.ShipLoc loc;
 
         CrewMenu testCrewMenu;
         int[] testCrewList = new int[]{0,0,0};
@@ -133,9 +141,8 @@ public class TestShipView extends Screen implements IUpdateable {
             super(x, y, width, height);
 
         }
-        void open(HomeShip.ShipLoc loc) {
+        void open() {
             menu = new Menu(0, 0, getWidth()/5, getHeight(), "test1", "test2", "test3", "test4");
-            this.loc = loc;
             this.getComponents().add(menu);
             homeshipGUI.drawMode = HomeshipGUI.HomeShipDrawMode.cutout;
             //Point2D focus = homeshipGUI.getSectionFocusPoint(loc.getS());
@@ -162,17 +169,60 @@ public class TestShipView extends Screen implements IUpdateable {
         @Override
         public void render(Graphics2D _g) {
             Graphics2D g = (Graphics2D)_g.create();
+            g.translate(getX(), getY());
+
+            Font infoFont = new Font(Font.MONOSPACED, Font.PLAIN, 24);
 
             g.setColor(new Color(0,0,150,100));
             g.fillRect(0, 0, (int)getWidth(), (int)getHeight());
 
             g.translate((int)getWidth()/5, 0);
-            g.setColor(Color.white);
+            g.setColor(Color.gray);
+            g.setFont(infoFont);
+
+
+
             //g.fillRect(0,0,50,50);
             g.drawString("Hello world", 0, 10);
 
             g.dispose();
             super.render(_g);
         }
+    }
+    abstract class ConfigPanel extends GuiComponent{
+        /**
+         * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
+         *
+         * @param x      the x
+         * @param y      the y
+         * @param width  the width
+         * @param height the height
+         */
+        protected ConfigPanel(double x, double y, double width, double height) {
+            super(x, y, width, height);
+        }
+    };
+    class ModuleInfo extends ConfigPanel {
+        AbstractShipModule module;
+        /**
+         * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
+         *
+         * @param x      the x
+         * @param y      the y
+         * @param width  the width
+         * @param height the height
+         */
+        protected ModuleInfo(double x, double y, double width, double height) {
+            super(x, y, width, height);
+            module =
+        }
+        @Override
+        public void render(Graphics2D _g) {
+            Graphics2D g = (Graphics2D) _g.create();
+            g.translate(getX(), getY());
+
+
+        }
+
     }
 }
