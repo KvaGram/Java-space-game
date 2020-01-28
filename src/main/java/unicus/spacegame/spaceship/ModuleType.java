@@ -70,10 +70,7 @@ public enum ModuleType {
             return false;
         }
 
-        @Override
-        public Color getPaintColor() {
-            return Color.BLACK;
-        }
+        public Color getColor() {return new Color(100, 100, 100);}
     };
 
     public abstract boolean getNeedGravity();

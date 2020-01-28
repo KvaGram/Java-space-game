@@ -1,18 +1,15 @@
-package unicus.spacegame.ui.homeship;
+package unicus.spacegame.ui.Homeship;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
 import de.gurkenlabs.litiengine.entities.Entity;
 import de.gurkenlabs.litiengine.entities.IEntity;
-import de.gurkenlabs.litiengine.graphics.ICamera;
 import de.gurkenlabs.litiengine.graphics.IRenderable;
 import de.gurkenlabs.litiengine.graphics.RenderEngine;
 import de.gurkenlabs.litiengine.graphics.RenderType;
 import unicus.spacegame.spaceship.*;
 
 import java.awt.*;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 
 import static unicus.spacegame.utilities.Math.rollClamp;
 
@@ -53,7 +50,7 @@ public class HomeshipGUI extends Entity implements IRenderable {
      * cutout: shows a cutout interior of the ship, only the modules directly above and below the spine are visible.
      * extruded: shows the cutout view, but the normally hidden modules are visible in a fake view extruding above and below.
      */
-    enum HomeShipDrawMode{closed, cutout, extruded}
+    enum HomeShipDrawMode{closed, cutout, unwrapped}
     public HomeShipDrawMode drawMode;
     /**
      * Rotation of the ship, for displaying different modules.
@@ -80,7 +77,7 @@ public class HomeshipGUI extends Entity implements IRenderable {
      * @return
      */
     private double getShipDrawWidth() {
-        double size = HomeShip.getInstance().getMiddleLength() * SECTION_WIDTH;
+        double size = HomeShip.getMiddleLength() * SECTION_WIDTH;
         size += HEAD_WIDTH;
         size += TAIL_WIDTH;
         return size;
@@ -88,14 +85,27 @@ public class HomeshipGUI extends Entity implements IRenderable {
 
     private double getSectionDrawX(int section) {
         double x = getStartX();
-        if(section == HomeShip.getInstance().getHeadLocation())
+        if(section == HomeShip.getHeadLocation())
             return x;
         x += HEAD_WIDTH;
         x += (section-1) * SECTION_WIDTH;
         return x;
     }
 
+    /**
+     * Moves the focus to the set section location.
+     * If module set to something other than 0, sets the rotation so the module appears as first slot above the spine.
+     * @param loc
+     * @param menuMode
+     */
+    public void setSelection(HomeShip.ShipLoc loc, boolean menuMode) {
+        setSelectionFocus(loc.getS(), 30, menuMode);
+        //Set the closest rotation, based on current rotation and target module index.
+        int m = loc.getM() + rotation;
 
+
+
+    }
     public void setSelectionFocus(int section, int panFrames, boolean menuMode) {
         double y = Game.world().environment().getCenter().getY();
         //If in menu-mode, move the camera up a bit, so the ship appears below
@@ -103,9 +113,9 @@ public class HomeshipGUI extends Entity implements IRenderable {
         if (menuMode)
             y -= SECTION_WIDTH;
         double x = getSectionDrawX(section);
-        if(section == HomeShip.getInstance().getHeadLocation())
+        if(section == HomeShip.getHeadLocation())
             x+= HEAD_WIDTH/2.0;
-        else if (section == HomeShip.getInstance().getTailLocation())
+        else if (section == HomeShip.getTailLocation())
             x+= TAIL_WIDTH/2.0;
         else
             x+= SECTION_WIDTH/2.0;
@@ -118,9 +128,9 @@ public class HomeshipGUI extends Entity implements IRenderable {
     private double getSectionDrawY(int section){
         double y = Game.world().environment().getCenter().getY();
 
-        if(section == HomeShip.getInstance().getHeadLocation())
+        if(section == HomeShip.getHeadLocation())
             y -= HEAD_HEIGHT / 2.0;
-        else if(section == HomeShip.getInstance().getTailLocation())
+        else if(section == HomeShip.getTailLocation())
             y -= TAIL_HEIGHT / 2.0;
         else
             y -= SECTION_HEIGHT / 2.0;
@@ -167,6 +177,8 @@ public class HomeshipGUI extends Entity implements IRenderable {
     public void render(Graphics2D _g) {
 
         Graphics2D g = (Graphics2D) _g.create();
+        g.setColor(Color.white);
+        g.drawString("Rotation: " + rotation, 10, 20);
 
         int middle = (int)Game.world().environment().getCenter().getY();
 
@@ -178,38 +190,76 @@ public class HomeshipGUI extends Entity implements IRenderable {
         //AbstractShipModule[][] modules = homeShip.getModules();
 
         HomeShip.ShipLoc loc;
-        for(int s = 0; s < homeShip.getFullLength(); s++) {
+        for(int s = 0; s < HomeShip.getFullLength(); s++) {
             loc = homeShip.getShipLoc(s, 0);
 
             Graphics2D partG = (Graphics2D) g.create();
             renderSection(partG, loc);
             partG.dispose();
-            /*
-            Module-drawing.
-            Do not draw modules if:
-            Draw-mode is set to closed.
-            current section is the head (first) or tail (last).
-            Module-graphics for tail and head (will be) built into the section graphics.
-            */
-            if (drawMode != HomeShipDrawMode.closed && (s != homeShip.getHeadLocation() && s != homeShip.getTailLocation())) {
-                //If cutout mode, draw one module above and below. If extruded, draw 3 above and below.
-                int numToDraw = drawMode == HomeShipDrawMode.extruded ? 3 : 1;
-                for(int i = 0; i < numToDraw; i++) {
-                    //Render module above spine
-                    int m = rollClamp(i + rotation, 6) + 1;
+
+            if(drawMode == HomeShipDrawMode.closed) {
+                /*
+                 in this mode, draw some surface effects, windows etc for the modules facing the player's view.
+                 Draw these over the spine.
+                 That would be rotation + 1 and rotation + 2
+                 Add Section object offset, off course.
+
+                */
+                int m;
+                //Draw above
+                m = rollClamp(rotation + 1, 6) + 1;
+                loc = homeShip.getShipLoc(s, m);
+                partG = (Graphics2D) g.create();
+                renderModule(partG, loc, 0, true);
+                partG.dispose();
+                //Draw below
+                m = rollClamp(rotation + 2, 6) + 1;
+                loc = homeShip.getShipLoc(s, m);
+                partG = (Graphics2D) g.create();
+                renderModule(partG, loc, 0, false);
+                partG.dispose();
+            }
+            else if(drawMode == HomeShipDrawMode.cutout) {
+                /*
+                 draw cutout view of modules.
+                 module to draw above spine is rotation + 0 and below is rotation + 3.
+                 Add Section object offset, off course.
+                */
+
+                int m;
+                //Draw above
+                m = rollClamp(rotation + 0, 6) + 1;
+                loc = homeShip.getShipLoc(s, m);
+                partG = (Graphics2D) g.create();
+                renderModule(partG, loc, 0, true);
+                partG.dispose();
+                //Draw below
+                m = rollClamp(rotation + 3, 6) + 1;
+                loc = homeShip.getShipLoc(s, m);
+                partG = (Graphics2D) g.create();
+                renderModule(partG, loc, 0, false);
+                partG.dispose();
+            }
+            else if(drawMode == HomeShipDrawMode.unwrapped) {
+                /*
+                unwrap the ship by rendering the modules in this order, from above the spine.
+                This un-wrapping fake perspective works by
+                dragging the invisible modules from the front above the spine, and the those behind to below.
+                2 + rotation
+                1 + rotation
+                0 + rotation
+                (spine)
+                3 + rotation
+                4 + rotation
+                5 + rotation
+                */
+                int i, j, m;
+                for(i=0; i < 6; i++) {
+                    j = i % 3;
+                    m = rollClamp(rotation + i, 6) + 1;
                     loc = homeShip.getShipLoc(s, m);
-
                     partG = (Graphics2D) g.create();
-
-                    renderModule(partG, loc, i, true);
-                    partG.dispose();
-
-                    //Render module below spine
-                    m = rollClamp(i + 6 + rotation, 6)+1;
-                    loc = homeShip.getShipLoc(s, m);
-
-                    partG = (Graphics2D) g.create();
-                    renderModule(partG, loc, i, false);
+                    renderModule(partG, loc, j, i<3);
                     partG.dispose();
                 }
             }
@@ -250,11 +300,8 @@ public class HomeshipGUI extends Entity implements IRenderable {
         y += Game.world().camera().getPixelOffsetY();
         g.setColor(moduleType.getColor());
         g.fillRect(x+5, y+5, MODULE_WIDTH-10, MODULE_HEIGHT-10);
-    }
-
-
-    public void refresh() {
-
-
+        g.setColor(Color.white);
+        g.drawString("Section " + loc.getS(),x+10, y+20);
+        g.drawString("Module " + loc.getM(),x+10, y+35);
     }
 }
