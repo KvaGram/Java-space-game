@@ -1,4 +1,4 @@
-package unicus.spacegame.ui.homeship;
+package unicus.spacegame.ui.Homeship;
 
 import de.gurkenlabs.litiengine.*;
 import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
@@ -16,7 +16,6 @@ import unicus.spacegame.ui.crew.CrewMenu;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -109,14 +108,10 @@ public class TestShipView extends Screen implements IUpdateable {
         homeshipGUI = new HomeshipGUI();
         shipViewEnv = Game.world().environment();
         shipViewEnv.add(homeshipGUI, RenderType.GROUND);
-        homeshipGUI.drawMode = HomeshipGUI.HomeShipDrawMode.extruded;
+        homeshipGUI.drawMode = HomeshipGUI.HomeShipDrawMode.unwrapped;
         homeshipGUI.setSelectionFocus(6, 30, false);
 
-        configMenu.open(HomeShip.getInstance().getShipLoc(1, 2));
-    }
-
-    public void rollUpModule(){
-        selectionLoc
+        //configMenu.open(HomeShip.getInstance().getShipLoc(1, 2));
     }
 
 
@@ -214,7 +209,7 @@ public class TestShipView extends Screen implements IUpdateable {
          */
         protected ModuleInfo(double x, double y, double width, double height) {
             super(x, y, width, height);
-            module =
+            //module =
         }
         @Override
         public void render(Graphics2D _g) {

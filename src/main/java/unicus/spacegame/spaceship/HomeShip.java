@@ -42,17 +42,6 @@ public class HomeShip {
     public static int getHeadLocation() {
         return instance.headLocation;
     }
-    public static int getMiddleLength() {
-        return instance.tailLocation;
-    }
-    public static int getTailLocation() {
-        return instance.tailLocation;
-    }
-
-
-
-
-
 
     /* TODO: static special modules
 
@@ -677,28 +666,22 @@ public class HomeShip {
         System.out.println(ship.toString());
     }
 
-    public int getHeadLocation() {
-        return headLocation;
-    }
-
-    public int getMiddleLength() {
-        return middleLength;
-    }
-
-    public int getTailLocation() {
-        return tailLocation;
-    }
-
-    public int getFullLength() {
-        return fullLength;
-    }
-
-    public AbstractShipModule[][] getModules() {
-        return modules;
+    public AbstractShipModule[] getModules() {
+        return (AbstractShipModule[]) modules.values().toArray();
     }
 
     public ArrayList<RefitTask> getTaskchain() {
         return taskchain;
+    }
+
+    public static int getMiddleLength() {
+        return instance.tailLocation;
+    }
+    public static int getTailLocation() {
+        return instance.tailLocation;
+    }
+    public static int getFullLength() {
+        return instance.fullLength;
     }
 }
 
@@ -717,7 +700,7 @@ class ConstructionTask {
 abstract class SpecialSection extends AbstractShipSection {
 
     public SpecialSection(HomeShip.ShipLoc loc) {
-        super(loc);
+        super(loc, SectionType.Special);
     }
 
 
@@ -810,6 +793,11 @@ abstract class SpecialModule extends AbstractShipModule {
     @Override
     public abstractShipComponent[] getComponents() {
         return new abstractShipComponent[0];
+    }
+
+    @Override
+    public ModuleType getModuleType() {
+        return ModuleType.Special;
     }
 
     /**

@@ -8,8 +8,6 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import unicus.spacegame.crew.SpaceCrew;
 import unicus.spacegame.spaceship.HomeShip;
 import unicus.spacegame.ui.DebugConsole;
-import unicus.spacegame.ui.homeship.HomeshipUI;
-import unicus.spacegame.ui.homeship.HomeshipUIController;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -58,7 +56,7 @@ import java.util.Random;
 
 class Demo2 implements IUpdateable {
 
-    ShipRefitController shipView;
+    //ShipRefitController shipView;
 
     Demo2(String[] args) {
     }
@@ -92,7 +90,7 @@ class Demo2 implements IUpdateable {
         Game.window().cursor().set(cursor, 8, 8);
         Input.mouse().setGrabMouse(false);
 
-        shipView = new ShipRefitController("SHIPVIEW", homeship);
+        //shipView = new ShipRefitController("SHIPVIEW", homeship);
 
         DebugConsole console = new DebugConsole(homeship);
         console.run();
@@ -133,47 +131,47 @@ class SituationScreen extends GameScreen {
         //...
     }
 }
-/**
- * The ship refit screen is an interface to select changes to The Homeship
- */
-class ShipRefitController extends GameScreen implements IUpdateable, HomeshipUIController {
-    private HomeShip homeShip;
-    private HomeshipUI homeshipUI;
-
-    public ShipRefitController(String screenName, HomeShip homeShip) {
-        super(screenName);
-        this.homeShip = homeShip;
-
-        homeshipUI = new HomeshipUI(homeShip, 0, 0, Game.window().getWidth(), Game.window().getHeight());
-        getComponents().add(homeshipUI);
-        Game.loop().attach(this);
-        Game.screens().add(this);
-    }
-
-    /**
-     * This method is called by the game loop on all objects that need to update
-     * their attributes. It is called on every tick, means, it is called
-     * Game.GameLoop.TICKS_PER_SECOND times per second.
-     */
-    @Override
-    public void update() {
-        if(isSuspended())
-            return;
-        //System.out.println("Hello world");
-
-    }
-
-    @Override
-    public void render(final Graphics2D g) {
-        super.render(g);
-    }
-
-
-    @Override
-    public void onSelected(HomeShip.ShipLoc loc) {
-        //TODO what to do when a section, module or component is selected.
-        //Expected to run homeshipUI.openMenu
-    }
-}
+///**
+// * The ship refit screen is an interface to select changes to The Homeship
+// */
+//class ShipRefitController extends GameScreen implements IUpdateable, HomeshipUIController {
+//    private HomeShip homeShip;
+//    private HomeshipUI homeshipUI;
+//
+//    public ShipRefitController(String screenName, HomeShip homeShip) {
+//        super(screenName);
+//        this.homeShip = homeShip;
+//
+//        homeshipUI = new HomeshipUI(homeShip, 0, 0, Game.window().getWidth(), Game.window().getHeight());
+//        getComponents().add(homeshipUI);
+//        Game.loop().attach(this);
+//        Game.screens().add(this);
+//    }
+//
+//    /**
+//     * This method is called by the game loop on all objects that need to update
+//     * their attributes. It is called on every tick, means, it is called
+//     * Game.GameLoop.TICKS_PER_SECOND times per second.
+//     */
+//    @Override
+//    public void update() {
+//        if(isSuspended())
+//            return;
+//        //System.out.println("Hello world");
+//
+//    }
+//
+//    @Override
+//    public void render(final Graphics2D g) {
+//        super.render(g);
+//    }
+//
+//
+//    @Override
+//    public void onSelected(HomeShip.ShipLoc loc) {
+//        //TODO what to do when a section, module or component is selected.
+//        //Expected to run homeshipUI.openMenu
+//    }
+//}
 
 
