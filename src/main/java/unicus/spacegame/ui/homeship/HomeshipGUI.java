@@ -100,9 +100,7 @@ public class HomeshipGUI extends Entity implements IRenderable {
     public void setSelection(HomeShip.ShipLoc loc, boolean menuMode) {
         setSelectionFocus(loc.getS(), 30, menuMode);
         //Set the closest rotation, based on current rotation and target module index.
-        int m = loc.getM() + rotation;
-        rotation = rollClamp(m-1, 6);
-
+        rotation = loc.getM();
     }
     public void setSelectionFocus(int section, int panFrames, boolean menuMode) {
         double y = Game.world().environment().getCenter().getY();

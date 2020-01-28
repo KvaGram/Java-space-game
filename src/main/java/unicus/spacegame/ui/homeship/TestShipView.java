@@ -4,7 +4,6 @@ import de.gurkenlabs.litiengine.*;
 import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.graphics.RenderType;
-import de.gurkenlabs.litiengine.gui.ComponentMouseEvent;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 import de.gurkenlabs.litiengine.gui.Menu;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
@@ -17,11 +16,11 @@ import unicus.spacegame.ui.crew.CrewMenu;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Random;
-import java.util.function.Consumer;
 
 public class TestShipView extends Screen implements IUpdateable {
     Environment shipViewEnv;
@@ -71,8 +70,53 @@ public class TestShipView extends Screen implements IUpdateable {
         shipViewEnv = Game.world().getEnvironment("Spaceship");
         selectionLoc = HomeShip.getInstance().getShipLoc(0,1);
 
-        
+        Input.keyboard().onKeyTyped(KeyEvent.VK_LEFT, keyEvent -> onLeft());
+        Input.keyboard().onKeyTyped(KeyEvent.VK_A, keyEvent -> onLeft());
+
+        Input.keyboard().onKeyTyped(KeyEvent.VK_RIGHT, keyEvent -> onRight());
+        Input.keyboard().onKeyTyped(KeyEvent.VK_D, keyEvent -> onRight());
+
+        Input.keyboard().onKeyTyped(KeyEvent.VK_UP, keyEvent -> onUp());
+        Input.keyboard().onKeyTyped(KeyEvent.VK_W, keyEvent -> onUp());
+
+        Input.keyboard().onKeyTyped(KeyEvent.VK_DOWN, keyEvent -> onDown());
+        Input.keyboard().onKeyTyped(KeyEvent.VK_S, keyEvent -> onDown());
+
+        Input.keyboard().onKeyTyped(KeyEvent.VK_ENTER, keyEvent -> onEnter());
+
+        Input.keyboard().onKeyTyped(KeyEvent.VK_ESCAPE, keyEvent -> onExit());
+        Input.keyboard().onKeyTyped(KeyEvent.VK_BACK_SPACE, keyEvent -> onExit());
     }
+    void onLeft(){
+        if(!getMenuOpen()) {
+            setSelection(selectionLoc.prevSection());
+        }
+    }
+    void onRight(){
+        if(!getMenuOpen()) {
+            setSelection(selectionLoc.nextSection());
+        }
+    }
+    void onUp(){
+        if(!getMenuOpen()) {
+            setSelection(selectionLoc.nextModule());
+        }
+    }
+    void onDown(){
+        if(!getMenuOpen()) {
+            setSelection(selectionLoc.prevModule());
+        }
+    }
+    void onEnter(){
+        if(!getMenuOpen())
+            open(selectionLoc);
+    }
+    void onExit(){
+        if(getMenuOpen())
+            close();
+    }
+
+    boolean getMenuOpen(){return configMenu.isVisible();}
 
     /**
      * This method is called by the game loop on all objects that are attached to the loop.
@@ -97,6 +141,10 @@ public class TestShipView extends Screen implements IUpdateable {
         configMenu.testCrewMenu = null;
         configMenu.testModuleInfo = null;
 
+        homeshipGUI.setSelection(selectionLoc, false);
+    }
+    void setSelection(HomeShip.ShipLoc loc) {
+        selectionLoc = loc;
         homeshipGUI.setSelection(selectionLoc, false);
     }
 
