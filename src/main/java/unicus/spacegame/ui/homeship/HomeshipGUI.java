@@ -57,7 +57,6 @@ public class HomeshipGUI extends Entity implements IRenderable {
      * clamped to [0,5]
      */
     private int rotation;
-
     public HomeshipGUI() {
         super();
     }
@@ -102,8 +101,7 @@ public class HomeshipGUI extends Entity implements IRenderable {
         setSelectionFocus(loc.getS(), 30, menuMode);
         //Set the closest rotation, based on current rotation and target module index.
         int m = loc.getM() + rotation;
-
-
+        rotation = rollClamp(m-1, 6);
 
     }
     public void setSelectionFocus(int section, int panFrames, boolean menuMode) {
@@ -148,11 +146,13 @@ public class HomeshipGUI extends Entity implements IRenderable {
         assert(0 <= spineDist && spineDist < 3);
         double y = Game.world().environment().getCenter().getY();
         if(above) {
-            y -= SPINE_HEIGHT / 2.0;
+            if(drawMode != HomeShipDrawMode.closed)
+                y -= SPINE_HEIGHT / 2.0;
             y -= (spineDist+1) * MODULE_HEIGHT;
         }
         else {
-            y += SPINE_HEIGHT / 2.0;
+            if(drawMode != HomeShipDrawMode.closed)
+                y += SPINE_HEIGHT / 2.0;
             y += (spineDist) * MODULE_HEIGHT;
         }
         return y;
@@ -197,6 +197,8 @@ public class HomeshipGUI extends Entity implements IRenderable {
             renderSection(partG, loc);
             partG.dispose();
 
+            if(s == HomeShip.getHeadLocation() || s == HomeShip.getTailLocation())
+                continue; //Modules for head and tail are special, and are rendered with the section
             if(drawMode == HomeShipDrawMode.closed) {
                 /*
                  in this mode, draw some surface effects, windows etc for the modules facing the player's view.

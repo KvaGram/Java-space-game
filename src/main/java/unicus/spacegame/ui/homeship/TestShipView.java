@@ -4,6 +4,7 @@ import de.gurkenlabs.litiengine.*;
 import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.gui.ComponentMouseEvent;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 import de.gurkenlabs.litiengine.gui.Menu;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
@@ -20,6 +21,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Random;
+import java.util.function.Consumer;
 
 public class TestShipView extends Screen implements IUpdateable {
     Environment shipViewEnv;
@@ -56,9 +58,8 @@ public class TestShipView extends Screen implements IUpdateable {
         Game.screens().display(view);
         Game.start();
 
+        view.open(hs.getShipLoc(4, 5));
 
-        //Game.world().loadEnvironment("Spaceship");
-        //Game.world().camera().setFocus(150, 100);
 
     }
 
@@ -68,6 +69,9 @@ public class TestShipView extends Screen implements IUpdateable {
         getComponents().add(configMenu);
         configMenu.suspend();
         shipViewEnv = Game.world().getEnvironment("Spaceship");
+        selectionLoc = HomeShip.getInstance().getShipLoc(0,1);
+
+        
     }
 
     /**
@@ -79,6 +83,21 @@ public class TestShipView extends Screen implements IUpdateable {
     @Override
     public void update() {
 
+    }
+
+    public void open(HomeShip.ShipLoc loc) {
+        selectionLoc = loc;
+        homeshipGUI.setSelection(loc, true);
+        configMenu.open();
+    }
+    void close() {
+        configMenu.suspend();
+        configMenu.getComponents().clear();
+        configMenu.menu = null;
+        configMenu.testCrewMenu = null;
+        configMenu.testModuleInfo = null;
+
+        homeshipGUI.setSelection(selectionLoc, false);
     }
 
     /**
@@ -93,11 +112,12 @@ public class TestShipView extends Screen implements IUpdateable {
 
     @Override
     public void render(final Graphics2D g) {
+        Graphics2D childG = (Graphics2D) g.create();
         if (Game.world().environment() != null) {
-            Game.world().environment().render(g);
+            Game.world().environment().render(childG);
         }
-
-        super.render(g);
+        super.render(childG);
+        childG.dispose();
     }
 
     @Override
@@ -109,17 +129,16 @@ public class TestShipView extends Screen implements IUpdateable {
         shipViewEnv = Game.world().environment();
         shipViewEnv.add(homeshipGUI, RenderType.GROUND);
         homeshipGUI.drawMode = HomeshipGUI.HomeShipDrawMode.unwrapped;
-        homeshipGUI.setSelectionFocus(6, 30, false);
-
-        //configMenu.open(HomeShip.getInstance().getShipLoc(1, 2));
     }
 
 
 
     class ConfigMenu extends GuiComponent {
+        private final ExitButton exitButton;
         Menu menu;
 
         CrewMenu testCrewMenu;
+        ModuleInfo testModuleInfo;
         int[] testCrewList = new int[]{0,0,0};
         int testMenuColumns = 2;
         int testMenuRows = 3;
@@ -134,31 +153,27 @@ public class TestShipView extends Screen implements IUpdateable {
          */
         protected ConfigMenu(double x, double y, double width, double height) {
             super(x, y, width, height);
-
+            exitButton = new ExitButton(width - 50 + x, y, 50, 50);
+            exitButton.onClicked(componentMouseEvent -> close());
         }
         void open() {
             menu = new Menu(0, 0, getWidth()/5, getHeight(), "test1", "test2", "test3", "test4");
             this.getComponents().add(menu);
             homeshipGUI.drawMode = HomeshipGUI.HomeShipDrawMode.cutout;
             //Point2D focus = homeshipGUI.getSectionFocusPoint(loc.getS());
-            homeshipGUI.setSelectionFocus(6, 30, true);
+            //homeshipGUI.setSelectionFocus(6, 30, true);
 
             //focus.setLocation(focus.getX(), focus.getY() - getHeight()/4);
             //Game.world().camera().setFocus(focus);
 
             //This is a test:
-            testCrewMenu = new CrewMenu(getWidth() / 5, 0, getWidth() / 5, getHeight(), testMenuRows, testMenuColumns, testCrewList);
-            this.getComponents().add(testCrewMenu);
-            this.prepare();
-        }
-        void close() {
-            this.suspend();
-            this.getComponents().clear();
-            this.menu = null;
-            this.testCrewMenu = null;
+            //testCrewMenu = new CrewMenu(getWidth() / 5, 0, getWidth() / 5, getHeight(), testMenuRows, testMenuColumns, testCrewList);
+            testModuleInfo = new ModuleInfo(menu.getWidth(), 30, getWidth() - menu.getWidth(), getHeight());
+            this.getComponents().add(testModuleInfo);
+            //this.getComponents().add(testCrewMenu);
 
-            //Point2D focus = homeshipGUI.getSectionFocusPoint(loc.getS());
-            //Game.world().camera().setFocus(focus);
+            this.getComponents().add(exitButton);
+            this.prepare();
         }
 
         @Override
@@ -195,8 +210,48 @@ public class TestShipView extends Screen implements IUpdateable {
          */
         protected ConfigPanel(double x, double y, double width, double height) {
             super(x, y, width, height);
+
+        }
+
+
+        @Override
+        public void render(Graphics2D _g) {
+            super.render(_g);
+            Graphics2D g = (Graphics2D) _g.create();
         }
     };
+    class ExitButton extends GuiComponent {
+        Rectangle exitRect;
+
+        /**
+         * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
+         *
+         * @param x      the x
+         * @param y      the y
+         * @param width  the width
+         * @param height
+         */
+        protected ExitButton(double x, double y, double width, double height) {
+            super(x, y, width, height);
+            exitRect = new Rectangle((int)getWidth() - 50, 0, (int)width, (int)height);
+        }
+
+        @Override
+        public void render(Graphics2D _g) {
+            super.render(_g);
+            Graphics2D g = (Graphics2D) _g.create();
+            g.translate(getX(), getY());
+
+            g.setColor(Color.red);
+            g.fillRect(exitRect.x, exitRect.y, exitRect.width, exitRect.height);
+            g.setColor(Color.black);
+
+            g.setStroke(new BasicStroke(5));
+            g.drawLine(exitRect.x, exitRect.y + exitRect.height, exitRect.x + exitRect.width, exitRect.y);
+            g.drawLine(exitRect.x + exitRect.width, exitRect.y + exitRect.height, exitRect.x, exitRect.y);
+        }
+    }
+
     class ModuleInfo extends ConfigPanel {
         AbstractShipModule module;
         /**
@@ -209,15 +264,24 @@ public class TestShipView extends Screen implements IUpdateable {
          */
         protected ModuleInfo(double x, double y, double width, double height) {
             super(x, y, width, height);
-            //module =
+            module = selectionLoc.getModule();
         }
         @Override
         public void render(Graphics2D _g) {
+            super.render(_g);
             Graphics2D g = (Graphics2D) _g.create();
             g.translate(getX(), getY());
+            Font font = new Font(Font.SERIF, Font.PLAIN, 24);
+            g.setFont(font);
+            StringBuffer info = new StringBuffer();
+            module.getInfo(info);
 
-
+            g.setColor(Color.white);
+            String[] textlines = info.toString().split("\n");
+            for (int i = 0; i < textlines.length; i++) {
+                String text = textlines[i];
+                g.drawString(text, 50, 20 + 15 * i);
+            }
         }
-
     }
 }
