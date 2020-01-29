@@ -4,6 +4,7 @@ import de.gurkenlabs.litiengine.*;
 import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
 import de.gurkenlabs.litiengine.environment.Environment;
 import de.gurkenlabs.litiengine.graphics.RenderType;
+import de.gurkenlabs.litiengine.gui.DropdownListField;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 import de.gurkenlabs.litiengine.gui.Menu;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
@@ -302,6 +303,9 @@ public class TestShipView extends Screen implements IUpdateable {
 
     class ModuleInfo extends ConfigPanel {
         AbstractShipModule module;
+        PlainButton refitButton;
+        DropdownListField dropListModules;
+
         /**
          * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
          *
@@ -313,6 +317,13 @@ public class TestShipView extends Screen implements IUpdateable {
         protected ModuleInfo(double x, double y, double width, double height) {
             super(x, y, width, height);
             module = selectionLoc.getModule();
+
+
+            refitButton = new PlainButton(500, 5, 200, 100, Color.red, Color.black, "Change Module");
+            getComponents().add(refitButton);
+
+            dropListModules = new DropdownListField(800, 50, 100, 300, new Object[]{"test0", "test1", "test2", "test3", "test4", "test5"}, 6);
+            getComponents().add(dropListModules);
         }
         @Override
         public void render(Graphics2D _g) {
@@ -331,5 +342,57 @@ public class TestShipView extends Screen implements IUpdateable {
                 g.drawString(text, 50, 20 + 15 * i);
             }
         }
+    }
+}
+class PlainButton extends GuiComponent {
+
+    /**
+     * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
+     *
+     * @param x      the x
+     * @param y      the y
+     * @param width  the width
+     * @param height
+     */
+    public Color bgColor;
+    public Color textColor;
+    public String text;
+
+    protected PlainButton(double x, double y, double width, double height, Color bgColor, Color textColor, String text) {
+        super(x, y, width, height);
+        this.bgColor = bgColor;
+        this.textColor = textColor;
+        this.text = text;
+    }
+
+    @Override
+    public void render(Graphics2D _g) {
+        super.render(_g);
+        Graphics2D g = (Graphics2D)_g.create((int)getX(), (int)getY(), (int)getWidth(), (int)getHeight());
+        g.setColor(bgColor);
+        g.fillRect(0, 0, (int)getWidth(), (int)getHeight());
+
+        double textw = g.getFontMetrics().stringWidth(text);
+        double texth = g.getFont().getSize();
+
+        int xOffset = 0;
+        int yOffset = (int)texth;
+
+        double xScale = 1.0;
+        double yScale = 1.0;
+
+        if(textw < getWidth())
+            xOffset += (int)((getWidth() - textw) / 2);
+        else
+            xScale = getWidth() / textw;
+
+        if(texth < getHeight())
+            yOffset += (int)((getHeight() - texth) / 2);
+        else
+            yScale = getHeight() / texth;
+        g.setColor(textColor);
+        g.scale(xScale, yScale);
+        g.drawString(text, xOffset, yOffset);
+        g.dispose();
     }
 }
