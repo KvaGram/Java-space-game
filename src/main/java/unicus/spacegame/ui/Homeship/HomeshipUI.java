@@ -140,7 +140,7 @@ public class HomeshipUI extends GuiComponent {
         }
 
         for(ModuleComponentUI m : modules) {
-            int numModules = m.loc.getSection().getNumModules();
+            int numModules = HomeShip.MODULES_PER_SECTION;
             if(!m.loc.isValidModule() || m.loc.getM() >= numModules) {
                 m.suspend();
                 continue;

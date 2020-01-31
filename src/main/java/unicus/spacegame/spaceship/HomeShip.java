@@ -20,10 +20,10 @@ import java.util.*;
 public class HomeShip {
 
     /** Number of modules each non-special section has.*/
-    private final static int MODULES_PER_SECTION = 6;
+    public final static int MODULES_PER_SECTION = 6;
     /**total amount of module objects allowed per section (this includes the section object)
      * Used for calculating the hash value for ShipLoc.*/
-    private final static int MAX_MODULE_OBJECTS = MODULES_PER_SECTION + 1;
+    public final static int MAX_MODULE_OBJECTS = MODULES_PER_SECTION + 1;
 
     private static HomeShip instance;
     public static HomeShip getInstance() {
