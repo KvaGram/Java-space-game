@@ -79,8 +79,8 @@ public enum ModuleType {
             Empty, Cargo, Habitat, Hydroponics
     };
 
-    public ModuleType[] getBuildable(boolean includeGravity){
-        ModuleType[] ret = new ModuleType[]{Cargo};
+    public static ModuleType[] getBuildable(boolean includeGravity){
+        ModuleType[] ret = new ModuleType[]{Cargo, Hydroponics};
         if(includeGravity)
             ret = ArrayUtils.addAll(ret, Habitat);
         return ret;

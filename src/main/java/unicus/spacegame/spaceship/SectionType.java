@@ -18,7 +18,7 @@ public enum SectionType {
         this.color = color;
     }
 
-    public SectionType[] getBuildable(){
+    public static SectionType[] getBuildable(){
         return new SectionType[]{Normal, Wheel, GravityPlated};
     }
 
