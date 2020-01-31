@@ -327,6 +327,8 @@ public class TestShipView extends Screen implements IUpdateable {
         private ModuleType[] buildableModules;
         private SectionType[] buildableFrames;
 
+
+
         protected RefitPanel(double x, double y, double width, double height) {
             super(x, y, width, height);
 
@@ -386,6 +388,9 @@ public class TestShipView extends Screen implements IUpdateable {
                  */
                 @Override
                 public void accept(ComponentMouseEvent componentMouseEvent) {
+                    if(isAddTaskReady()) {
+                        //TODO: send the temporary stored task to the construction task-list.
+                    }
                     System.out.println("On Add Task");
                 }
             });
@@ -404,6 +409,7 @@ public class TestShipView extends Screen implements IUpdateable {
                     }
                     message = text.toString();
                     setAddTaskReady(canDo);
+                    //TODO: create a new construction task, and store it temporarily.
                 }
             });
             sectionRefitOptions.onChange(value -> {
@@ -420,6 +426,7 @@ public class TestShipView extends Screen implements IUpdateable {
                     }
                     message = text.toString();
                     setAddTaskReady(canDo);
+                    //TODO: create a new construction task, and store it temporarily.
                 }
             });
 

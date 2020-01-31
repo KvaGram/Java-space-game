@@ -440,7 +440,7 @@ public class HomeShip {
     }
 
     public boolean canBuildModule(ShipLoc loc, ModuleType typeToBuild, StringBuffer message) {
-        if (loc.isValidModule()){
+        if (!loc.isValidModule()){
             message.append("Illegal selection! How did you manage this? HOW!? (this is a bug, please report it)");
             return false;
         }
@@ -468,7 +468,7 @@ public class HomeShip {
 
     }
     public boolean canRemoveModule(ShipLoc shipLoc, StringBuffer message) {
-        if (shipLoc.isValidModule()){
+        if (!shipLoc.isValidModule()){
             message.append("Illegal selection! How did you manage this? HOW!? (this is a bug, please report it)");
             return false;
         }

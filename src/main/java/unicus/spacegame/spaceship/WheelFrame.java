@@ -37,7 +37,7 @@ public class WheelFrame extends AbstractShipSection {
 
     @Override
     public boolean canBuildModule(ModuleType typeToBuild, StringBuffer message) {
-        return false;
+        return true;
     }
 
     @Override
