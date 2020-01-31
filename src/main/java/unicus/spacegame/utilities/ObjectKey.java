@@ -29,6 +29,9 @@ public class ObjectKey {
 
     /**
      * Sets the keys reserved for special use.
+     * For example:
+     *      A crewman spawned from an event
+     *      A permanent job like Bridge shifts and Construction.
      * {@link #yieldKey()} will never yield a reserved value.
      * note: value 0 is always reserved.
      * @param reserved

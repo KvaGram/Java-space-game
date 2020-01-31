@@ -1,5 +1,6 @@
 package unicus.spacegame.crew;
 import org.apache.commons.lang3.ArrayUtils;
+import unicus.spacegame.spaceship.cunstruction.Construction;
 import unicus.spacegame.utilities.ObjectKey;
 /*
  * Refactor notes:
@@ -31,6 +32,9 @@ public class SpaceCrew {
         jobKeys = new ObjectKey();
         crewKeys = new ObjectKey();
         housingKeys = new ObjectKey();
+
+        //set reserved keys
+        jobKeys.setReserved(Construction.CONSTRUCTION_JOB_KEY);
     }
 
     //TODO: crewGenerator (start scenarios), crew-lists
