@@ -54,13 +54,7 @@ public abstract class AbstractCrewman {
         this.selfID = new CrewSelfID();
         this.birthDate = birthDate;
         this.geneData = new CrewmanGeneData(parents);
-        Random r = new Random(randomSeed);
-        //TODO: geneData.randomize(r);
-        selfID.giveSkiffyName(r);
-        //TODO: selfID.gender = geneData.getAssumedGender();
-
-        //sets assumed gender to either male or female until genes are implemented
-        selfID.gender = new CrewGender[]{CrewGender.male, CrewGender.female}[r.nextInt(2)];
+        onRandomize(new Random(randomSeed));
     }
 
     /**
@@ -97,5 +91,47 @@ public abstract class AbstractCrewman {
 
     public int getKeyID() {
         return keyID;
+    }
+
+    public CrewmanState getState() {
+        return state;
+    }
+
+    /**
+     * Randomize properties of the crewman
+     * @param r random instance
+     */
+    protected void onRandomize(Random r) {
+        //TODO: geneData.randomize(r);
+        selfID.giveSkiffyName(r);
+        //TODO: selfID.gender = geneData.getAssumedGender();
+
+        //sets assumed gender to either male or female until genes are implemented
+        selfID.gender = new CrewGender[]{CrewGender.male, CrewGender.female}[r.nextInt(2)];
+    }
+
+    public CrewSelfID getSelfID() {
+        return selfID;
+    }
+
+    /**
+     * Called last at the end of month cycle.
+     * To be implemented in child classes.
+     */
+    protected abstract void endOfMonth();
+
+    @Override
+    public String toString() {
+        return toString(new StringBuffer()).toString();
+    }
+
+    //Placeholder constant
+    private static final int CURRENT_DATE = 0;
+
+    public StringBuffer toString(StringBuffer text) {
+        text.append("Crewman ID ").append(keyID).append("\n");
+        text.append(selfID.getFullName()).append(", age ").append(getAgeYears(CURRENT_DATE)).append("\n");
+
+        return text;
     }
 }

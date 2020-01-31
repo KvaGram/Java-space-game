@@ -1,5 +1,10 @@
 package unicus.spacegame.spaceship;
 
+import unicus.spacegame.CargoCollection;
+import unicus.spacegame.CargoContainer;
+
+import java.util.Collection;
+
 public class StrippedFrame extends AbstractShipSection {
 
     public StrippedFrame(HomeShip.ShipLoc loc) {
@@ -32,11 +37,6 @@ public class StrippedFrame extends AbstractShipSection {
     }
 
     @Override
-    public int getNumModules() {
-        return 0;
-    }
-
-    @Override
     public boolean canBuildModule(ModuleType typeToBuild, StringBuffer message) {
         message.append("This section is stripped");
         return false;
@@ -48,7 +48,17 @@ public class StrippedFrame extends AbstractShipSection {
     }
 
     @Override
-    public CargoPlaceholder[] getCargoOnDestruction() {
-        return new CargoPlaceholder[0];
+    public Collection<CargoCollection> getCargoOnDestruction() {
+        return CargoContainer.Null.getCollection();
+    }
+
+    /**
+     * This function runs when the ship-part is removed or dismantled from the ship.
+     * This function only deals with this object itself, any ship-part depended on this,
+     * will be taken care of from HomeShip. .
+     */
+    @Override
+    public void onDestroy() {
+        
     }
 }

@@ -5,7 +5,15 @@ package unicus.spacegame.crew;
  * A job is a responsibility, a set of tasks, that needs to be done during each month.
  * A crewmembers needs to be assigned to a job for a job to function.
  *
- * Some jobs are temporary, and may disappear after its tasks have been completed, or event-chain expired.
+ * Some jobs are temporary. There are two types of temporary jobs.
+ *      * Recurring temporary jobs will be automatically disabled once the current task(s) are completed or aborted.
+ *          This includes jobs like ship-repair, refit jobs, research, diplomacy etc.
+ *          Jobs of this type are created at the start of a new game
+ *          These jobs will be disabled when not in use.
+ *      * Temporary jobs, spawned from events, eventchains and speacial needs.
+ *          This includes jobs like guarding an alien prisoner, childcare, planetary expeditions etc.
+ *          Jobs of this type are automatically created when needed, in case of childcare even automatically assigned.
+ *          These jobs will be deleted once their use has been fullfilled.
  * Other jobs are set from the configuration of the ship, ie the modules constructed.
  *
  * A job's function varies, and so does the consequences for a job not being done.
@@ -44,10 +52,16 @@ public abstract class AbstractJob {
     private final int numWorkerSlots;
     private boolean active;
 
+    protected double monthWorkDone;
+    protected int monthWorstCrewman;
+    protected int monthBestCrewman;
+    protected JobAssignment[] monthJobAssignments;
+
     protected AbstractJob(int keyID, int numWorkerSlots){
         this.keyID = keyID;
         this.numWorkerSlots = numWorkerSlots;
         active = true;
+        monthWorkDone = 0;
     }
 
     public int getKeyID() {
@@ -65,32 +79,60 @@ public abstract class AbstractJob {
     public abstract double getMonthlyWorkload();
 
     /**
-     * Calculates how much work this worker will normally produce.
-     * This is used to:
-     *      show efficiency percentage (work divided by workload)
-     *      used as first step to calculate how muc work this assigned crewman will do.
-     * NOTE: Implementation must be calculation only, and not alter any data, as this may be called multiple times.
+     * Calculates a base efficiency for how well a crewman will do this job.
+     * Used in UI to show percentage efficiency.
+     * Note: implementation should include the result from {@link AdultCrewman#getGeneralWorkModifier()},
+     *      unless implementation has an alternative.
      *
-     * @param crewman The assigned crewman
-     * @param workload The amount of workload assigned to this crewman for this job.
-     * @return An estimated amount of work a crewman will do on the job.
+     * @param crewID The ID of the crewman
+     * @return The base efficiency of the crewman, where 1.0 equals 100%.
      *
-     * NOTE: class AdultCrewman may be replaced with a more general class of all crewmen who can take jobs.
      */
-    public abstract double evaluateWorker(AdultCrewman crewman, double workload);
+    public abstract double getWorkModifierOfCrewman(int crewID);
 
     /**
      * Completes work required for the month.
      * Completes task list and or operations.
      * May triggers events related to what has been worked on.
-     * @param workDone how much work has been done in total
+     *
+     * planned feature:
+     *         1. From each assignment of the job, get the total amount of work done.
+     *         2. Calculate resulting product, operation,  service quality, and or amenities the job does.
+     *             1. Consume resources required for the job.
+     *             2. Reduce work done if resources are missing
+     *
      */
-    public abstract void endOfMonth(double workDone);
+    public void endOfMonth() {
+        double max = 0;
+        double min = Integer.MAX_VALUE;
+        monthWorkDone = 0;
+        monthJobAssignments = SpaceCrew.getInstance().getJobAssignmentsByJob(keyID);
+        for (JobAssignment ja : monthJobAssignments) {
+            int crewID = ja.getCrewID();
+            if (ja.getWorkshare() == WorkShare.vacation)
+                continue;
+            double w = ja.getMonthWorkProduced();
+            monthWorkDone += w;
+
+            if (w > max) {
+                max = w;
+                monthBestCrewman = crewID;
+            }
+            if (w < min) {
+                min = w;
+                monthWorstCrewman = crewID;
+            }
+        }
+        /*Leave it up the sub-classes on how to use
+        monthBestCrewman, monthWorstCrewman and monthWorkDone
+        */
+
+    }
 
     /**
      * Whatever this job is currently active.
-     * Some jobs can be disabled. This will shut down any functions this job provides.
-     * Some recurring temporary jobs mey be automatically disabled instead of removed.
+     * Jobs can be disabled. No crew will work the job.
+     * endOfMonth will still be called on a disabled job.
      * When a job is disabled, all assigned crewmen get unassigned from the job.
      * @return whatever the job is active.
      */
@@ -98,7 +140,65 @@ public abstract class AbstractJob {
         return active;
     }
 
-    protected void setActive(boolean active) {
+    public void setActive(boolean active) {
         this.active = active;
+        if (!active) {
+            //This unassigns all crewmen assigned to this job.
+            SpaceCrew.getInstance().unassignAllJobCrew(keyID);
+        }
+    }
+
+    /**
+     * Total amount of work done by the end of the month.
+     * Set in {@link #endOfMonth()}.
+     * @return
+     */
+    public double getMonthWorkDone() {
+        return monthWorkDone;
+    }
+
+    /**
+     * Gets the crewman that did the least work this month (does not count vacation)
+     * @return
+     */
+    public AdultCrewman getMonthWorstCrewman() {
+        try {
+            return (AdultCrewman) SpaceCrew.getInstance().getCrew(monthWorstCrewman);
+        } catch (Exception err) {
+            System.err.println(err);
+            return null;
+        }
+    }
+
+    /**
+     * Gets the crewman that did the most work this month
+     * @return
+     */
+
+    public AdultCrewman getMonthBestCrewman() {
+        try {
+            return (AdultCrewman) SpaceCrew.getInstance().getCrew(monthBestCrewman);
+        } catch (Exception err) {
+            System.err.println(err);
+            return null;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return toString(new StringBuffer()).toString();
+    }
+    public StringBuffer toString(StringBuffer text) {
+        text.append("Job ID: ").append(keyID).append("/n");
+        text.append("Monthly workload: ").append(getMonthlyWorkload()).append("\n");
+        JobAssignment[] workers = SpaceCrew.getInstance().getJobAssignmentsByJob(keyID);
+        text.append("The job has ").append(workers.length).append(" assigned workers.\n");
+        for (JobAssignment ja :
+                workers) {
+            text.append("\t*CrewID ").append(ja.getCrewID()).append(", assigned with a ").append(ja.getWorkshare()).append(" workshare.\n");
+        }
+
+        return text;
     }
 }
+

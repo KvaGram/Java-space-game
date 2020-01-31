@@ -38,4 +38,12 @@ public class CrewSelfID {
     }
 
 
+    /**
+     * (STUB)
+     * Get full formal name of crewman
+     * @return
+     */
+    public String getFullName() {
+        return name;
+    }
 }

@@ -1,8 +1,11 @@
 package unicus.spacegame.spaceship;
 
 import org.apache.commons.lang3.ArrayUtils;
+import unicus.spacegame.CargoCollection;
+import unicus.spacegame.CargoContainer;
 
 import java.io.PrintStream;
+import java.util.Collection;
 
 /**
  * Master class of all parts of the ship.
@@ -72,10 +75,17 @@ public abstract class AbstractShipPart {
 
     //Descriptive name of the ship-part.
     public abstract String GetName();
-    //TODO: change CargoPlaceholder[] to CargoContainer
-    //Returns a container of storable parts, material and cargo retrieved/reclaimed
+
+    //Returns a list of storable parts, material and cargo retrieved/reclaimed
     // from removing/dismantling this ship-part.
-    public abstract CargoPlaceholder[] getCargoOnDestruction();
+    public abstract Collection<CargoCollection> getCargoOnDestruction();
 
     public void getInfo(StringBuffer b) {b.append("\n " + GetName());}
+
+    /**
+     * This function runs when the ship-part is removed or dismantled from the ship.
+     * This function only deals with this object itself, any ship-part depended on this,
+     * will be taken care of from HomeShip. .
+     */
+    public abstract void onDestroy();
 }

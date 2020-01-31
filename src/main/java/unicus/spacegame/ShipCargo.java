@@ -1,12 +1,12 @@
 package unicus.spacegame;
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 
-public class CargoBay {
-    private static CargoBay instance;
-    public static CargoBay getInstance() {
+public class ShipCargo {
+    private static ShipCargo instance;
+    public static ShipCargo getInstance() {
+        if (instance == null) instance = new ShipCargo();
         return instance;
     }
 
@@ -21,7 +21,7 @@ public class CargoBay {
         JPanel j_buttonpanel = new JPanel();
 
         //Create cargo
-        CargoBay allcargo = new CargoBay(); //possibly: pass textarea argument to print out there?
+        ShipCargo allcargo = new ShipCargo(); //possibly: pass textarea argument to print out there?
         allcargo.createStartCargo();
 
         //Populate buttons
@@ -48,6 +48,22 @@ public class CargoBay {
         frame.getContentPane().add(BorderLayout.CENTER, j_statustextarea);
         frame.setVisible(true);
     }
+
+    public boolean storeCargo(CargoCollection... cargo){
+        System.out.println("Placeholder storeCargo function");
+        for(CargoCollection c : cargo){
+            System.out.println("(STUB) Storing " + c.getCargoUnits() + " units of cargo");
+        }
+        return true;
+    }
+    public boolean payCargo(CargoCollection... cargo){
+        System.out.println("Placeholder payCargo function");
+        for(CargoCollection c : cargo){
+            System.out.println("(STUB) Removing " + c.getCargoUnits() + " units of cargo");
+        }
+        return true;
+    }
+
 
     private boolean AddCargo(int amount, String type) {
         int remaining_amount = amount;
@@ -91,7 +107,7 @@ public class CargoBay {
         return result;
     }
 
-    public CargoBay() { //constructor
+    public ShipCargo() { //constructor
         cargos = new CargoModule[CARGO_MODULES_COUNT];
         for (int i=0; i<cargos.length; i++) {
             cargos[i] = new CargoModule(this, i);
@@ -211,13 +227,13 @@ class CargoModule {
     String moduleID;
     HashMap<String, Integer> contents;
 
-    public CargoModule(CargoBay cb, int id) { //constructor
+    public CargoModule(ShipCargo cb, int id) { //constructor
         total_fullness = 0;
         contents = new HashMap<>();
         for (String s: CARGO_NAMES) {
             contents.put(s, 0);
         }
-        CargoBay master = cb;
+        ShipCargo master = cb;
         moduleID = (String) ("Module "+(id+1));
     }
     public boolean AddCargo(int amount, String type, boolean force) {

@@ -7,6 +7,7 @@ import unicus.spacegame.CargoCollection;
 import unicus.spacegame.CargoContainer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class CargoModule extends AbstractShipModule implements CargoContainer {
     static int cargoCapacity;
@@ -44,8 +45,18 @@ public class CargoModule extends AbstractShipModule implements CargoContainer {
     }
 
     @Override
-    public CargoPlaceholder[] getCargoOnDestruction() {
-        return new CargoPlaceholder[0];
+    public Collection<CargoCollection> getCargoOnDestruction() {
+        return CargoContainer.Null.getCollection();
+    }
+
+    /**
+     * This function runs when the ship-part is removed or dismantled from the ship.
+     * This function only deals with this object itself, any ship-part depended on this,
+     * will be taken care of from HomeShip. .
+     */
+    @Override
+    public void onDestroy() {
+
     }
 
     //Cargo container implementation:
