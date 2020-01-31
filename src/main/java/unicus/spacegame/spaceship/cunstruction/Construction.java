@@ -3,6 +3,9 @@ package unicus.spacegame.spaceship.cunstruction;
 import unicus.spacegame.crew.AbstractJob;
 import unicus.spacegame.crew.AdultCrewman;
 import unicus.spacegame.crew.Workplace;
+import unicus.spacegame.spaceship.HomeShip;
+import unicus.spacegame.spaceship.ModuleType;
+import unicus.spacegame.spaceship.SectionType;
 
 import java.util.ArrayList;
 
@@ -82,3 +85,6 @@ public class Construction extends AbstractJob implements Workplace {
         return instance;
     }
 }
+
+
+
