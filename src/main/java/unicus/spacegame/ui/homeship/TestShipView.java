@@ -390,6 +390,7 @@ public class TestShipView extends Screen implements IUpdateable {
                 }
             });
             moduleRefitOptions.onChange(value -> {
+                System.out.println("moduleRefitOptions.onChange -> " + value);
                 sectionRefitOptions.deselect();
                 clearAddTask();
                 if(value >= 0) {
@@ -406,6 +407,7 @@ public class TestShipView extends Screen implements IUpdateable {
                 }
             });
             sectionRefitOptions.onChange(value -> {
+                System.out.println("sectionRefitOptions.onChange -> " + value);
                 moduleRefitOptions.deselect();
                 if(value >= 0) {
                     StringBuffer text = new StringBuffer();
@@ -428,10 +430,9 @@ public class TestShipView extends Screen implements IUpdateable {
             super.render(_g);
             Graphics2D g = (Graphics2D) _g.create((int)getX(), (int)getY(), (int)getWidth(), (int)getHeight());
             String infoText = String.format(INFO, selectionLoc.getModule().GetName(), selectionLoc.getSection().GetName());
-            String messageText = "Hello world. Yes, I am message.";
 
             TextRenderer.renderWithLinebreaks(g, infoText, infoArea.x, infoArea.y, infoArea.width);
-            TextRenderer.renderWithLinebreaks(g, messageText, messageArea.x, messageArea.y, messageArea.width);
+            TextRenderer.renderWithLinebreaks(g, message, messageArea.x, messageArea.y, messageArea.width);
         }
         public void clearAddTask(){
             setAddTaskReady(false);
@@ -442,8 +443,9 @@ public class TestShipView extends Screen implements IUpdateable {
             return addTaskReady;
         }
 
-        public void setAddTaskReady(boolean addTaskReady) {
-            this.addTaskReady = addTaskReady;
+        public void setAddTaskReady(boolean value) {
+            this.addTaskReady = value;
+            addTask.bgColor = value ? Color.green : Color.gray;
         }
     }
 

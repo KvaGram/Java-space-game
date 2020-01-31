@@ -247,6 +247,7 @@ public class HomeShip {
                 modules.put(loc, new NullModule(loc));
             }
         }
+        taskChain = new ArrayList<>();
     }
 
     /**
@@ -598,19 +599,19 @@ public class HomeShip {
 
     public ArrayList<ShipLoc> getLockedModules() {
         ArrayList<ShipLoc> ret = new ArrayList<>();
-        for (RefitTask task : getTaskchain()) {
+        for (RefitTask task : getTaskChain()) {
             Collections.addAll(ret, task.targets);
         }
         return ret;
     }
 
 
-    private ArrayList<RefitTask> taskchain;
+    private ArrayList<RefitTask> taskChain;
 
 
     //STUB TODO: integrate with the job system
     public void cancelAllRefitTasks(){
-        taskchain = new ArrayList<>();
+        taskChain = new ArrayList<>();
     }
 
 
@@ -670,8 +671,8 @@ public class HomeShip {
         return (AbstractShipModule[]) modules.values().toArray();
     }
 
-    public ArrayList<RefitTask> getTaskchain() {
-        return taskchain;
+    public ArrayList<RefitTask> getTaskChain() {
+        return taskChain;
     }
 
     public static int getMiddleLength() {
