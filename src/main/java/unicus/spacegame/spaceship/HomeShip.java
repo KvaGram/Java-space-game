@@ -123,6 +123,7 @@ public class HomeShip {
      * Replaces a section of the spaceship.
      * Warning: this WILL replace (destroy!) the existing section and modules,
      * including the components in it, with the new section and empty modules, without asking!
+     * This function presumes any checks have already been done.
      *
      * @param index section index of module to replace.
      * @param sectionType The new section type.
@@ -170,7 +171,7 @@ public class HomeShip {
      *
      * @return The new module
      */
-    private AbstractShipModule forceBuildModule(ShipLoc loc, ModuleType moduleType){
+    protected AbstractShipModule forceBuildModule(ShipLoc loc, ModuleType moduleType){
         if (!loc.isValidModule())
             throw new IllegalArgumentException("Whoops.. that location is invalid for construction.\n" +
                     "Someone did a programming woopsie, because of that, the game will now quit.");
@@ -293,13 +294,15 @@ public class HomeShip {
         }
         return ship;
     }
-    public boolean canBuildSection(ShipLoc shipLoc, SectionType typeToBuild, StringBuffer message) {
-        if (!shipLoc.isValidSection()) {
+
+    static public boolean canBuildSection(ShipLoc loc, SectionType typeToBuild, StringBuffer message) {
+        if (!loc.isValidSection()) {
             message.append("Illegal selection! How did you manage this? HOW!? (this is a bug, please report it)");
             return false;
         }
-        //TODO: get material cost of construction.
-        ArrayList<CargoCollection> cost = new ArrayList<>();
+        if(!canRemoveSection(loc, message))
+            return false;
+        Collection<CargoCollection> cost = typeToBuild.getBuildCost();
         if(! CanAfford(cost)) {
             message.append("You cannot afford X resources :-(");
             return false;
@@ -307,8 +310,19 @@ public class HomeShip {
         message.append("You can build this section-frame. It will cost X resources.");
         return true;
     }
+    static public boolean doBuildSection(ShipLoc loc, SectionType typeToBuild, StringBuffer message) {
+        StringBuffer canDo = new StringBuffer();
+        if(!canBuildSection(loc, typeToBuild, canDo)) {
+            message.append(canDo);
+            return false;
+        }
 
-    public boolean canBuildModule(ShipLoc loc, ModuleType typeToBuild, StringBuffer message) {
+        pay(typeToBuild.getBuildCost());
+        instance.forceBuildSection(loc.s, typeToBuild);
+        return true;
+    }
+
+    static public boolean canBuildModule(ShipLoc loc, ModuleType typeToBuild, StringBuffer message) {
         if (loc.isValidModule()){
             message.append("Illegal selection! How did you manage this? HOW!? (this is a bug, please report it)");
             return false;
@@ -319,36 +333,41 @@ public class HomeShip {
             return false;
         }
 
-        if (canRemoveModule(loc, message)) {
-            message.append("\n");
-        }
-        else {
-            message.append("\nModule cannot be built.");
+        if (!canRemoveModule(loc, message)) {
             return false;
         }
-        //TODO: get material cost of construction.
-        ArrayList<CargoCollection> cost = new ArrayList<>();
+        Collection<CargoCollection> cost = typeToBuild.getBuildCost();
         if(! CanAfford(cost)) {
             message.append("You cannot afford X resources :-(");
             return false;
         }
         message.append("You can build this module. It will cost X resources.");
         return true;
-
     }
-    public boolean canRemoveModule(ShipLoc shipLoc, StringBuffer message) {
-        if (shipLoc.isValidModule()){
+    static public boolean doBuildModule(ShipLoc loc, ModuleType typeToBuild, StringBuffer message) {
+        StringBuffer canDo = new StringBuffer();
+        if(!canBuildModule(loc, typeToBuild, canDo)) {
+            message.append(canDo);
+            return false;
+        }
+        pay(typeToBuild.getBuildCost());
+        instance.forceBuildModule(loc, typeToBuild);
+        return true;
+    }
+
+    static public boolean canRemoveModule(ShipLoc loc, StringBuffer message) {
+        if (loc.isValidModule()){
             message.append("Illegal selection! How did you manage this? HOW!? (this is a bug, please report it)");
             return false;
         }
 
-        ArrayList<ShipLoc> lockedModules = getLockedModules();
-        if(lockedModules.contains(shipLoc)) {
+        ArrayList<ShipLoc> lockedModules = Construction.getBusyLocations();
+        if(lockedModules.contains(loc)) {
             message.append("Your crew is already busy at work here.");
             return false;
         }
 
-        AbstractShipModule module = shipLoc.getModule();
+        AbstractShipModule module = loc.getModule();
         //TODO: find more elegant way for checking this.
         if (module.getClass() == NullModule.class) {
             message.append("There is no module to remove.");
@@ -364,7 +383,7 @@ public class HomeShip {
         //Add this location to the locked modules.
         // This is used when checking if cargo,
         // recycled resources and displaced crew can be relocated.
-        lockedModules.add(shipLoc);
+        lockedModules.add(loc);
 
         int numCargo = cargoToMove.size(); //STUB - TODO: should report the total cargo units
         //int numPeople = housingToMove.size();
@@ -382,20 +401,30 @@ public class HomeShip {
         message.append("You can remove this module. You will move and reclaim x resources and displace x crew-members");
         return true;
     }
-    public boolean canRemoveSection(ShipLoc shipLoc, StringBuffer message) {
-        if (!shipLoc.isValidSection()) {
+    static public boolean doRemoveModule(ShipLoc loc, StringBuffer message){
+        StringBuffer canDo = new StringBuffer();
+        if(!canRemoveModule(loc, canDo)) {
+            message.append(canDo);
+            return false;
+        }
+        instance.forceBuildModule(loc, ModuleType.Empty);
+        return true;
+    }
+
+    static public boolean canRemoveSection(ShipLoc loc, StringBuffer message) {
+        if (!loc.isValidSection()) {
             message.append("Illegal selection! How did you manage this? HOW!? (this is a bug, please report it)");
             return false;
         }
 
-        ArrayList<ShipLoc> lockedModules = getLockedModules();
+        ArrayList<ShipLoc> lockedModules = Construction.getBusyLocations();
         for (ShipLoc l : lockedModules)
-            if (l.s == shipLoc.s) {
+            if (l.s == loc.s) {
                 message.append("Your crew is already busy working in this section. You cannot remove it.");
                 return false;
             }
         //TODO: find a more elegant way on checking for this
-        if(shipLoc.getSection().getClass() == StrippedFrame.class) {
+        if(loc.getSection().getClass() == StrippedFrame.class) {
             message.append("This section is already stripped.");
             return false;
         }
@@ -408,7 +437,7 @@ public class HomeShip {
         //TODO: add resources stripped from section-frame to cargo.
         //TODO: add weapon-components dismantled to cargo.
 
-        ShipLoc[] sModules = shipLoc.getModuleLocList();
+        ShipLoc[] sModules = loc.getModuleLocList();
         for (int i = 0, moduleLength = sModules.length; i < moduleLength; i++) {
             AbstractShipModule m = sModules[i].getModule();
             cargoToMove.addAll(m.getCargoOnDestruction());
@@ -422,7 +451,7 @@ public class HomeShip {
         //Adds this section's modules to the locked modules list.
         // This is used when checking if cargo,
         // recycled resources and displaced crew can be relocated.
-        Collections.addAll(lockedModules, shipLoc.getModuleLocList());
+        Collections.addAll(lockedModules, loc.getModuleLocList());
 
         int numCargo = cargoToMove.size(); //STUB - should report the total cargo units
         int numPeople = housingToMove.size();
@@ -443,6 +472,15 @@ public class HomeShip {
             message.append("/n" + numPeople + " crewmen will have to be moved.");
         return true;
     }
+    static public boolean doRemoveSection(ShipLoc loc, StringBuffer message) {
+        StringBuffer canDo = new StringBuffer();
+        if(!canRemoveSection(loc, canDo)) {
+            message.append(canDo);
+            return false;
+        }
+        instance.forceBuildSection(loc.s, SectionType.None);
+        return true;
+    }
 
     //region checkStore/re-house shortcuts
     private boolean checkCanHouseCrew(ArrayList<HousingAssignment> toMove) {
@@ -454,16 +492,19 @@ public class HomeShip {
     //endregion
 
     // STUB. TODO: check if crew can be housed in available housing space (except in modules in the ignore list).
-    private boolean checkCanHouseCrew(ArrayList<HousingAssignment> toMove, ArrayList<ShipLoc> ignoreList) {
+    static private boolean checkCanHouseCrew(ArrayList<HousingAssignment> toMove, ArrayList<ShipLoc> ignoreList) {
         return true;
     }
     // STUB. TODO: check if cargo can be stored in available space (except in modules in the ignore list).
-    private boolean checkStoreCargo(ArrayList<CargoCollection> toStore, ArrayList<ShipLoc> ignoreList) {
+    static private boolean checkStoreCargo(ArrayList<CargoCollection> toStore, ArrayList<ShipLoc> ignoreList) {
         return true;
     }
     //STUB! Todo: check if player can afford the cost.
-    private boolean CanAfford(ArrayList<CargoCollection> cost) {
+    static private boolean CanAfford(Collection<CargoCollection> cost) {
         return true;
+    }
+    //STUB TODO: implement a way to pay resources
+    private static void pay(Collection<CargoCollection> buildCost) {
     }
 
     @Deprecated(since = "Replaced by Construction#getBusyLocations ")
