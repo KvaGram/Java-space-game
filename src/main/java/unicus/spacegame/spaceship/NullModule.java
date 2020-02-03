@@ -7,7 +7,7 @@ import java.util.Collection;
 
 public class NullModule extends AbstractShipModule {
 
-    public NullModule(HomeShip.ShipLoc loc) {
+    public NullModule(ShipLoc loc) {
         super(loc);
     }
 

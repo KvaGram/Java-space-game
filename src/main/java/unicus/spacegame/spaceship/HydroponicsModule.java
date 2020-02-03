@@ -7,16 +7,14 @@ import unicus.spacegame.crew.AdultCrewman;
 import unicus.spacegame.crew.SpaceCrew;
 import unicus.spacegame.crew.Workplace;
 
-import java.sql.SQLSyntaxErrorException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Queue;
 
 public class HydroponicsModule extends AbstractShipModule implements Workplace {
     private HydroponicsJob job;
     private ArrayList<FoodTask> taskList;
 
-    public HydroponicsModule(HomeShip.ShipLoc loc) {
+    public HydroponicsModule(ShipLoc loc) {
         super(loc);
         int jobKey = SpaceCrew.getInstance().getJobKeys().yieldKey();
         //Note that the module and job are co-linked and have shared private access to each other.

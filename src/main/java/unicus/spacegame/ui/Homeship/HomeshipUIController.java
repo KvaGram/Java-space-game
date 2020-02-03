@@ -1,5 +1,5 @@
 package unicus.spacegame.ui.Homeship;
 
-import unicus.spacegame.spaceship.HomeShip;
+import unicus.spacegame.spaceship.ShipLoc;
 
-public interface HomeshipUIController{void onSelected(HomeShip.ShipLoc loc);}
+public interface HomeshipUIController{void onSelected(ShipLoc loc);}

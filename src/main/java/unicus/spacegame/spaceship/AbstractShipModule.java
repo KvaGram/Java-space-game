@@ -6,10 +6,10 @@ package unicus.spacegame.spaceship;
  */
 public abstract class AbstractShipModule extends AbstractShipPart{
 
-    public AbstractShipModule(HomeShip.ShipLoc loc) {
+    public AbstractShipModule(ShipLoc loc) {
         super(ShipPartType.Module, loc);
     }
-    protected AbstractShipModule(ShipPartType partType, HomeShip.ShipLoc loc) {
+    protected AbstractShipModule(ShipPartType partType, ShipLoc loc) {
         super(partType, loc);
     }
     public abstract int getNumComponents();

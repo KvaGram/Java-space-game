@@ -2,13 +2,11 @@ package unicus.spacegame.ui;
 
 import com.mojang.brigadier.Message;
 import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandExceptionType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import unicus.spacegame.crew.SpaceCrew;
 import unicus.spacegame.gameevent.GameEvent;
@@ -32,6 +30,7 @@ import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
 import static com.mojang.brigadier.builder.LiteralArgumentBuilder.*;
 import static com.mojang.brigadier.builder.RequiredArgumentBuilder.*;
 import com.mojang.brigadier.arguments.*;
+import unicus.spacegame.spaceship.ShipLoc;
 
 
 public class DebugConsole implements IUpdateable {
@@ -119,7 +118,7 @@ public class DebugConsole implements IUpdateable {
                 ).then(
                         argument("loc", shipLocArgument())
                                 .executes( context -> {
-                                    printShipLoc(context.getArgument("loc", HomeShip.ShipLoc.class));
+                                    printShipLoc(context.getArgument("loc", ShipLoc.class));
                                     return 1;
                                 })
 
@@ -365,7 +364,7 @@ public class DebugConsole implements IUpdateable {
         return new ShipLocArgument(HomeShip.getInstance());
     }
 
-    private void printShipLoc(HomeShip.ShipLoc loc){
+    private void printShipLoc(ShipLoc loc){
         StringBuffer b = new StringBuffer();
         loc.getModule().getInfo(b);
         out.println(b.toString());
@@ -413,7 +412,7 @@ class InvalidShipLocMessage implements Message{
     }
 }
 
-class ShipLocArgument implements ArgumentType<HomeShip.ShipLoc> {
+class ShipLocArgument implements ArgumentType<ShipLoc> {
     private HomeShip homeship;
     private ShipLocTarget target;
 
@@ -426,7 +425,7 @@ class ShipLocArgument implements ArgumentType<HomeShip.ShipLoc> {
     }
 
     @Override
-    public HomeShip.ShipLoc parse(StringReader reader) throws CommandSyntaxException {
+    public ShipLoc parse(StringReader reader) throws CommandSyntaxException {
         reader.expect('(');
         int section = reader.readInt();
         reader.expect(':');
@@ -435,7 +434,7 @@ class ShipLocArgument implements ArgumentType<HomeShip.ShipLoc> {
 
         CommandExceptionType exceptionType = new CommandExceptionType() {};
 
-        HomeShip.ShipLoc loc = homeship.getShipLoc(section, module);
+        ShipLoc loc = homeship.getShipLoc(section, module);
         if (!loc.isValidModule()) {
             Message msg = new Message() {
                 @Override public String getString() {return loc.toString() + " does not point to a valid module or section."; }

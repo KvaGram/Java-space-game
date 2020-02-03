@@ -1,6 +1,5 @@
 package unicus.spacegame;
 
-import de.gurkenlabs.litiengine.Align;
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.gui.screens.GameScreen;
@@ -9,6 +8,7 @@ import de.gurkenlabs.litiengine.resources.Resources;
 import unicus.spacegame.gameevent.GameEvent;
 import unicus.spacegame.crew.SpaceCrew;
 import unicus.spacegame.spaceship.HomeShip;
+import unicus.spacegame.spaceship.ShipLoc;
 import unicus.spacegame.ui.DebugConsole;
 import unicus.spacegame.ui.Homeship.HomeshipUI;
 import unicus.spacegame.ui.Homeship.HomeshipUIController;
@@ -174,7 +174,7 @@ class ShipRefitController extends GameScreen implements IUpdateable, HomeshipUIC
 
 
     @Override
-    public void onSelected(HomeShip.ShipLoc loc) {
+    public void onSelected(ShipLoc loc) {
         //TODO what to do when a section, module or component is selected.
         //Expected to run homeshipUI.openMenu
     }
