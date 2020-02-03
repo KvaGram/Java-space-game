@@ -172,20 +172,18 @@ public class SpaceCrew {
 
     public boolean canAssignJobCrew(int jobID, int crewID, StringBuffer message) {
         AbstractJob job = getJob(jobID);
-        AbstractCrewman crewman = getCrew(crewID);
+        AdultCrewman crewman = getAbleCrew(crewID);
         if(job == null) {
             message.append("Cannot assign crewman, invalid job ID.");
             return false;
         }
         if(crewman == null) {
-            message.append("Cannot assign crewman, invalid crewman ID");
+            message.append("Cannot assign crewman, invalid crewman ID, or not able to work.");
             return false;
         }
-        //TODO: check for illegible for work
-        //if(false) {
-        //    message.append("Cannot assign crewman, this crewman can't work.");
-        //    return false;
-        //}
+
+        if(!job.crewmanAllowedJob(crewman, message))
+            return false;
         int numAssigned = 0;
         for (JobAssignment a : jobAssignments) {
             if(a.getJobID() == jobID) {
@@ -203,6 +201,14 @@ public class SpaceCrew {
         }
         message.append("Crewman may be assigned.");
         return true;
+    }
+
+    private AdultCrewman getAbleCrew(int crewID) {
+        AbstractCrewman crewman = getCrew(crewID);
+        if(crewman.getState().isWorkAble())
+            return (AdultCrewman) crewman;
+        else
+            return null;
     }
 
     public void assignJobCrew(int jobID, int crewID) {

@@ -126,7 +126,18 @@ public abstract class AbstractJob {
         /*Leave it up the sub-classes on how to use
         monthBestCrewman, monthWorstCrewman and monthWorkDone
         */
+    }
 
+    /**
+     * Returns false if there is any reason a crewman may not be assigned to this job.
+     * If there is, an explanation must be appended to the message object.
+     * If a crewman can take the job, but there are reasons why they should not, a warning should be appended.
+     * @param crewman The crewman to potentially assign the job.
+     * @param message The output area for UI feedback to user / player.
+     * @return whatever the crewman is allowed to be assigned to this job.
+     */
+    public boolean crewmanAllowedJob(AdultCrewman crewman, StringBuffer message) {
+        return true;
     }
 
     /**

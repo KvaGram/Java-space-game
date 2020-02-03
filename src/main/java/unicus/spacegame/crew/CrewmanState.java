@@ -1,7 +1,11 @@
 package unicus.spacegame.crew;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 /**
- * The CrewmanState defines what kind of crewman this is.
+ * The CrewmanState defines the state of life of crewman is.
+ * Every implementation of AbstractCrewman must set its crewman state value.
+ * CrewmanState can be considered as an age-group.
  * Typically there is one CrewState value per implemented AbstractCrewman class.
  * Used internally to determine the type of crewman it is, and to ensure safe casting.
  *
@@ -15,5 +19,18 @@ package unicus.spacegame.crew;
  *  - when converting a Crewman object, the old object MUST be deleted afterwards
  */
 public enum CrewmanState {
-    infant, toddler, child, youth, adult, senior, corpse, memorial
+    infant, toddler, child, youth, adult, senior, corpse, memorial;
+
+    /**
+     * Whatever this crewman state can be assigned a job
+     * @return
+     */
+    public boolean isWorkAble() {
+        return ArrayUtils.contains(WORK_ABLE, this);
+    }
+
+    /**
+     * Types of crewmen who are able to be assigned to a job.
+     */
+    public static final CrewmanState[] WORK_ABLE = new CrewmanState[]{child, youth, adult, senior};
 }
