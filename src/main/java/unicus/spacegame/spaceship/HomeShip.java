@@ -3,6 +3,7 @@ package unicus.spacegame.spaceship;
 import unicus.spacegame.CargoCollection;
 import unicus.spacegame.CargoContainer;
 import unicus.spacegame.crew.*;
+import unicus.spacegame.spaceship.cunstruction.Construction;
 
 import java.util.*;
 
@@ -465,12 +466,9 @@ public class HomeShip {
         return true;
     }
 
+    @Deprecated(since = "Replaced by Construction#getBusyLocations ")
     public ArrayList<ShipLoc> getLockedModules() {
-        ArrayList<ShipLoc> ret = new ArrayList<>();
-        for (RefitTask task : taskchain) {
-            Collections.addAll(ret, task.targets);
-        }
-        return ret;
+        return Construction.getBusyLocations();
     }
 
 

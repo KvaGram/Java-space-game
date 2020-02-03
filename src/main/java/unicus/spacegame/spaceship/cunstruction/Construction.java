@@ -3,11 +3,10 @@ package unicus.spacegame.spaceship.cunstruction;
 import unicus.spacegame.crew.AbstractJob;
 import unicus.spacegame.crew.AdultCrewman;
 import unicus.spacegame.crew.Workplace;
-import unicus.spacegame.spaceship.HomeShip;
-import unicus.spacegame.spaceship.ModuleType;
-import unicus.spacegame.spaceship.SectionType;
+import unicus.spacegame.spaceship.ShipLoc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Construction is a unique job and workplace.
@@ -17,10 +16,11 @@ public class Construction extends AbstractJob implements Workplace {
     static final public int CONSTRUCTION_JOB_KEY = 1;
     private static Construction instance;
 
-    ArrayList<Object> WorkQueue;
+    ArrayList<RefitTask> workQueue;
 
-    public Construction() {
+    private Construction() {
         super(CONSTRUCTION_JOB_KEY, 9);
+        workQueue = new ArrayList<>();
         if (instance == null)
             instance = this;
     }
@@ -29,6 +29,14 @@ public class Construction extends AbstractJob implements Workplace {
     public void endOfMonth() {
         super.endOfMonth();
 
+    }
+
+    public static ArrayList<ShipLoc> getBusyLocations(){
+        ArrayList<ShipLoc> ret = new ArrayList<>();
+        for (RefitTask task : instance.workQueue) {
+            ret.addAll(Arrays.asList(task.targets));
+        }
+        return ret;
     }
 
     /**
