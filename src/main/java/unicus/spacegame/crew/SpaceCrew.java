@@ -172,7 +172,7 @@ public class SpaceCrew {
 
     public boolean canAssignJobCrew(int jobID, int crewID, StringBuffer message) {
         AbstractJob job = getJob(jobID);
-        AdultCrewman crewman = getAbleCrew(crewID);
+        AbleCrewman crewman = getAbleCrew(crewID);
         if(job == null) {
             message.append("Cannot assign crewman, invalid job ID.");
             return false;
@@ -203,10 +203,10 @@ public class SpaceCrew {
         return true;
     }
 
-    private AdultCrewman getAbleCrew(int crewID) {
+    private AbleCrewman getAbleCrew(int crewID) {
         AbstractCrewman crewman = getCrew(crewID);
         if(crewman.getState().isWorkAble())
-            return (AdultCrewman) crewman;
+            return (AbleCrewman) crewman;
         else
             return null;
     }

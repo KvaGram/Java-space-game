@@ -3,7 +3,7 @@ package unicus.spacegame.spaceship;
 import unicus.spacegame.CargoCollection;
 import unicus.spacegame.CargoContainer;
 import unicus.spacegame.crew.AbstractJob;
-import unicus.spacegame.crew.AdultCrewman;
+import unicus.spacegame.crew.AbleCrewman;
 import unicus.spacegame.crew.SpaceCrew;
 import unicus.spacegame.crew.Workplace;
 
@@ -105,7 +105,7 @@ public class HydroponicsModule extends AbstractShipModule implements Workplace {
         /**
          * Calculates a base efficiency for how well a crewman will do this job.
          * Used in UI to show percentage efficiency.
-         * Note: implementation should include the result from {@link AdultCrewman#getGeneralWorkModifier()},
+         * Note: implementation should include the result from {@link AbleCrewman#getGeneralWorkModifier()},
          * unless implementation has an alternative.
          *
          * @param crewID The ID of the crewman
@@ -113,9 +113,9 @@ public class HydroponicsModule extends AbstractShipModule implements Workplace {
          */
         @Override
         public double getWorkModifierOfCrewman(int crewID) {
-            AdultCrewman c;
+            AbleCrewman c;
             try {
-                c = (AdultCrewman) SpaceCrew.getInstance().getCrew(crewID);
+                c = (AbleCrewman) SpaceCrew.getInstance().getCrew(crewID);
             }catch (Error err) {
                 System.err.println(err);
                 return 0.0;

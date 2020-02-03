@@ -1,7 +1,7 @@
 package unicus.spacegame.spaceship.cunstruction;
 
 import unicus.spacegame.crew.AbstractJob;
-import unicus.spacegame.crew.AdultCrewman;
+import unicus.spacegame.crew.AbleCrewman;
 import unicus.spacegame.crew.Workplace;
 import unicus.spacegame.spaceship.ShipLoc;
 
@@ -76,7 +76,7 @@ public class Construction extends AbstractJob implements Workplace {
     /**
      * Calculates a base efficiency for how well a crewman will do this job.
      * Used in UI to show percentage efficiency.
-     * Note: implementation should include the result from {@link AdultCrewman#getGeneralWorkModifier()},
+     * Note: implementation should include the result from {@link AbleCrewman#getGeneralWorkModifier()},
      * unless implementation has an alternative.
      *
      * @param crewID The ID of the crewman

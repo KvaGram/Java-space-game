@@ -81,7 +81,7 @@ public abstract class AbstractJob {
     /**
      * Calculates a base efficiency for how well a crewman will do this job.
      * Used in UI to show percentage efficiency.
-     * Note: implementation should include the result from {@link AdultCrewman#getGeneralWorkModifier()},
+     * Note: implementation should include the result from {@link AbleCrewman#getGeneralWorkModifier()},
      *      unless implementation has an alternative.
      *
      * @param crewID The ID of the crewman
@@ -136,7 +136,7 @@ public abstract class AbstractJob {
      * @param message The output area for UI feedback to user / player.
      * @return whatever the crewman is allowed to be assigned to this job.
      */
-    public boolean crewmanAllowedJob(AdultCrewman crewman, StringBuffer message) {
+    public boolean crewmanAllowedJob(AbleCrewman crewman, StringBuffer message) {
         return true;
     }
 
@@ -172,9 +172,9 @@ public abstract class AbstractJob {
      * Gets the crewman that did the least work this month (does not count vacation)
      * @return
      */
-    public AdultCrewman getMonthWorstCrewman() {
+    public AbleCrewman getMonthWorstCrewman() {
         try {
-            return (AdultCrewman) SpaceCrew.getInstance().getCrew(monthWorstCrewman);
+            return (AbleCrewman) SpaceCrew.getInstance().getCrew(monthWorstCrewman);
         } catch (Exception err) {
             System.err.println(err);
             return null;
@@ -186,9 +186,9 @@ public abstract class AbstractJob {
      * @return
      */
 
-    public AdultCrewman getMonthBestCrewman() {
+    public AbleCrewman getMonthBestCrewman() {
         try {
-            return (AdultCrewman) SpaceCrew.getInstance().getCrew(monthBestCrewman);
+            return (AbleCrewman) SpaceCrew.getInstance().getCrew(monthBestCrewman);
         } catch (Exception err) {
             System.err.println(err);
             return null;
