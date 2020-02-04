@@ -28,7 +28,21 @@ public class Construction extends AbstractJob implements Workplace {
     @Override
     public void endOfMonth() {
         super.endOfMonth();
+        double workRemaining = monthWorkDone;
+        StringBuffer message = new StringBuffer();
 
+        //runs over the tasks twice.
+        //If a task somehow is dependent on another task (out of order), and fails to complete at the first pass,
+        // it will get another chance to complete at the second pass.
+        //NOTE: this could be optimized by checking for any such conflicts at this stage.
+        for (int i = 0; i < 2; i++) {
+            for (int j = workQueue.size() - 1; j >= 0; j--) {
+                RefitTask task = workQueue.get(j);
+                //Adds progress to a task, reducing the amount of work left.
+                // If a task is complete, run the onFinish(StringBuffer) method with param message
+                workRemaining = task.addProgress(workRemaining, true, message.append("\n"));
+            }
+        }
     }
 
     public static ArrayList<ShipLoc> getBusyLocations(){
