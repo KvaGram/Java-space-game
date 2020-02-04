@@ -30,7 +30,8 @@ public class BuildFrameTask extends RefitTask{
         //Builds the section. If it some fails, return false.
         //It if completes, remove self from the work queue,
         if (HomeShip.doBuildSection(targets[0], targetType, message)) {
-            Construction.getInstance().workQueue.remove(this);
+            Construction.RemoveTask(this);
+            return true;
         }
         return false;
     }
@@ -40,7 +41,7 @@ public class BuildFrameTask extends RefitTask{
      */
     @Override
     boolean onRemove(StringBuffer message) {
-        Construction.getInstance().workQueue.remove(this);
+        Construction.RemoveTask(this);
         return true;
     }
 }

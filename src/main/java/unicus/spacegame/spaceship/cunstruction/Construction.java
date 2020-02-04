@@ -16,7 +16,7 @@ public class Construction extends AbstractJob implements Workplace {
     static final public int CONSTRUCTION_JOB_KEY = 1;
     private static Construction instance;
 
-    ArrayList<RefitTask> workQueue;
+    private ArrayList<RefitTask> workQueue;
 
     private Construction() {
         super(CONSTRUCTION_JOB_KEY, 9);
@@ -87,10 +87,27 @@ public class Construction extends AbstractJob implements Workplace {
         return 0;
     }
 
-    public static Construction getInstance() {
+
+    public static Construction I() {
         if (instance == null)
             new Construction();
         return instance;
+    }
+
+    static public boolean AddTask(RefitTask task) {
+        if (I().workQueue.contains(task))
+            return false;
+        I().workQueue.add(0, task);
+        I().setActive(!I().workQueue.isEmpty());
+        return true;
+    }
+    static public boolean RemoveTask(RefitTask task) {
+        boolean success = I().workQueue.remove(task);
+        I().setActive(!I().workQueue.isEmpty());
+        return success;
+    }
+    static public RefitTask[] getWorkQueue(){
+        return (RefitTask[]) I().workQueue.toArray();
     }
 }
 

@@ -25,4 +25,41 @@ public abstract class ConstructionTask {
      * @return whatever the task was successfully removed.
      */
     abstract boolean onRemove(StringBuffer message);
+
+    public int getLabourCost() {
+        return labourCost;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public boolean isDone(){
+        double remaining = getLabourCost() - progress;
+        return remaining <= 0;
+    }
+
+    /**
+     * Adds work to the progress of the task.
+     * Returns unused workinput.
+     * @param workInput Amount of work to add to task.
+     * @param callFinish Whatever {@link #onFinish(StringBuffer)} should be called if work is done.
+     * @param message Feedback information the player might want (only applicable if callFinish is true).
+     * @return any work that did not get added to the progress.
+     */
+    public double addProgress(double workInput, boolean callFinish, StringBuffer message) {
+        double remaining = getLabourCost() - progress;
+        //Get amount of work to offload into this task.
+        double w = Math.min(remaining, workInput);
+        //Transfer work progress to task.
+        progress += w;
+        workInput -= w;
+        if(callFinish && isDone())
+            onFinish(message);
+
+        return workInput;
+    }
+    public double addProgress (double workInput){
+        return addProgress(workInput, false, null);
+    }
 }
