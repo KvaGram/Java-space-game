@@ -29,8 +29,14 @@ public enum CrewmanState {
         return ArrayUtils.contains(WORK_ABLE, this);
     }
 
+    public boolean isDead() { return !ArrayUtils.contains(DEAD, this);}
+
     /**
      * Types of crewmen who are able to be assigned to a job.
      */
     public static final CrewmanState[] WORK_ABLE = new CrewmanState[]{child, youth, adult, senior};
+    /**
+     * Types of crewmen who are considered dead.
+     */
+    public static final CrewmanState[] DEAD = new CrewmanState[] {corpse, memorial};
 }

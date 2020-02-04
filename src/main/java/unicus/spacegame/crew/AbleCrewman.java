@@ -167,7 +167,7 @@ abstract public class AbleCrewman extends AbstractCrewman {
     protected JobAssignment[] monthJobAssignments = new JobAssignment[0];
 
     /**
-     * Called last at the end of month cycle.
+     * Called last at the SpaceCrew end of month cycle.
      * planned feature:
      *         1. Consume resources based on crewman needs (rations?).
      *         2. Apply change to stress

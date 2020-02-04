@@ -23,6 +23,14 @@ public abstract class AbstractShipModule extends AbstractShipPart{
      * @return
      */
     public abstract boolean useGravity();
+
+    /**
+     * End of month update.
+     * Modules that provides amenities must implement this.
+     */
+    public void endOfMonth() {
+
+    }
 }
 
 

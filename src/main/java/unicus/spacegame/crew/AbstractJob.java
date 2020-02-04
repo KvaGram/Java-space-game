@@ -57,7 +57,7 @@ public abstract class AbstractJob {
     protected int monthBestCrewman;
     protected JobAssignment[] monthJobAssignments;
 
-    protected AbstractJob(int keyID, int numWorkerSlots){
+    protected AbstractJob(int keyID, int numWorkerSlots) {
         this.keyID = keyID;
         this.numWorkerSlots = numWorkerSlots;
         active = true;

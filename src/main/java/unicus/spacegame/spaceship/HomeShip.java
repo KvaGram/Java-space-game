@@ -27,6 +27,8 @@ public class HomeShip {
     public final static int MAX_MODULE_OBJECTS = MODULES_PER_SECTION + 1;
 
     private static HomeShip instance;
+
+
     public static HomeShip getInstance() {
         return instance;
     }
@@ -35,8 +37,13 @@ public class HomeShip {
     protected final int middleLength;
     protected final int tailLocation;
 
-
     public Hashtable<ShipLoc, AbstractShipModule> modules;
+
+    /**
+     * The monthly boom to morale to each crewman's morale.
+     *
+     */
+    private double monthAmenities;
 
     public static int getHeadLocation() {
         return instance.headLocation;
@@ -519,6 +526,14 @@ public class HomeShip {
     //STUB TODO: integrate with the job system
     public void cancelAllRefitTasks(){
         taskchain = new ArrayList<>();
+    }
+
+    public void endOfMonth() {
+        monthAmenities = 0.0;
+
+        for (AbstractShipModule module : modules.values()) {
+            module.endOfMonth();
+        }
     }
 
 

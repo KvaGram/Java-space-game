@@ -2,6 +2,7 @@ package unicus.spacegame.spaceship.cunstruction;
 
 import unicus.spacegame.crew.AbstractJob;
 import unicus.spacegame.crew.AbleCrewman;
+import unicus.spacegame.crew.SpaceCrew;
 import unicus.spacegame.crew.Workplace;
 import unicus.spacegame.spaceship.ShipLoc;
 
@@ -23,6 +24,7 @@ public class Construction extends AbstractJob implements Workplace {
         workQueue = new ArrayList<>();
         if (instance == null)
             instance = this;
+        SpaceCrew.getInstance().addJobs(this);
     }
 
     @Override

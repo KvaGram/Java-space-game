@@ -21,27 +21,6 @@ public class SpaceCrew {
     private final ObjectKey jobKeys;
     private final ObjectKey housingKeys;
 
-    public SpaceCrew(){
-        this.crewmen = new AbstractCrewman[0];
-        this.jobs = new AbstractJob[0];
-        this.jobAssignments = new JobAssignment[0];
-        this.housing = new AbstractHousing[0];
-        this.housingAssignments = new HousingAssignment[0];
-        instance = this;
-
-        jobKeys = new ObjectKey();
-        crewKeys = new ObjectKey();
-        housingKeys = new ObjectKey();
-
-        //set reserved keys
-        jobKeys.setReserved(Construction.CONSTRUCTION_JOB_KEY);
-    }
-
-    //TODO: crewGenerator (start scenarios), crew-lists
-
-    /*
-    Note: consider replacing array with hash map of key ids
-     */
     /**
      * List of all crewman objects that can be referenced in game, living or dead.
      * All lists and references of crewmen eventually refer to this list.
@@ -54,8 +33,53 @@ public class SpaceCrew {
     private AbstractJob[] jobs;
     private JobAssignment[] jobAssignments;
 
-    private AbstractHousing[] housing;
+    private AbstractHousing[] housings;
     private HousingAssignment[] housingAssignments;
+
+    public SpaceCrew(){
+        this.crewmen = new AbstractCrewman[0];
+        this.jobs = new AbstractJob[0];
+        this.jobAssignments = new JobAssignment[0];
+        this.housings = new AbstractHousing[0];
+        this.housingAssignments = new HousingAssignment[0];
+        instance = this;
+
+        jobKeys = new ObjectKey();
+        crewKeys = new ObjectKey();
+        housingKeys = new ObjectKey();
+
+        //set reserved keys
+        jobKeys.setReserved(Construction.CONSTRUCTION_JOB_KEY);
+    }
+    public void endOfMonthJobsHousing(){
+        int i;
+        for (i = jobAssignments.length - 1; i >= 0; i--) {
+            JobAssignment ja = jobAssignments[i];
+            ja.endOfMonth();
+        }
+        for (i = jobs.length - 1; i >= 0; i--) {
+            AbstractJob job = jobs[i];
+            job.endOfMonth();
+        }
+        for (i = housings.length - 1; i >= 0; i--) {
+            AbstractHousing housing = housings[i];
+            housing.endOfMonth();
+        }
+    }
+    public void endOfMonthCrew(){
+        for (int i = crewmen.length - 1; i >= 0; i--) {
+            AbstractCrewman crewman = crewmen[i];
+            crewman.endOfMonth();
+        }
+    }
+
+
+    //TODO: crewGenerator (start scenarios), crew-lists
+
+    /*
+    Note: consider replacing array with hash map of key ids
+     */
+
 
     //STUB!
     public static SpaceCrew GenerateStart1() {
@@ -77,7 +101,7 @@ public class SpaceCrew {
         return null;
     }
     public AbstractHousing getHousing(int housingID){
-        for (AbstractHousing h : housing) {
+        for (AbstractHousing h : housings) {
             if(h.getKeyID() == housingID) {
                 return h;
             }
@@ -144,20 +168,20 @@ public class SpaceCrew {
     public void addHousing(AbstractHousing... newHousingObjects) {
         int[] toRemove = new int[0];
         for (AbstractHousing h:newHousingObjects) {
-            for (int i = 0; i < housing.length; i++)
-                if (housing[i].getKeyID() == h.getKeyID()) toRemove = ArrayUtils.add(toRemove, i);
+            for (int i = 0; i < housings.length; i++)
+                if (housings[i].getKeyID() == h.getKeyID()) toRemove = ArrayUtils.add(toRemove, i);
         }
-        housing = ArrayUtils.removeAll(housing, toRemove);
-        housing = ArrayUtils.addAll(housing, newHousingObjects);
+        housings = ArrayUtils.removeAll(housings, toRemove);
+        housings = ArrayUtils.addAll(housings, newHousingObjects);
     }
 
     public void removeHousing(int... housingKeys) {
         int[] toRemove = new int[0];
         int i;
-        for (i = 0; i < housing.length; i++)
-            if (ArrayUtils.contains(housingKeys, housing[i].getKeyID()))
+        for (i = 0; i < housings.length; i++)
+            if (ArrayUtils.contains(housingKeys, housings[i].getKeyID()))
                 toRemove = ArrayUtils.add(toRemove, i);
-        housing = ArrayUtils.removeAll(housing, toRemove);
+        housings = ArrayUtils.removeAll(housings, toRemove);
         toRemove = new int[0];
         for (i = 0; i < housingAssignments.length; i++)
             if (ArrayUtils.contains(housingKeys, housingAssignments[i].getHousingID()))
