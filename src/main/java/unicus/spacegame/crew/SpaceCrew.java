@@ -14,6 +14,8 @@ public class SpaceCrew {
 
     private static SpaceCrew instance;
     public static SpaceCrew getInstance() {
+        if (instance == null)
+            new SpaceCrew(); //constructor sets instance.
         return instance;
     }
 
@@ -36,7 +38,7 @@ public class SpaceCrew {
     private AbstractHousing[] housings;
     private HousingAssignment[] housingAssignments;
 
-    public SpaceCrew(){
+    private SpaceCrew(){
         this.crewmen = new AbstractCrewman[0];
         this.jobs = new AbstractJob[0];
         this.jobAssignments = new JobAssignment[0];
@@ -83,7 +85,95 @@ public class SpaceCrew {
 
     //STUB!
     public static SpaceCrew GenerateStart1() {
-        return new SpaceCrew();
+        SpaceCrew crew = getInstance();
+
+        /*
+        Starting crew, made mostly at random. Feel free to change minor details
+
+
+        4 male
+        Hugh Frost - 381 months old, Bridge crew (captain)
+        Zach Frost - 360 months old, Maintenance (logistics expert)
+        Cole Rowe - 570 months old, passenger (asteroid miner)
+        George Hawkins - 312 months old, passenger (cook)
+
+        6 female
+        Eden Day - 408 months old, engineer
+        Rosie Connor - 308 months old, Bridge crew (pilot expert)
+        Jessie Marshall - 400 months old, Bridge crew (navigation expert)
+        Ciara Palmer - 302 months old, engineer
+        Alicia Hatcher - 320 months old, passenger (asteroid miner)
+        Norma López - 432 months old, passenger (security / combat expert)
+
+         */
+
+        //#region crew initialization
+        AdultCrewman Hugh = new AdultCrewman(crew.crewKeys.yieldKey(),
+                -381,
+                new CrewSelfID("Hugh Frost", CrewGender.male), new CrewmanGeneData(),
+                AbleCrewman.GenerateSkills(70, SkillTypes.leadership, SkillTypes.diplomacy),
+                60, 6000
+        );
+        AdultCrewman Zach = new AdultCrewman(crew.crewKeys.yieldKey(),
+                -360,
+                new CrewSelfID("Zach Frost", CrewGender.male), new CrewmanGeneData(),
+                AbleCrewman.GenerateSkills(60),
+                60, 6000
+        );
+        AdultCrewman Cole = new AdultCrewman(crew.crewKeys.yieldKey(),
+                -570,
+                new CrewSelfID("Cole Rowe", CrewGender.male), new CrewmanGeneData(),
+                AbleCrewman.GenerateSkills(60),
+                60, 6000
+        );
+        AdultCrewman George = new AdultCrewman(crew.crewKeys.yieldKey(),
+                -312,
+                new CrewSelfID("George Hawkins", CrewGender.male), new CrewmanGeneData(),
+                AbleCrewman.GenerateSkills(60),
+                60, 6000
+        );
+        AdultCrewman Eden = new AdultCrewman(crew.crewKeys.yieldKey(),
+                -408,
+                new CrewSelfID("Eden Day", CrewGender.female), new CrewmanGeneData(),
+                AbleCrewman.GenerateSkills(90),
+                60, 6000
+        );
+        AdultCrewman Rosie = new AdultCrewman(crew.crewKeys.yieldKey(),
+                -308,
+                new CrewSelfID("Rosie Connor", CrewGender.female), new CrewmanGeneData(),
+                AbleCrewman.GenerateSkills(90),
+                60, 6000
+        );
+        AdultCrewman Jessie = new AdultCrewman(crew.crewKeys.yieldKey(),
+                -400,
+                new CrewSelfID("Jessie Marshall", CrewGender.female), new CrewmanGeneData(),
+                AbleCrewman.GenerateSkills(90),
+                60, 6000
+        );
+        AdultCrewman Ciara = new AdultCrewman(crew.crewKeys.yieldKey(),
+                -302,
+                new CrewSelfID("Ciara Palmer", CrewGender.female), new CrewmanGeneData(),
+                AbleCrewman.GenerateSkills(90),
+                60, 6000
+        );
+        AdultCrewman Alicia = new AdultCrewman(crew.crewKeys.yieldKey(),
+                -320,
+                new CrewSelfID("Alicia Hatcher", CrewGender.female), new CrewmanGeneData(),
+                AbleCrewman.GenerateSkills(90),
+                60, 6000
+        );
+        AdultCrewman Norma = new AdultCrewman(crew.crewKeys.yieldKey(),
+                -432,
+                new CrewSelfID("Norma López", CrewGender.female), new CrewmanGeneData(),
+                AbleCrewman.GenerateSkills(90),
+                60, 6000
+        );
+        //#endregion
+
+
+        crew.addReplaceCrewmen(Hugh, Zach, Cole, George, Eden, Rosie, Jessie, Ciara, Alicia, Norma);
+
+        return crew;
     }
 
     public AbstractJob getJob(int jobID){

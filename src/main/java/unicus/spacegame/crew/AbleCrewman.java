@@ -4,6 +4,7 @@ Note that some features of the AdultCrewman may be moved to a new superclass
  or interfaces as other implementations of AbstractCrewman are written.
  */
 
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -109,6 +110,17 @@ abstract public class AbleCrewman extends AbstractCrewman {
         assert (state.isWorkAble());
     }
 
+    /**
+     *
+     * @param keyID unique ID for this crewman
+     * @param state The life-state or age-group of this crewman
+     * @param birthDate Month of birth after start of game (can be negative)
+     * @param selfID Name, gender, presentation of crewman
+     * @param geneData Genetic traits and history of crewman
+     * @param skillValues Proficiencies and abilities of crewman.
+     * @param base_intelligence Ability to learn and avoid stupid mistakes.
+     * @param base_morale Tolerance for workload
+     */
     public AbleCrewman(int keyID, CrewmanState state, int birthDate, CrewSelfID selfID, CrewmanGeneData geneData, int[] skillValues, double base_intelligence, double base_morale) {
         super(keyID, state, birthDate, selfID, geneData);
         assert (state.isWorkAble());
@@ -218,6 +230,21 @@ abstract public class AbleCrewman extends AbstractCrewman {
         text.append("Stress-change: ").append(monthStressChange);
 
         return text;
+    }
+
+    /** This is a stub. Currently only returns a flat average on all skills.
+     * TODO: write a skill generator with bias and some random nudge
+     *
+     * Generates a skillset based on average skill level, and any bias they may have.
+     * @param average The average amount of points each skill have.
+     * @param bias List of skills that will get more points. Repeated entries will get more skills
+     * @return A skillset
+     */
+    public static int[] GenerateSkills(int average, SkillTypes... bias) {
+        SkillTypes[] types = SkillTypes.values();
+        int[] skills = new int[types.length];
+        Arrays.fill(skills, average);
+        return skills;
     }
 }
 

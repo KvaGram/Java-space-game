@@ -39,4 +39,7 @@ public class ObjectKey {
     public void setReserved(int... reserved) {
         this.reserved = ArrayUtils.add(reserved, 0);
     }
+    public void addReserved(int... newReserved) {
+        this.reserved = ArrayUtils.addAll(reserved, newReserved);
+    }
 }

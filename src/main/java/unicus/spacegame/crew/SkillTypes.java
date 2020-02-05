@@ -10,7 +10,6 @@ public enum SkillTypes
     research,
     diplomacy,
     medical,
-    teaching,
     navigation,
     engineering,
     mining,

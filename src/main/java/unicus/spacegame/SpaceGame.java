@@ -48,7 +48,8 @@ public class SpaceGame implements IUpdateable {
 
     /**
      *  Generates a fairly typical start scenario.
-     *  Start with a crew of 6 adults with high stats.
+     *  Start with a crew of 10 adults with high stats.
+     *      6 ship crew with existing roles, 4 passengers without any roles.
      *  Start with a ship of a middle length of 6 (total length of 8)
      *  Start with 1 wheel section with two habitat modules.
      *  Start with 20 cargo modules installed
@@ -65,6 +66,7 @@ public class SpaceGame implements IUpdateable {
      */
     private static void GenerateStart1() {
         SpaceCrew.GenerateStart1();
+
     }
 
     public static void main(String[] args) {
