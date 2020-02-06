@@ -7,17 +7,16 @@ package unicus.spacegame.crew;
 */
 public enum SkillTypes
 {
-    research,
-    diplomacy,
-    medical,
-    navigation,
-    engineering,
-    mining,
-    leadership,
-    gunnery,
-    boarding;
+    socialization("The ability to come to agreement with other, be they fellow crew, or aliens."),
+    navigation("The ability to steer and navigate spacecraft, be it in sublight or warp speeds."),
+    weaponry("The proficiency of using tools of destruction, to blow stuff up! Be it for mining or combat."),
+    combat("The skill of fighting in a combat with hostiles. Be it close or at range with handheld weapons."),
+    artifice("The skill of understanding tools, devices and other technology."),
+    doctoring("The skill of healing any biological creature, be it human, alien or plants");
 
     // Static function for all of SkillTypes:
+
+    public final String description;
 
     public static int GetIndexByType(SkillTypes type) {
         return type.ordinal();
@@ -39,5 +38,10 @@ public enum SkillTypes
 
     public String getName(){
         return this.toString();
+    }
+
+    SkillTypes(String description){
+
+        this.description = description;
     }
 }

@@ -89,6 +89,7 @@ public class SpaceCrew {
 
         /*
         Starting crew, made mostly at random. Feel free to change minor details
+        NOTE: There should be more crewman onboard, but this is the start for now.
 
 
         4 male
@@ -111,7 +112,7 @@ public class SpaceCrew {
         AdultCrewman Hugh = new AdultCrewman(crew.crewKeys.yieldKey(),
                 -381,
                 new CrewSelfID("Hugh Frost", CrewGender.male), new CrewmanGeneData(),
-                AbleCrewman.GenerateSkills(70, SkillTypes.leadership, SkillTypes.diplomacy),
+                AbleCrewman.GenerateSkills(70),
                 60, 6000
         );
         AdultCrewman Zach = new AdultCrewman(crew.crewKeys.yieldKey(),
@@ -169,9 +170,10 @@ public class SpaceCrew {
                 60, 6000
         );
         //#endregion
-
-
         crew.addReplaceCrewmen(Hugh, Zach, Cole, George, Eden, Rosie, Jessie, Ciara, Alicia, Norma);
+
+
+
 
         return crew;
     }
