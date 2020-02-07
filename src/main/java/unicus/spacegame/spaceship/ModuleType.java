@@ -1,8 +1,11 @@
 package unicus.spacegame.spaceship;
 
 import org.apache.commons.lang3.ArrayUtils;
+import unicus.spacegame.CargoCollection;
+import unicus.spacegame.CargoContainer;
 
 import java.awt.*;
+import java.util.Collection;
 
 /**
  * The type of Module a section may have.
@@ -58,5 +61,9 @@ public enum ModuleType {
         if(includeGravity)
             ret = ArrayUtils.addAll(ret, Habitat);
         return ret;
+    }
+
+    public Collection<CargoCollection> getBuildCost() {
+        return CargoContainer.Null.getCollection();
     }
 };

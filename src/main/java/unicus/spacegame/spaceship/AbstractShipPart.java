@@ -2,7 +2,6 @@ package unicus.spacegame.spaceship;
 
 import org.apache.commons.lang3.ArrayUtils;
 import unicus.spacegame.CargoCollection;
-import unicus.spacegame.CargoContainer;
 
 import java.io.PrintStream;
 import java.util.Collection;
@@ -14,9 +13,9 @@ import java.util.Collection;
  */
 public abstract class AbstractShipPart {
     private final ShipPartType partType;
-    protected final HomeShip.ShipLoc loc;
+    protected final ShipLoc loc;
 
-    protected AbstractShipPart(ShipPartType partType, HomeShip.ShipLoc loc) {
+    protected AbstractShipPart(ShipPartType partType, ShipLoc loc) {
 
         this.partType = partType;
         this.loc = loc;
@@ -26,7 +25,7 @@ public abstract class AbstractShipPart {
         return partType;
     }
 
-    public HomeShip.ShipLoc getLoc() {
+    public ShipLoc getLoc() {
         return loc;
     }
 

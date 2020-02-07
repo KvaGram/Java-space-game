@@ -11,7 +11,7 @@ public class BasicFrame extends AbstractShipSection {
         return new AbstractShipModule[0];
     }
 
-    public BasicFrame(HomeShip.ShipLoc loc) {
+    public BasicFrame(ShipLoc loc) {
         super(loc);
     }
 

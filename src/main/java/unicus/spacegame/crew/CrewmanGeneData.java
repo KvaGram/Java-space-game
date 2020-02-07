@@ -13,6 +13,9 @@ public class CrewmanGeneData {
      */
     int[] parentIDs;
 
+    public CrewmanGeneData() {
+        this(new int[0]);
+    }
     public CrewmanGeneData(int[] parentIDs) {
 
         this.parentIDs = parentIDs;
