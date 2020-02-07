@@ -24,6 +24,8 @@ public abstract class AbstractShipModule extends AbstractShipPart{
      */
     public abstract boolean useGravity();
 
+    public abstract ModuleType getModuleType();
+
     /**
      * End of month update.
      * Modules that provides amenities must implement this.

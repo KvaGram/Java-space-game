@@ -27,8 +27,7 @@ public class HomeShip {
     public final static int MAX_MODULE_OBJECTS = MODULES_PER_SECTION + 1;
 
     private static HomeShip instance;
-
-
+	
     public static HomeShip getInstance() {
         return instance;
     }
@@ -36,6 +35,7 @@ public class HomeShip {
     protected final int headLocation;
     protected final int middleLength;
     protected final int tailLocation;
+    protected final int fullLength;
 
     public Hashtable<ShipLoc, AbstractShipModule> modules;
 
@@ -48,17 +48,6 @@ public class HomeShip {
     public static int getHeadLocation() {
         return instance.headLocation;
     }
-    public static int getMiddleLength() {
-        return instance.tailLocation;
-    }
-    public static int getTailLocation() {
-        return instance.tailLocation;
-    }
-
-
-
-
-
 
     /* TODO: static special modules
 
@@ -93,6 +82,7 @@ public class HomeShip {
         this.headLocation = 0; //It's always 0, but hey, now the code might be more readable.
         this.middleLength = middleLength;
         this.tailLocation = 1 + middleLength; //The tail's index is right after the middle sections.
+        this.fullLength = middleLength + 2; //the full length of the ship
 
         modules = new Hashtable<>();
         instance = this;
@@ -124,6 +114,7 @@ public class HomeShip {
                 modules.put(loc, new NullModule(loc));
             }
         }
+        taskChain = new ArrayList<>();
     }
 
     /**
@@ -139,7 +130,7 @@ public class HomeShip {
      */
     private AbstractShipSection forceBuildSection(int index, SectionType sectionType)
     {
-        if (index < 1 || index > middleLength) {
+        if (index < 1 || index > getMiddleLength()) {
             throw new IllegalArgumentException("Whoops.. that location is invalid for construction.\n" +
                     "Someone did a programming woopsie, because of that, the game will now quit.");
         }
@@ -323,13 +314,11 @@ public class HomeShip {
             message.append(canDo);
             return false;
         }
-
-        pay(typeToBuild.getBuildCost());
+		pay(typeToBuild.getBuildCost());
         instance.forceBuildSection(loc.s, typeToBuild);
         return true;
-    }
-
-    static public boolean canBuildModule(ShipLoc loc, ModuleType typeToBuild, StringBuffer message) {
+	}
+	static public boolean canBuildModule(ShipLoc loc, ModuleType typeToBuild, StringBuffer message) {
         if (loc.isValidModule()){
             message.append("Illegal selection! How did you manage this? HOW!? (this is a bug, please report it)");
             return false;
@@ -520,12 +509,12 @@ public class HomeShip {
     }
 
 
-    public ArrayList<RefitTask> taskchain;
+    private ArrayList<RefitTask> taskChain;
 
 
     //STUB TODO: integrate with the job system
     public void cancelAllRefitTasks(){
-        taskchain = new ArrayList<>();
+        taskChain = new ArrayList<>();
     }
 
     public void endOfMonth() {
@@ -580,72 +569,6 @@ public class HomeShip {
     enum RefitType{build, remove}
 
 
-
-
-
-
-
-
-
-
-/*    public CanBuildResult canBuildWeapon(int sectionID, int slotID, WeaponType type) {
-        CanBuildResult result = new CanBuildResult();
-        if (!validateWeaponSlot(sectionID, slotID)) {
-            result.possible = false;
-            result.message = "Invalid selection.";
-            return result;
-        }
-
-        //STUB. TODO: check if player can afford to construct this.
-        result.possible = true;
-        result.message = String.format("A test-weapon will be built on section %1$s's weapon slot number %2$s.", sectionID, slotID);
-        return result;
-    }
-    public CanBuildResult canBuildModule(int sectionID, int moduleID, ModuleType type) {
-        CanBuildResult result = new CanBuildResult();
-        if (validateModuleSlot(sectionID, moduleID)) {
-            result.possible = false;
-            result.message = "Invalid selection.";
-            return result;
-        }
-        ShipModule module = modules[sectionID][moduleID];
-        //This is a STUB - No care is made for cargo or crew quarters yet
-
-        if (module.moduleType == ModuleType.Empty) {
-            if(type == ModuleType.Empty) {
-                result.possible = true;
-                result.message = "";
-                return result;
-            }
-            //STUB. TODO: check if player can afford to construct this.
-            result.possible = true;
-            result.message = String.format("A %1$s module will be constructed at section 2$s's module slot number 3$s", type, sectionID, moduleID);
-
-        }
-
-
-        if(type == ModuleType.Empty) {
-            result.possible = true;
-            if (module.moduleType == ModuleType.Empty) {
-                result.message = "";
-            }
-            result.message = "Module at ";
-        }
-
-
-
-    }*/
-    /** --- end of refit section ----**/
-
-
-
-
-
-
-
-
-
-
     /**
      * Test-creates a spaceship, then prints the structure to console.
      * @param args
@@ -653,6 +576,24 @@ public class HomeShip {
     public static void main(String[] args) {
         HomeShip ship = HomeShip.GenerateStart1(new Random(0), 2, 10, 0.0f, 1.0f);
         System.out.println(ship.toString());
+    }
+
+    public AbstractShipModule[] getModules() {
+        return (AbstractShipModule[]) modules.values().toArray();
+    }
+
+    public ArrayList<RefitTask> getTaskChain() {
+        return taskChain;
+    }
+
+    public static int getMiddleLength() {
+        return instance.tailLocation;
+    }
+    public static int getTailLocation() {
+        return instance.tailLocation;
+    }
+    public static int getFullLength() {
+        return instance.fullLength;
     }
 }
 
@@ -671,7 +612,7 @@ class ConstructionTask {
 abstract class SpecialSection extends AbstractShipSection {
 
     public SpecialSection(ShipLoc loc) {
-        super(loc);
+        super(loc, SectionType.Special);
     }
 
 
@@ -764,6 +705,11 @@ abstract class SpecialModule extends AbstractShipModule {
     @Override
     public abstractShipComponent[] getComponents() {
         return new abstractShipComponent[0];
+    }
+
+    @Override
+    public ModuleType getModuleType() {
+        return ModuleType.Special;
     }
 
     /**

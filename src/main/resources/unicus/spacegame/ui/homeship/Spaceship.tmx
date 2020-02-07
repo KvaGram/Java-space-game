@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="220" height="60" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="1">
+ <imagelayer id="2" name="Spaceship">
+  <image source="../../../../../../../../../Spacegame experiments/background.png" width="3520" height="960"/>
+ </imagelayer>
+</map>

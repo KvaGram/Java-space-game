@@ -8,7 +8,7 @@ import java.util.Collection;
 public class StrippedFrame extends AbstractShipSection {
 
     public StrippedFrame(ShipLoc loc) {
-        super(loc);
+        super(loc, SectionType.None);
     }
 
     @Override
