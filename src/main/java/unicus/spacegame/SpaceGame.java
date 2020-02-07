@@ -6,10 +6,18 @@ import unicus.spacegame.crew.SpaceCrew;
 import unicus.spacegame.spaceship.HomeShip;
 import unicus.spacegame.ui.DebugConsole;
 
+import java.time.Month;
+import java.util.Random;
+
 /**
  * Main game class.
  */
 public class SpaceGame implements IUpdateable {
+    // (subject to change) Start of game: March 2104
+    private static final int START_YEAR = 2104;
+    private static final int START_MONTH = 3;
+
+
     private static DebugConsole debugConsole;
     private static HomeShip homeShip;
     private static SpaceCrew spaceCrew;
@@ -65,9 +73,16 @@ public class SpaceGame implements IUpdateable {
      *
      */
     private static void GenerateStart1() {
-        SpaceCrew.GenerateStart1();
+        spaceCrew = SpaceCrew.GenerateStart1();
+        homeShip = HomeShip.GenerateStart1(new Random(0), 6, 6, .5f, .8f);
+
+        //TODO: add the cargostuff.
+
+        debugConsole = DebugConsole.getInstance();
+        debugConsole.addGameCommands();
 
     }
+
 
     public static void main(String[] args) {
         GenerateStart1();
@@ -82,5 +97,17 @@ public class SpaceGame implements IUpdateable {
     @Override
     public void update() {
 
+    }
+
+    public static String getDate(){
+        return getDate(getGameMonth());
+    }
+
+    private static String getDate(int gameMonth) {
+        int tot_month = (gameMonth + START_MONTH);
+        int real_year = START_YEAR + tot_month / 12;
+        Month real_month = Month.of(tot_month%12 + 1);
+
+        return real_month.name() + " " + real_year;
     }
 }

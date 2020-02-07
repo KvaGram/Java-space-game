@@ -27,7 +27,7 @@ public class ShipLoc {
     //section, module.
     int s, m;
 
-    ShipLoc(int s, int m){
+    public ShipLoc(int s, int m){
         this.s = s; this.m = m;
         if(HS == null)
             HS = HomeShip.getInstance();

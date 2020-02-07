@@ -8,6 +8,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import de.gurkenlabs.litiengine.IUpdateable;
+import unicus.spacegame.SpaceGame;
 import unicus.spacegame.crew.SpaceCrew;
 import unicus.spacegame.gameevent.GameEvent;
 import unicus.spacegame.crew.*;
@@ -161,6 +162,23 @@ public class DebugConsole implements IUpdateable {
         );
 
 
+    }
+    public void addGameCommands() {
+        dispatcher.register(
+            literal("game").then(
+                literal("date").then(
+                    literal("advance").executes( context -> {
+                        SpaceGame.NextMonth();
+                        return SpaceGame.getGameMonth();
+                    })
+                ).then(
+                    literal("print").executes(context -> {
+                        out.println(SpaceGame.getDate());
+                        return SpaceGame.getGameMonth();
+                    })
+                )
+            )
+        );
     }
     public void addCrewCommands() {
         /*
@@ -434,7 +452,7 @@ class ShipLocArgument implements ArgumentType<ShipLoc> {
 
         CommandExceptionType exceptionType = new CommandExceptionType() {};
 
-        ShipLoc loc = homeship.getShipLoc(section, module);
+        ShipLoc loc = new ShipLoc(section, module);
         if (!loc.isValidModule()) {
             Message msg = new Message() {
                 @Override public String getString() {return loc.toString() + " does not point to a valid module or section."; }
