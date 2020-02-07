@@ -8,6 +8,8 @@ import java.util.Random;
 import static unicus.spacegame.crew.SkillTypes.*;
 
 class SkillSet {
+    private static final int SKILL_CAP = 100;
+
     public SkillSet(long r, int average, int tolerance, int fudge, int maxBiasBoon, SkillTypes... bias) {
         this(new Random(r), average, tolerance, fudge, maxBiasBoon, bias);
     }
@@ -24,37 +26,43 @@ class SkillSet {
      */
     public SkillSet(Random r, int average, int tolerance, int fudge, int boon, SkillTypes... bias) {
         SkillTypes[] types = SkillTypes.values();
-        if(average < 0 || average > 100 || tolerance < 0 || fudge < 0 || fudge > 100 || boon < 0 || boon > 100)
+        int numSkills = types.length;
+        if(average < 0 || average > SKILL_CAP || tolerance < 0 || fudge < 0 || fudge > SKILL_CAP || boon < 0 || boon > SKILL_CAP)
             throw new IllegalArgumentException();
 
-        stats = new int[types.length];
-
-        int targetMinimalTotalPoints = (average - tolerance) * types.length;
-        int targetMaximumTotalPoints = (average + tolerance) * types.length;
+        stats = new int[numSkills];
+        int targetMinimalTotalPoints = (average - tolerance) * numSkills;
+        int targetMaximumTotalPoints = (average + tolerance) * numSkills;
 
         if (targetMinimalTotalPoints < 0)
             targetMinimalTotalPoints = 0;
-        if(targetMaximumTotalPoints > 100)
-            targetMaximumTotalPoints = 100;
+        if(targetMaximumTotalPoints > SKILL_CAP * numSkills)
+            targetMaximumTotalPoints = SKILL_CAP * numSkills;
 
+        //Total skill points
+        int total = 0;
         for(int s = 0; s < types.length; s++) {
             if(ArrayUtils.contains(bias, SkillTypes.GetTypeByIndex(s))) {
                 stats[s] = average + r.nextInt(boon);
             }
-            stats[s] = average - fudge + r.nextInt(fudge * 2);
+            else {
+                stats[s] = average - fudge + r.nextInt(fudge * 2);
+            }
+            total += stats[s];
         }
 
-        int toAdjust = 0;
-        int total = Arrays.stream(stats).sum();
+
+        double toAdjust = 0;
         if(total > targetMaximumTotalPoints)
             toAdjust = targetMaximumTotalPoints - total;
         else if (total < targetMinimalTotalPoints)
             toAdjust = targetMinimalTotalPoints - total;
 
-        for(int s = 0; s < types.length; s++) {
-            stats[s] += toAdjust;
+        for (int s = 0; s < types.length; s++) {
+            int a = (int)Math.floor( (toAdjust / (numSkills - s)));
+            stats[s] += a;
+            toAdjust -= a;
         }
-
     }
     public SkillSet(int[] stats) {
         this.stats = stats;
@@ -68,6 +76,14 @@ class SkillSet {
 
     protected void setStats(int[] stats) {
         this.stats = stats;
+    }
+
+    public double averageStat() {
+        double ret = 0.0;
+        for(int s : stats)
+            ret += s;
+        ret /= stats.length;
+        return ret;
     }
 
     public String asText() {
@@ -87,7 +103,8 @@ class SkillSet {
      */
     public static void main(String[] args) {
         long seed = System.currentTimeMillis();
-        SkillSet set = new SkillSet(seed, 50, 10, 10, 40, socialization, weaponry);
+        SkillSet set = new SkillSet(seed, 20, 0, 5, 50, socialization, weaponry);
         System.out.println(set.asText());
+        System.out.println("Average: " + set.averageStat());
     }
 }
