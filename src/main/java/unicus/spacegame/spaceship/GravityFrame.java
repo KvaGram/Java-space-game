@@ -12,7 +12,7 @@ public class GravityFrame extends AbstractShipSection {
     }
 
     public GravityFrame(ShipLoc sectionLoc) {
-        super(sectionLoc);
+        super(sectionLoc, SectionType.GravityPlated);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class GravityFrame extends AbstractShipSection {
 
     @Override
     public boolean canBuildModule(ModuleType typeToBuild, StringBuffer message) {
-        return false;
+        return true;
     }
 
     @Override

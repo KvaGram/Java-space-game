@@ -1,4 +1,4 @@
-package unicus.spacegame.ui.Homeship;
+package unicus.spacegame.ui.homeship;
 
 import unicus.spacegame.spaceship.ShipLoc;
 

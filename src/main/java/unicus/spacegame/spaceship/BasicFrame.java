@@ -12,7 +12,7 @@ public class BasicFrame extends AbstractShipSection {
     }
 
     public BasicFrame(ShipLoc loc) {
-        super(loc);
+        super(loc, SectionType.Normal);
     }
 
     @Override
@@ -37,7 +37,11 @@ public class BasicFrame extends AbstractShipSection {
 
     @Override
     public boolean canBuildModule(ModuleType typeToBuild, StringBuffer message) {
-        return false;
+        if(typeToBuild.getNeedGravity() && !this.useGravity()){
+            message.append("A ").append(typeToBuild.name()).append(" requires Gravity!");
+            return false;
+        }
+        return true;
     }
 
     @Override

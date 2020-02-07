@@ -40,6 +40,11 @@ public class CargoModule extends AbstractShipModule implements CargoContainer {
     }
 
     @Override
+    public ModuleType getModuleType() {
+        return ModuleType.Cargo;
+    }
+
+    @Override
     public String GetName() {
         return "Cargo bay at " + loc.toString();
     }

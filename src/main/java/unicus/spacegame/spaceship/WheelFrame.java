@@ -12,7 +12,7 @@ public class WheelFrame extends AbstractShipSection {
     }
 
     public WheelFrame(ShipLoc sectionLoc) {
-        super(sectionLoc);
+        super(sectionLoc, SectionType.Wheel);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class WheelFrame extends AbstractShipSection {
 
     @Override
     public boolean canBuildModule(ModuleType typeToBuild, StringBuffer message) {
-        return false;
+        return true;
     }
 
     @Override

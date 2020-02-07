@@ -70,6 +70,11 @@ public class HabitatModule extends AbstractShipModule implements HousingPlace {
     }
 
     @Override
+    public ModuleType getModuleType() {
+        return ModuleType.Habitat;
+    }
+
+    @Override
     public String GetName() {
         return "Habitat module at " + loc.toString();
     }

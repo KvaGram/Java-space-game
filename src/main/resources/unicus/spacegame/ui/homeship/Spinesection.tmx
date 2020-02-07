@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="16" height="3" tilewidth="16" tileheight="16" infinite="0" nextlayerid="2" nextobjectid="1">
+ <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16" tilecount="144" columns="16">
+  <image source="../../../../../../../../../Spacegame experiments/tileset.png" width="256" height="144"/>
+ </tileset>
+ <layer id="1" name="Tile Layer 1" width="16" height="3">
+  <data encoding="csv">
+4,6,6,6,6,5,6,6,6,6,5,6,6,6,6,7,
+20,22,22,22,22,21,22,22,22,22,21,22,22,22,22,23,
+36,38,38,38,38,37,38,38,38,38,37,38,38,38,38,39
+</data>
+ </layer>
+</map>

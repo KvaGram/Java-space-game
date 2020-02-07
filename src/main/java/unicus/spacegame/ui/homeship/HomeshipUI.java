@@ -1,10 +1,11 @@
-package unicus.spacegame.ui.Homeship;
+package unicus.spacegame.ui.homeship;
 
 import de.gurkenlabs.litiengine.gui.ComponentMouseEvent;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 import unicus.spacegame.spaceship.HomeShip;
 import unicus.spacegame.spaceship.ShipLoc;
 import unicus.spacegame.ui.Axis2D;
+import unicus.spacegame.ui.homeship.HomeshipUIController;
 import unicus.spacegame.ui.MenuController;
 import unicus.spacegame.ui.Scrollbar;
 import unicus.spacegame.ui.ScrollbarListener;
