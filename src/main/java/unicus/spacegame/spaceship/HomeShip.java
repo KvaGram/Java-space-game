@@ -3,6 +3,7 @@ package unicus.spacegame.spaceship;
 import unicus.spacegame.CargoCollection;
 import unicus.spacegame.CargoContainer;
 import unicus.spacegame.crew.*;
+import unicus.spacegame.spaceship.cunstruction.Construction;
 
 import java.util.*;
 
@@ -20,24 +21,29 @@ import java.util.*;
 public class HomeShip {
 
     /** Number of modules each non-special section has.*/
-    private final static int MODULES_PER_SECTION = 6;
+    public final static int MODULES_PER_SECTION = 6;
     /**total amount of module objects allowed per section (this includes the section object)
      * Used for calculating the hash value for ShipLoc.*/
-    private final static int MAX_MODULE_OBJECTS = MODULES_PER_SECTION + 1;
+    public final static int MAX_MODULE_OBJECTS = MODULES_PER_SECTION + 1;
 
     private static HomeShip instance;
-
+	
     public static HomeShip getInstance() {
         return instance;
     }
 
-    private final int headLocation;
-    private final int middleLength;
-    private final int tailLocation;
-    private final int fullLength;
-
+    protected final int headLocation;
+    protected final int middleLength;
+    protected final int tailLocation;
+    protected final int fullLength;
 
     public Hashtable<ShipLoc, AbstractShipModule> modules;
+
+    /**
+     * The monthly boom to morale to each crewman's morale.
+     *
+     */
+    private double monthAmenities;
 
     public static int getHeadLocation() {
         return instance.headLocation;
@@ -57,150 +63,11 @@ public class HomeShip {
 
 
     /**
-     * Ship location, inner class.
-     * Used to store a location of a section or module
-     *
-     * A section-value of 0 points to the head end of the ship.
-     * A section-value of {@link this.length} points to the tail end of the ship.
-     * A section-value not inside the above two is invalid, and points to nothing.
-     *
-     * A module-value of 0 refer to the section itself.
-     * A module-value above number of modules in the section or -1 and below are invalid, and does not point to any module or component.
-     *
-     */
-    public class ShipLoc {
-        //section, module.
-        int s, m;
-
-        ShipLoc(int s, int m){
-            this.s = s; this.m = m;
-        }
-
-        public boolean isValidSection() {return s >= 0 && s <= tailLocation;}
-        public boolean isValidModule() {
-            if (!isValidSection() || m < 0)
-                return false;
-            return modules.containsKey(this);
-        }
-
-        /**
-         * @return If this is the head section.
-         */
-        public boolean isHead(){return s == headLocation;} //Note: headLocation is always 0
-
-        /**
-         * @return If this is the tail section.
-         */
-        public boolean isTail(){return s == tailLocation;}
-
-
-        public AbstractShipModule getModule() {
-            if(isValidModule())
-                return modules.get(this);
-            return null;
-        }
-        public AbstractShipSection getSection() {
-            if (isValidSection()) {
-                return (AbstractShipSection) new ShipLoc(s, 0).getModule();
-            }
-            return null;
-        }
-        public ShipLoc[] getModuleLocList() {
-            if(!isValidSection())
-                return null;
-
-            ShipLoc[] ret = new ShipLoc[MODULES_PER_SECTION];
-            for (int i = 0; i < MODULES_PER_SECTION; i++) {
-                ret[i] = new ShipLoc(s, i + 1); //offset by 1, because the SectionObject occupies index 0.
-            }
-            return ret;
-        }
-
-        /**
-         * One Ship location equals another
-         * when they have the same section and module value.
-         * @param obj object to compare.
-         * @return Whatever the two locations are the same.
-         */
-        @Override
-        public boolean equals(Object obj) {
-            if (! (obj instanceof ShipLoc))
-                return false;
-            ShipLoc other = (ShipLoc)obj;
-
-            return other.s == s && other.m == m;
-        }
-
-        /**
-         * The hash value for a ship location, is the section number, multiplied by the maximum number of
-         * module objects (this includes the section object), plus the module index.
-         * @return a unique indexed value of the ship location (given valid values for section and module).
-         */
-        @Override
-        public int hashCode() {
-            int h = (MAX_MODULE_OBJECTS * s) + m;
-            return h;
-        }
-
-        public int getM() {
-            return m;
-        }
-        public int getS() {
-            return s;
-        }
-
-        @Override
-        public String toString() {
-            return "(Section " + s + ", Module " + m + ")";
-        }
-
-        /**
-         * Rolls the module-index.
-         * Should not be used for locations meant to represent a section index.
-         * @param num number of modules to roll.
-         * @return A new ShipLoc linking to the new module index.
-         */
-        public ShipLoc rollModule(int num) {
-            int newM = m + num; //add the roll amount.
-            /*
-            The following rolls newW to be within the [1, MAX_MODULE_OBJECTS] range
-             note: MODULES_PER_SECTION is expected to be 6,
-                  and MAX_MODULE_OBJECTS is expected to be 7 ( MODULES_PER_SECTION + 1).
-            */
-            while (newM >= MAX_MODULE_OBJECTS)
-                newM -= MODULES_PER_SECTION;
-            while (newM < 1) //Note: index 0 is reserved for the section-object.
-                newM += MODULES_PER_SECTION;
-
-            return new ShipLoc(s, newM);
-        }
-        public ShipLoc nextModule(){return rollModule(1);}
-        public ShipLoc prevModule(){return rollModule(-1);}
-
-        /**
-         * Moves the section-index.
-         * @param num number of sections to move.
-         * @return A new ShipLoc linking to the new section index.
-         */
-        public ShipLoc moveSection(int num) {
-            // Clamp newS to [headLocation, tailLocation]
-            // Where headLocation is always 0, and tailLocation is the last section index.
-            int newS = Math.max(headLocation, Math.min(tailLocation, s + num));
-            return new ShipLoc(newS, m);
-        }
-        public ShipLoc nextSection() {return moveSection(1);}
-        public ShipLoc prevSection() {return moveSection(-1);}
-
-
-
-    }
-
-    /**
-     *
      * @param s section index. exceptions: 0 refer to the head section, {@code length} refer to the tail section.
      * @param m module index. exceptions: 0 refer to the section itself.
      * @return
      */
+    @Deprecated(since = "ShipLoc has been moved out of HomeShip, and should be used directly.")
     public ShipLoc getShipLoc(int s, int m) {
         return new ShipLoc(s, m);
     }
@@ -254,6 +121,7 @@ public class HomeShip {
      * Replaces a section of the spaceship.
      * Warning: this WILL replace (destroy!) the existing section and modules,
      * including the components in it, with the new section and empty modules, without asking!
+     * This function presumes any checks have already been done.
      *
      * @param index section index of module to replace.
      * @param sectionType The new section type.
@@ -301,7 +169,7 @@ public class HomeShip {
      *
      * @return The new module
      */
-    private AbstractShipModule forceBuildModule(ShipLoc loc, ModuleType moduleType){
+    protected AbstractShipModule forceBuildModule(ShipLoc loc, ModuleType moduleType){
         if (!loc.isValidModule())
             throw new IllegalArgumentException("Whoops.. that location is invalid for construction.\n" +
                     "Someone did a programming woopsie, because of that, the game will now quit.");
@@ -424,13 +292,15 @@ public class HomeShip {
         }
         return ship;
     }
-    public boolean canBuildSection(ShipLoc shipLoc, SectionType typeToBuild, StringBuffer message) {
-        if (!shipLoc.isValidSection()) {
+
+    static public boolean canBuildSection(ShipLoc loc, SectionType typeToBuild, StringBuffer message) {
+        if (!loc.isValidSection()) {
             message.append("Illegal selection! How did you manage this? HOW!? (this is a bug, please report it)");
             return false;
         }
-        //TODO: get material cost of construction.
-        ArrayList<CargoCollection> cost = new ArrayList<>();
+        if(!canRemoveSection(loc, message))
+            return false;
+        Collection<CargoCollection> cost = typeToBuild.getBuildCost();
         if(! CanAfford(cost)) {
             message.append("You cannot afford X resources :-(");
             return false;
@@ -438,9 +308,18 @@ public class HomeShip {
         message.append("You can build this section-frame. It will cost X resources.");
         return true;
     }
-
-    public boolean canBuildModule(ShipLoc loc, ModuleType typeToBuild, StringBuffer message) {
-        if (!loc.isValidModule()){
+    static public boolean doBuildSection(ShipLoc loc, SectionType typeToBuild, StringBuffer message) {
+        StringBuffer canDo = new StringBuffer();
+        if(!canBuildSection(loc, typeToBuild, canDo)) {
+            message.append(canDo);
+            return false;
+        }
+		pay(typeToBuild.getBuildCost());
+        instance.forceBuildSection(loc.s, typeToBuild);
+        return true;
+	}
+	static public boolean canBuildModule(ShipLoc loc, ModuleType typeToBuild, StringBuffer message) {
+        if (loc.isValidModule()){
             message.append("Illegal selection! How did you manage this? HOW!? (this is a bug, please report it)");
             return false;
         }
@@ -450,36 +329,41 @@ public class HomeShip {
             return false;
         }
 
-        if (canRemoveModule(loc, message)) {
-            message.append("\n");
-        }
-        else {
-            message.append("\nModule cannot be built.");
+        if (!canRemoveModule(loc, message)) {
             return false;
         }
-        //TODO: get material cost of construction.
-        ArrayList<CargoCollection> cost = new ArrayList<>();
+        Collection<CargoCollection> cost = typeToBuild.getBuildCost();
         if(! CanAfford(cost)) {
             message.append("You cannot afford X resources :-(");
             return false;
         }
         message.append("You can build this module. It will cost X resources.");
         return true;
-
     }
-    public boolean canRemoveModule(ShipLoc shipLoc, StringBuffer message) {
-        if (!shipLoc.isValidModule()){
+    static public boolean doBuildModule(ShipLoc loc, ModuleType typeToBuild, StringBuffer message) {
+        StringBuffer canDo = new StringBuffer();
+        if(!canBuildModule(loc, typeToBuild, canDo)) {
+            message.append(canDo);
+            return false;
+        }
+        pay(typeToBuild.getBuildCost());
+        instance.forceBuildModule(loc, typeToBuild);
+        return true;
+    }
+
+    static public boolean canRemoveModule(ShipLoc loc, StringBuffer message) {
+        if (loc.isValidModule()){
             message.append("Illegal selection! How did you manage this? HOW!? (this is a bug, please report it)");
             return false;
         }
 
-        ArrayList<ShipLoc> lockedModules = getLockedModules();
-        if(lockedModules.contains(shipLoc)) {
+        ArrayList<ShipLoc> lockedModules = Construction.getBusyLocations();
+        if(lockedModules.contains(loc)) {
             message.append("Your crew is already busy at work here.");
             return false;
         }
 
-        AbstractShipModule module = shipLoc.getModule();
+        AbstractShipModule module = loc.getModule();
         //TODO: find more elegant way for checking this.
         if (module.getClass() == NullModule.class) {
             message.append("There is no module to remove.");
@@ -495,7 +379,7 @@ public class HomeShip {
         //Add this location to the locked modules.
         // This is used when checking if cargo,
         // recycled resources and displaced crew can be relocated.
-        lockedModules.add(shipLoc);
+        lockedModules.add(loc);
 
         int numCargo = cargoToMove.size(); //STUB - TODO: should report the total cargo units
         //int numPeople = housingToMove.size();
@@ -513,20 +397,30 @@ public class HomeShip {
         message.append("You can remove this module. You will move and reclaim x resources and displace x crew-members");
         return true;
     }
-    public boolean canRemoveSection(ShipLoc shipLoc, StringBuffer message) {
-        if (!shipLoc.isValidSection()) {
+    static public boolean doRemoveModule(ShipLoc loc, StringBuffer message){
+        StringBuffer canDo = new StringBuffer();
+        if(!canRemoveModule(loc, canDo)) {
+            message.append(canDo);
+            return false;
+        }
+        instance.forceBuildModule(loc, ModuleType.Empty);
+        return true;
+    }
+
+    static public boolean canRemoveSection(ShipLoc loc, StringBuffer message) {
+        if (!loc.isValidSection()) {
             message.append("Illegal selection! How did you manage this? HOW!? (this is a bug, please report it)");
             return false;
         }
 
-        ArrayList<ShipLoc> lockedModules = getLockedModules();
+        ArrayList<ShipLoc> lockedModules = Construction.getBusyLocations();
         for (ShipLoc l : lockedModules)
-            if (l.s == shipLoc.s) {
+            if (l.s == loc.s) {
                 message.append("Your crew is already busy working in this section. You cannot remove it.");
                 return false;
             }
         //TODO: find a more elegant way on checking for this
-        if(shipLoc.getSection().getClass() == StrippedFrame.class) {
+        if(loc.getSection().getClass() == StrippedFrame.class) {
             message.append("This section is already stripped.");
             return false;
         }
@@ -539,7 +433,7 @@ public class HomeShip {
         //TODO: add resources stripped from section-frame to cargo.
         //TODO: add weapon-components dismantled to cargo.
 
-        ShipLoc[] sModules = shipLoc.getModuleLocList();
+        ShipLoc[] sModules = loc.getModuleLocList();
         for (int i = 0, moduleLength = sModules.length; i < moduleLength; i++) {
             AbstractShipModule m = sModules[i].getModule();
             cargoToMove.addAll(m.getCargoOnDestruction());
@@ -553,7 +447,7 @@ public class HomeShip {
         //Adds this section's modules to the locked modules list.
         // This is used when checking if cargo,
         // recycled resources and displaced crew can be relocated.
-        Collections.addAll(lockedModules, shipLoc.getModuleLocList());
+        Collections.addAll(lockedModules, loc.getModuleLocList());
 
         int numCargo = cargoToMove.size(); //STUB - should report the total cargo units
         int numPeople = housingToMove.size();
@@ -574,6 +468,15 @@ public class HomeShip {
             message.append("/n" + numPeople + " crewmen will have to be moved.");
         return true;
     }
+    static public boolean doRemoveSection(ShipLoc loc, StringBuffer message) {
+        StringBuffer canDo = new StringBuffer();
+        if(!canRemoveSection(loc, canDo)) {
+            message.append(canDo);
+            return false;
+        }
+        instance.forceBuildSection(loc.s, SectionType.None);
+        return true;
+    }
 
     //region checkStore/re-house shortcuts
     private boolean checkCanHouseCrew(ArrayList<HousingAssignment> toMove) {
@@ -585,24 +488,24 @@ public class HomeShip {
     //endregion
 
     // STUB. TODO: check if crew can be housed in available housing space (except in modules in the ignore list).
-    private boolean checkCanHouseCrew(ArrayList<HousingAssignment> toMove, ArrayList<ShipLoc> ignoreList) {
+    static private boolean checkCanHouseCrew(ArrayList<HousingAssignment> toMove, ArrayList<ShipLoc> ignoreList) {
         return true;
     }
     // STUB. TODO: check if cargo can be stored in available space (except in modules in the ignore list).
-    private boolean checkStoreCargo(ArrayList<CargoCollection> toStore, ArrayList<ShipLoc> ignoreList) {
+    static private boolean checkStoreCargo(ArrayList<CargoCollection> toStore, ArrayList<ShipLoc> ignoreList) {
         return true;
     }
     //STUB! Todo: check if player can afford the cost.
-    private boolean CanAfford(ArrayList<CargoCollection> cost) {
+    static private boolean CanAfford(Collection<CargoCollection> cost) {
         return true;
     }
+    //STUB TODO: implement a way to pay resources
+    private static void pay(Collection<CargoCollection> buildCost) {
+    }
 
+    @Deprecated(since = "Replaced by Construction#getBusyLocations ")
     public ArrayList<ShipLoc> getLockedModules() {
-        ArrayList<ShipLoc> ret = new ArrayList<>();
-        for (RefitTask task : getTaskChain()) {
-            Collections.addAll(ret, task.targets);
-        }
-        return ret;
+        return Construction.getBusyLocations();
     }
 
 
@@ -612,6 +515,14 @@ public class HomeShip {
     //STUB TODO: integrate with the job system
     public void cancelAllRefitTasks(){
         taskChain = new ArrayList<>();
+    }
+
+    public void endOfMonth() {
+        monthAmenities = 0.0;
+
+        for (AbstractShipModule module : modules.values()) {
+            module.endOfMonth();
+        }
     }
 
 
@@ -700,7 +611,7 @@ class ConstructionTask {
 }
 abstract class SpecialSection extends AbstractShipSection {
 
-    public SpecialSection(HomeShip.ShipLoc loc) {
+    public SpecialSection(ShipLoc loc) {
         super(loc, SectionType.Special);
     }
 
@@ -761,7 +672,7 @@ abstract class SpecialSection extends AbstractShipSection {
 }
 class HeadSection extends SpecialSection {
 
-    public HeadSection(HomeShip.ShipLoc loc) {
+    public HeadSection(ShipLoc loc) {
         super(loc);
     }
 
@@ -771,7 +682,7 @@ class HeadSection extends SpecialSection {
     }
 }
 class TailSection extends SpecialSection {
-    public TailSection(HomeShip.ShipLoc loc) {
+    public TailSection(ShipLoc loc) {
         super(loc);
     }
 
@@ -782,7 +693,7 @@ class TailSection extends SpecialSection {
 }
 abstract class SpecialModule extends AbstractShipModule {
 
-    protected SpecialModule(HomeShip.ShipLoc loc) {
+    protected SpecialModule(ShipLoc loc) {
         super(ShipPartType.Module, loc);
     }
 
@@ -825,7 +736,7 @@ abstract class SpecialModule extends AbstractShipModule {
 }
 class MainBridge extends SpecialModule {
 
-    protected MainBridge(HomeShip.ShipLoc loc) {
+    protected MainBridge(ShipLoc loc) {
         super(loc);
     }
 
@@ -836,7 +747,7 @@ class MainBridge extends SpecialModule {
 }
 class Engineering extends SpecialModule {
 
-    protected Engineering(HomeShip.ShipLoc loc) {
+    protected Engineering(ShipLoc loc) {
         super(loc);
     }
 

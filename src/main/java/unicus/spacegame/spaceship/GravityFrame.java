@@ -11,7 +11,7 @@ public class GravityFrame extends AbstractShipSection {
         return new AbstractShipModule[0];
     }
 
-    public GravityFrame(HomeShip.ShipLoc sectionLoc) {
+    public GravityFrame(ShipLoc sectionLoc) {
         super(sectionLoc, SectionType.GravityPlated);
     }
 

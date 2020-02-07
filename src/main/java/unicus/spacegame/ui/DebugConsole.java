@@ -8,6 +8,9 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import de.gurkenlabs.litiengine.IUpdateable;
+import unicus.spacegame.SpaceGame;
+import unicus.spacegame.crew.SpaceCrew;
+import unicus.spacegame.gameevent.GameEvent;
 import unicus.spacegame.crew.*;
 import unicus.spacegame.spaceship.AbstractShipModule;
 import unicus.spacegame.spaceship.HomeShip;
@@ -28,66 +31,67 @@ import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
 import static com.mojang.brigadier.builder.LiteralArgumentBuilder.*;
 import static com.mojang.brigadier.builder.RequiredArgumentBuilder.*;
 import com.mojang.brigadier.arguments.*;
+import unicus.spacegame.spaceship.ShipLoc;
 
 
 public class DebugConsole implements IUpdateable {
-    public static void main(String[] args) {
-        DebugConsole c = new DebugConsole(HomeShip.GenerateStart1(new Random(), 8, 10, 0.5f, 0.8f));
-        c.run();
+    private static DebugConsole instance;
 
+    public static void main(String[] args) {
+        DebugConsole c = new DebugConsole();
+        HomeShip.GenerateStart1(new Random(), 8, 10, 0.5f, 0.8f);
+        c.run();
     }
 
-    private HomeShip homeship;
+
     PrintStream out;
     JTextArea ta;
     JTextField tf;
+    TextAreaOutputStream outStream;
 
     Random random;
 
     CommandDispatcher<Object> dispatcher;
     private static Object dummySender = new Object();
 
-    public DebugConsole(HomeShip homeship) {
-        this.homeship = homeship;
+    public DebugConsole() {
         ta = new JTextArea();
         tf = new JTextField();
         ta.setBackground(Color.lightGray);
         tf.setBackground(Color.yellow);
 
-        TextAreaOutputStream taos = new TextAreaOutputStream(ta, 60);
-        out = new PrintStream(taos);
+        outStream = new TextAreaOutputStream(ta, 60);
+        out = new PrintStream(outStream);
 
         random = new Random();
 
         dispatcher = new CommandDispatcher<Object>();
-        dispatcher.register(literal("print").then(literal("ship").executes( context -> {
-            printShip();
-            return 1;
-        })));
+        instance = this;
+    }
 
-        //Print - prints information about the homeship (todo: the crew, cargo etc)
+    public void write(String text) {
+        out.println(text);
+    }
+
+    public static DebugConsole getInstance() {
+        if (instance == null)
+            instance = new DebugConsole();
+        return instance;
+    }
+
+    public void addShipCommands() {
+        //SpaceCrew crew = SpaceCrew.getInstance();
+        HomeShip ship = HomeShip.getInstance();
+
         /*
+        Print - prints information about the homeship (todo: the crew, cargo etc)
+
         print ship: print a summary of the homeship
         print [ShipLoc] print a summary of a module or section.
-         */
-        dispatcher.register(
-                literal("print").then(
-                        literal("ship")
-                                .executes( context -> {
-                                    printShip();
-                                    return 1;
-                                }
-                        )
-                ).then(
-                        argument("loc", shipLocArgument())
-                                .executes( context -> {
-                                    printShipLoc(context.getArgument("loc", HomeShip.ShipLoc.class));
-                                    return 1;
-                                })
 
-                )
-        );
-        /* refit - change the ship configuration
+
+        refit - change the ship configuration
+
         refit remove [ShipLoc] - Attempts to remove a module or section by normal means.
         refit remove [ShipLoc] check - checks if a module or section can be removed.
         refit remove [ShipLoc] force - instantly removes a module or section ignoring requirements, tasks and resources.
@@ -99,11 +103,82 @@ public class DebugConsole implements IUpdateable {
         refit build [ShipLoc] [partType] - Attempts to build the partType module or section-frame by normal means.
         refit build [ShipLoc] [partType] check - checks if the partType module or section-frame can be built.
         refit build [ShipLoc] [partType] force - instantly builds the module or section, ignoring illegal combinations, requirements, tasks and resources.
-        
+
         refit build component [ShipLoc] [index] [partType]
         refit build component [ShipLoc] [index] [partType] check
         refit build component [ShipLoc] [index] [partType] force
          */
+        dispatcher.register(
+                literal("print").then(
+                        literal("ship")
+                                .executes( context -> {
+                                            printShip();
+                                            return 1;
+                                        }
+                                )
+                ).then(
+                        argument("loc", shipLocArgument())
+                                .executes( context -> {
+                                    printShipLoc(context.getArgument("loc", ShipLoc.class));
+                                    return 1;
+                                })
+
+                )
+        );
+    }
+
+    public void addGameEventCommands() {
+        GameEvent gameEvent = GameEvent.getInstance();
+        /*
+        event run [event_id] - forcefully runs the event of this id, if it exist. event_id must be above 0, fails if an event is waiting
+        event option [option_choice] - selects an option as response to an event, fails if no event is waiting.
+        event random - runs a randomly selected event, fails if an event is waiting
+
+         */
+
+
+        dispatcher.register(literal("event").then(
+                literal("run").then(
+                    argument("event_id", integer(1)).executes(context -> {
+                        int eventID = context.getArgument("event_id", int.class);
+                        gameEvent.event_byID(eventID);
+                        return eventID;
+                    })
+                )
+            ).then(
+                literal("option").then(
+                    argument("option_choice", integer(0)).executes(context -> {
+                        int optionChoice = context.getArgument("option_choice", int.class);
+                        return gameEvent.handle_option(optionChoice);
+
+                    })
+                )
+            ).then(
+                literal("random").executes(context -> {
+                    int event_id = gameEvent.event_Random();
+                    return event_id;
+                })
+            )
+        );
+
+
+    }
+    public void addGameCommands() {
+        dispatcher.register(
+            literal("game").then(
+                literal("date").then(
+                    literal("advance").executes( context -> {
+                        SpaceGame.NextMonth();
+                        return SpaceGame.getGameMonth();
+                    })
+                ).then(
+                    literal("print").executes(context -> {
+                        out.println(SpaceGame.getDate());
+                        return SpaceGame.getGameMonth();
+                    })
+                )
+            )
+        );
     }
     public void addCrewCommands() {
         /*
@@ -127,7 +202,7 @@ public class DebugConsole implements IUpdateable {
                                 int key = spaceCrew.getCrewKeys().yieldKey();
                                 int birthday = context.getArgument("birthdate", int.class);
                                 //String name = context.getArgument("name", String.class);
-                                AdultCrewman c = new AdultCrewman(key, birthday, random.nextLong(), new int[0]);
+                                AbleCrewman c = new AdultCrewman(key, birthday, random.nextLong(), new int[0]);
                                 spaceCrew.addReplaceCrewmen(c);
                                 out.println("Created a new adult crewman. ID: " + key);
                                 return key;
@@ -304,10 +379,10 @@ public class DebugConsole implements IUpdateable {
     }
 
     private ShipLocArgument shipLocArgument(){
-        return new ShipLocArgument(homeship);
+        return new ShipLocArgument(HomeShip.getInstance());
     }
 
-    private void printShipLoc(HomeShip.ShipLoc loc){
+    private void printShipLoc(ShipLoc loc){
         StringBuffer b = new StringBuffer();
         loc.getModule().getInfo(b);
         out.println(b.toString());
@@ -323,7 +398,7 @@ public class DebugConsole implements IUpdateable {
         b.append("\nNumber of jobs - " + numJobs);
         b.append("\nNumber of buildable sections - " + HomeShip.getMiddleLength());
         b.append("\n------------------------------------");
-        for (AbstractShipModule m : homeship.modules.values()) {
+        for (AbstractShipModule m : HomeShip.getInstance().modules.values()) {
             m.getInfo(b);
         }
         out.println(b.toString());
@@ -355,7 +430,7 @@ class InvalidShipLocMessage implements Message{
     }
 }
 
-class ShipLocArgument implements ArgumentType<HomeShip.ShipLoc> {
+class ShipLocArgument implements ArgumentType<ShipLoc> {
     private HomeShip homeship;
     private ShipLocTarget target;
 
@@ -368,7 +443,7 @@ class ShipLocArgument implements ArgumentType<HomeShip.ShipLoc> {
     }
 
     @Override
-    public HomeShip.ShipLoc parse(StringReader reader) throws CommandSyntaxException {
+    public ShipLoc parse(StringReader reader) throws CommandSyntaxException {
         reader.expect('(');
         int section = reader.readInt();
         reader.expect(':');
@@ -377,7 +452,7 @@ class ShipLocArgument implements ArgumentType<HomeShip.ShipLoc> {
 
         CommandExceptionType exceptionType = new CommandExceptionType() {};
 
-        HomeShip.ShipLoc loc = homeship.getShipLoc(section, module);
+        ShipLoc loc = new ShipLoc(section, module);
         if (!loc.isValidModule()) {
             Message msg = new Message() {
                 @Override public String getString() {return loc.toString() + " does not point to a valid module or section."; }

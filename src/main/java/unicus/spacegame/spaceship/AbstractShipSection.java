@@ -5,7 +5,7 @@ public abstract class AbstractShipSection extends AbstractShipModule{
 
 
     public abstract AbstractShipModule[] GetModuleTypes();
-    public AbstractShipSection(HomeShip.ShipLoc loc, SectionType sectionType) {
+    public AbstractShipSection(ShipLoc loc, SectionType sectionType) {
         super(ShipPartType.Section, loc);
         this.sectionType = sectionType;
     }

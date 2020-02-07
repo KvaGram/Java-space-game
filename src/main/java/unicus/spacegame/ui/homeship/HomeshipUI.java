@@ -1,9 +1,11 @@
-package unicus.spacegame.ui.Homeship;
+package unicus.spacegame.ui.homeship;
 
 import de.gurkenlabs.litiengine.gui.ComponentMouseEvent;
 import de.gurkenlabs.litiengine.gui.GuiComponent;
 import unicus.spacegame.spaceship.HomeShip;
+import unicus.spacegame.spaceship.ShipLoc;
 import unicus.spacegame.ui.Axis2D;
+import unicus.spacegame.ui.homeship.HomeshipUIController;
 import unicus.spacegame.ui.MenuController;
 import unicus.spacegame.ui.Scrollbar;
 import unicus.spacegame.ui.ScrollbarListener;
@@ -58,20 +60,20 @@ public class HomeshipUI extends GuiComponent {
         for (int s = 0; s < numSections; s++) {
             //extra code-block, so variable-name loc can be reused.
             {
-                HomeShip.ShipLoc loc = homeship.getShipLoc(s+1, 0);
+                ShipLoc loc = homeship.getShipLoc(s+1, 0);
                 sections[s] = new SectionComponentUI(loc);
                 scrollbar.addScrollListener(sections[s]);
                 sections[s].onClicked(componentMouseEvent -> onShipPartClicked(loc, componentMouseEvent));
             }
             for (int m = 0; m < sectionNumModules; m++) {
-                HomeShip.ShipLoc loc = homeship.getShipLoc(s+1, m+1);
+                ShipLoc loc = homeship.getShipLoc(s+1, m+1);
                 int mm = s*sectionNumModules + m;
                 modules[mm] = new ModuleComponentUI(loc);
                 scrollbar.addScrollListener(modules[mm]);
                 modules[mm].onClicked(componentMouseEvent -> onShipPartClicked(loc, componentMouseEvent));
             }
             for (int g = 0; g < SectionNumGunSlots; g++) {
-                HomeShip.ShipLoc loc = homeship.getShipLoc(s+1, 0);
+                ShipLoc loc = homeship.getShipLoc(s+1, 0);
                 int gg = s*sectionNumModules + g;
                 gunSlots[gg] = new GunSlotComponentUI(loc, g);
                 scrollbar.addScrollListener(gunSlots[gg]);
@@ -88,7 +90,7 @@ public class HomeshipUI extends GuiComponent {
         getComponents().add(popMenu);
     }
 
-    private void onShipPartClicked(HomeShip.ShipLoc loc, ComponentMouseEvent componentMouseEvent) {
+    private void onShipPartClicked(ShipLoc loc, ComponentMouseEvent componentMouseEvent) {
         popMenu.setX(componentMouseEvent.getEvent().getX());
         popMenu.setY(componentMouseEvent.getEvent().getY());
         if(controller != null)
@@ -140,7 +142,7 @@ public class HomeshipUI extends GuiComponent {
         }
 
         for(ModuleComponentUI m : modules) {
-            int numModules = m.loc.getSection().getNumModules();
+            int numModules = HomeShip.MODULES_PER_SECTION;
             if(!m.loc.isValidModule() || m.loc.getM() >= numModules) {
                 m.suspend();
                 continue;
@@ -198,12 +200,12 @@ public class HomeshipUI extends GuiComponent {
     }
 }
 abstract class HomeshipUIComponent extends GuiComponent implements ScrollbarListener {
-    protected HomeShip.ShipLoc loc;
+    protected ShipLoc loc;
     private final Point localPos;
     private boolean needUpdate;
     private int scrollOffset;
 
-    protected HomeshipUIComponent(int width, int height, HomeShip.ShipLoc loc){
+    protected HomeshipUIComponent(int width, int height, ShipLoc loc){
         super(0,0, width, height);
         this.loc = loc;
         this.localPos = new Point();
@@ -241,7 +243,7 @@ class SectionComponentUI extends HomeshipUIComponent{
      * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
      *
      */
-    protected SectionComponentUI(HomeShip.ShipLoc loc) {
+    protected SectionComponentUI(ShipLoc loc) {
 
         super(HomeshipUI.SECTION_WIDTH, HomeshipUI.SECTION_HEIGHT, loc);
         this.loc = loc;
@@ -264,13 +266,13 @@ class SectionComponentUI extends HomeshipUIComponent{
 }
 class ModuleComponentUI extends  HomeshipUIComponent{
 
-    protected HomeShip.ShipLoc loc;
+    protected ShipLoc loc;
 
     /**
      * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
      *
      */
-    protected ModuleComponentUI(HomeShip.ShipLoc loc) {
+    protected ModuleComponentUI(ShipLoc loc) {
         super(HomeshipUI.MODULE_WIDTH, HomeshipUI.MODULE_HEIGHT, loc);
         this.loc = loc;
     }
@@ -299,7 +301,7 @@ class GunSlotComponentUI extends HomeshipUIComponent{
      * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
      *
      */
-    protected GunSlotComponentUI(HomeShip.ShipLoc loc, int gunSlot) {
+    protected GunSlotComponentUI(ShipLoc loc, int gunSlot) {
         super(HomeshipUI.WEAPON_WIDTH, HomeshipUI.WEAPON_HEIGHT, loc);
         this.gunSlot = gunSlot;
     }

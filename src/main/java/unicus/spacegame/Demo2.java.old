@@ -5,8 +5,10 @@ import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.gui.screens.GameScreen;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
+import unicus.spacegame.gameevent.GameEvent;
 import unicus.spacegame.crew.SpaceCrew;
 import unicus.spacegame.spaceship.HomeShip;
+import unicus.spacegame.spaceship.ShipLoc;
 import unicus.spacegame.ui.DebugConsole;
 
 import javax.imageio.ImageIO;
@@ -92,10 +94,12 @@ class Demo2 implements IUpdateable {
 
         //shipView = new ShipRefitController("SHIPVIEW", homeship);
 
-        DebugConsole console = new DebugConsole(homeship);
+        DebugConsole console = new DebugConsole();
         console.run();
         console.addCrewCommands();
         Game.loop().attach(console);
+
+        GameEvent.getInstance(); //get the events initiated
     }
 
 
@@ -173,5 +177,33 @@ class SituationScreen extends GameScreen {
 //        //Expected to run homeshipUI.openMenu
 //    }
 //}
+
+
+
+    /**
+     * This method is called by the game loop on all objects that need to update
+     * their attributes. It is called on every tick, means, it is called
+     * Game.GameLoop.TICKS_PER_SECOND times per second.
+     */
+    @Override
+    public void update() {
+        if(isSuspended())
+            return;
+        //System.out.println("Hello world");
+
+    }
+
+    @Override
+    public void render(final Graphics2D g) {
+        super.render(g);
+    }
+
+
+    @Override
+    public void onSelected(ShipLoc loc) {
+        //TODO what to do when a section, module or component is selected.
+        //Expected to run homeshipUI.openMenu
+    }
+}
 
 

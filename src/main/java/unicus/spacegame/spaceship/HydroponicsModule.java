@@ -3,20 +3,18 @@ package unicus.spacegame.spaceship;
 import unicus.spacegame.CargoCollection;
 import unicus.spacegame.CargoContainer;
 import unicus.spacegame.crew.AbstractJob;
-import unicus.spacegame.crew.AdultCrewman;
+import unicus.spacegame.crew.AbleCrewman;
 import unicus.spacegame.crew.SpaceCrew;
 import unicus.spacegame.crew.Workplace;
 
-import java.sql.SQLSyntaxErrorException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Queue;
 
 public class HydroponicsModule extends AbstractShipModule implements Workplace {
     private HydroponicsJob job;
     private ArrayList<FoodTask> taskList;
 
-    public HydroponicsModule(HomeShip.ShipLoc loc) {
+    public HydroponicsModule(ShipLoc loc) {
         super(loc);
         int jobKey = SpaceCrew.getInstance().getJobKeys().yieldKey();
         //Note that the module and job are co-linked and have shared private access to each other.
@@ -107,7 +105,7 @@ public class HydroponicsModule extends AbstractShipModule implements Workplace {
         /**
          * Calculates a base efficiency for how well a crewman will do this job.
          * Used in UI to show percentage efficiency.
-         * Note: implementation should include the result from {@link AdultCrewman#getGeneralWorkModifier()},
+         * Note: implementation should include the result from {@link AbleCrewman#getGeneralWorkModifier()},
          * unless implementation has an alternative.
          *
          * @param crewID The ID of the crewman
@@ -115,9 +113,9 @@ public class HydroponicsModule extends AbstractShipModule implements Workplace {
          */
         @Override
         public double getWorkModifierOfCrewman(int crewID) {
-            AdultCrewman c;
+            AbleCrewman c;
             try {
-                c = (AdultCrewman) SpaceCrew.getInstance().getCrew(crewID);
+                c = (AbleCrewman) SpaceCrew.getInstance().getCrew(crewID);
             }catch (Error err) {
                 System.err.println(err);
                 return 0.0;

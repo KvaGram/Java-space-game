@@ -1,4 +1,4 @@
-package unicus.spacegame.ui.Homeship;
+package unicus.spacegame.ui.homeship;
 
 import de.gurkenlabs.litiengine.*;
 import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
@@ -32,7 +32,7 @@ public class TestShipView extends Screen implements IUpdateable {
     HomeshipGUI homeshipGUI;
     ConfigMenu configMenu;
 
-    HomeShip.ShipLoc selectionLoc;
+    ShipLoc selectionLoc;
 
     public static void main(String[] args) {
         Image cursor;
@@ -134,7 +134,7 @@ public class TestShipView extends Screen implements IUpdateable {
 
     }
 
-    public void open(HomeShip.ShipLoc loc) {
+    public void open(ShipLoc loc) {
         selectionLoc = loc;
         homeshipGUI.setSelection(loc, true);
         configMenu.open();
@@ -148,7 +148,7 @@ public class TestShipView extends Screen implements IUpdateable {
 
         homeshipGUI.setSelection(selectionLoc, false);
     }
-    void setSelection(HomeShip.ShipLoc loc) {
+    void setSelection(ShipLoc loc) {
         selectionLoc = loc;
         homeshipGUI.setSelection(selectionLoc, false);
     }

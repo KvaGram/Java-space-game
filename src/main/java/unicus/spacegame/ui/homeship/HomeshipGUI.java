@@ -1,4 +1,4 @@
-package unicus.spacegame.ui.Homeship;
+package unicus.spacegame.ui.homeship;
 
 import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.annotation.EntityInfo;
@@ -97,7 +97,7 @@ public class HomeshipGUI extends Entity implements IRenderable {
      * @param loc
      * @param menuMode
      */
-    public void setSelection(HomeShip.ShipLoc loc, boolean menuMode) {
+    public void setSelection(ShipLoc loc, boolean menuMode) {
         setSelectionFocus(loc.getS(), 30, menuMode);
         //Set the closest rotation, based on current rotation and target module index.
         rotation = loc.getM();
@@ -187,7 +187,7 @@ public class HomeshipGUI extends Entity implements IRenderable {
         HomeShip homeShip = HomeShip.getInstance();
         //AbstractShipModule[][] modules = homeShip.getModules();
 
-        HomeShip.ShipLoc loc;
+        ShipLoc loc;
         for(int s = 0; s < HomeShip.getFullLength(); s++) {
             loc = homeShip.getShipLoc(s, 0);
 
@@ -267,7 +267,7 @@ public class HomeshipGUI extends Entity implements IRenderable {
         g.dispose();
     }
 
-    private void renderSection(Graphics2D g, HomeShip.ShipLoc loc) {
+    private void renderSection(Graphics2D g, ShipLoc loc) {
         SectionType sectionType;
         try {
             sectionType = loc.getSection().getSectionType();
@@ -284,7 +284,7 @@ public class HomeshipGUI extends Entity implements IRenderable {
         g.setColor(sectionType.getColor());
         g.fillRect(x,y,SECTION_WIDTH, SECTION_HEIGHT);
     }
-    private void renderModule(Graphics2D g, HomeShip.ShipLoc loc, int spineDist, boolean above) {
+    private void renderModule(Graphics2D g, ShipLoc loc, int spineDist, boolean above) {
         ModuleType moduleType;
         try {
             moduleType = loc.getModule().getModuleType();

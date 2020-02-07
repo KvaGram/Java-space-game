@@ -2,6 +2,12 @@ package unicus.spacegame.spaceship;
 
 import java.awt.*;
 
+import unicus.spacegame.CargoCollection;
+import unicus.spacegame.CargoContainer;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
 /**
  * A list of section-types
  * For test, each type has a color
@@ -24,5 +30,8 @@ public enum SectionType {
 
     public Color getColor() {
         return color;
+    }
+    public Collection<CargoCollection> getBuildCost(){
+        return CargoContainer.Null.getCollection();
     }
 };

@@ -7,7 +7,7 @@ import java.util.Collection;
 
 public class StrippedFrame extends AbstractShipSection {
 
-    public StrippedFrame(HomeShip.ShipLoc loc) {
+    public StrippedFrame(ShipLoc loc) {
         super(loc, SectionType.None);
     }
 

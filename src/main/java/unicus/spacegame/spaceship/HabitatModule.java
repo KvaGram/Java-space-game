@@ -18,7 +18,7 @@ import java.util.Collection;
  */
 
 public class HabitatModule extends AbstractShipModule implements HousingPlace {
-    public HabitatModule(HomeShip.ShipLoc loc) {
+    public HabitatModule(ShipLoc loc) {
         super(loc);
         housing = new HabitatHousing(SpaceCrew.getInstance().getHousingKeys().yieldKey());
         SpaceCrew.getInstance().addHousing(housing);
