@@ -2,6 +2,8 @@ package unicus.spacegame.crew;
 import org.apache.commons.lang3.ArrayUtils;
 import unicus.spacegame.spaceship.cunstruction.Construction;
 import unicus.spacegame.utilities.ObjectKey;
+
+import java.util.Random;
 /*
  * Refactor notes:
  * Crew.java is renamed to SpaceCrew.java.
@@ -107,74 +109,61 @@ public class SpaceCrew {
         Norma López - 432 months old, passenger (security / combat expert)
 
          */
+        Random r = new Random(0);
+        SkillSet skills;
 
         //#region crew initialization
+        skills = new SkillSet(r, 60, 20, 10, 50, SkillType.socialization, SkillType.navigation);
         AdultCrewman Hugh = new AdultCrewman(crew.crewKeys.yieldKey(),
-                -381,
-                new CrewSelfID("Hugh Frost", CrewGender.male), new CrewmanGeneData(),
-                AbleCrewman.GenerateSkills(70),
-                60, 6000
-        );
+                -381, new CrewSelfID("Hugh Frost", CrewGender.male), new CrewmanGeneData(),
+                skills,60, 6000);
+
+        skills = new SkillSet(r, 50, 20, 10, 50, SkillType.artifice, SkillType.doctoring);
         AdultCrewman Zach = new AdultCrewman(crew.crewKeys.yieldKey(),
-                -360,
-                new CrewSelfID("Zach Frost", CrewGender.male), new CrewmanGeneData(),
-                AbleCrewman.GenerateSkills(60),
-                60, 6000
-        );
+                -360, new CrewSelfID("Zach Frost", CrewGender.male), new CrewmanGeneData(),
+                skills, 60, 6000 );
+
+        skills = new SkillSet(r, 60, 20, 10, 30, SkillType.combat, SkillType.weaponry);
         AdultCrewman Cole = new AdultCrewman(crew.crewKeys.yieldKey(),
-                -570,
-                new CrewSelfID("Cole Rowe", CrewGender.male), new CrewmanGeneData(),
-                AbleCrewman.GenerateSkills(60),
-                60, 6000
-        );
+                -570, new CrewSelfID("Cole Rowe", CrewGender.male), new CrewmanGeneData(),
+                skills, 60, 6000 );
+
+        skills = new SkillSet(r, 60, 20, 10, 50, SkillType.socialization, SkillType.doctoring);
         AdultCrewman George = new AdultCrewman(crew.crewKeys.yieldKey(),
-                -312,
-                new CrewSelfID("George Hawkins", CrewGender.male), new CrewmanGeneData(),
-                AbleCrewman.GenerateSkills(60),
-                60, 6000
-        );
+                -312, new CrewSelfID("George Hawkins", CrewGender.male), new CrewmanGeneData(),
+                skills, 60, 6000 );
+
+        skills = new SkillSet(r, 60, 20, 10, 50, SkillType.artifice);
         AdultCrewman Eden = new AdultCrewman(crew.crewKeys.yieldKey(),
-                -408,
-                new CrewSelfID("Eden Day", CrewGender.female), new CrewmanGeneData(),
-                AbleCrewman.GenerateSkills(90),
-                60, 6000
-        );
+                -408, new CrewSelfID("Eden Day", CrewGender.female), new CrewmanGeneData(),
+                skills, 60, 6000 );
+
+        skills = new SkillSet(r, 60, 20, 10, 50, SkillType.navigation);
         AdultCrewman Rosie = new AdultCrewman(crew.crewKeys.yieldKey(),
-                -308,
-                new CrewSelfID("Rosie Connor", CrewGender.female), new CrewmanGeneData(),
-                AbleCrewman.GenerateSkills(90),
-                60, 6000
-        );
+                -308, new CrewSelfID("Rosie Connor", CrewGender.female), new CrewmanGeneData(),
+                skills, 60, 6000 );
+
+        skills = new SkillSet(r, 60, 20, 10, 30, SkillType.navigation);
         AdultCrewman Jessie = new AdultCrewman(crew.crewKeys.yieldKey(),
-                -400,
-                new CrewSelfID("Jessie Marshall", CrewGender.female), new CrewmanGeneData(),
-                AbleCrewman.GenerateSkills(90),
-                60, 6000
-        );
+                -400, new CrewSelfID("Jessie Marshall", CrewGender.female), new CrewmanGeneData(),
+                skills, 60, 6000 );
+
+        skills = new SkillSet(r, 60, 20, 10, 50, SkillType.artifice);
         AdultCrewman Ciara = new AdultCrewman(crew.crewKeys.yieldKey(),
-                -302,
-                new CrewSelfID("Ciara Palmer", CrewGender.female), new CrewmanGeneData(),
-                AbleCrewman.GenerateSkills(90),
-                60, 6000
-        );
+                -302, new CrewSelfID("Ciara Palmer", CrewGender.female), new CrewmanGeneData(),
+                skills, 60, 6000 );
+
+        skills = new SkillSet(r, 60, 20, 10, 50, SkillType.weaponry);
         AdultCrewman Alicia = new AdultCrewman(crew.crewKeys.yieldKey(),
-                -320,
-                new CrewSelfID("Alicia Hatcher", CrewGender.female), new CrewmanGeneData(),
-                AbleCrewman.GenerateSkills(90),
-                60, 6000
-        );
+                -320, new CrewSelfID("Alicia Hatcher", CrewGender.female), new CrewmanGeneData(),
+                skills, 60, 6000 );
+
+        skills = new SkillSet(r, 60, 20, 10, 50, SkillType.socialization, SkillType.combat);
         AdultCrewman Norma = new AdultCrewman(crew.crewKeys.yieldKey(),
-                -432,
-                new CrewSelfID("Norma López", CrewGender.female), new CrewmanGeneData(),
-                AbleCrewman.GenerateSkills(90),
-                60, 6000
-        );
+                -432, new CrewSelfID("Norma López", CrewGender.female), new CrewmanGeneData(),
+                skills, 60, 6000 );
         //#endregion
         crew.addReplaceCrewmen(Hugh, Zach, Cole, George, Eden, Rosie, Jessie, Ciara, Alicia, Norma);
-
-
-
-
         return crew;
     }
 

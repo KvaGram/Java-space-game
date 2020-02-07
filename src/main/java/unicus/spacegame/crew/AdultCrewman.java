@@ -5,8 +5,8 @@ public class AdultCrewman extends AbleCrewman {
         super(keyID, CrewmanState.adult, birthDate, randomSeed, parents);
     }
 
-    public AdultCrewman(int keyID, int birthDate, CrewSelfID selfID, CrewmanGeneData geneData, int[] skillValues, double base_intelligence, double base_morale) {
-        super(keyID, CrewmanState.adult, birthDate, selfID, geneData, skillValues, base_intelligence, base_morale);
+    public AdultCrewman(int keyID, int birthDate, CrewSelfID selfID, CrewmanGeneData geneData, SkillSet skillSet, double base_intelligence, double base_morale) {
+        super(keyID, CrewmanState.senior, birthDate, selfID, geneData, skillSet, base_intelligence, base_morale);
     }
 
     protected AdultCrewman(AbleCrewman crewman) {

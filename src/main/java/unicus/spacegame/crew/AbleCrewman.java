@@ -12,14 +12,6 @@ import java.util.Random;
  */
 abstract public class AbleCrewman extends AbstractCrewman {
 
-    //Maximum obtainable level in a skill.
-    private static final int SKILL_CAP = 100;
-
-    //Randomizer constants for crewman skills
-    private static final int MIN_SKILL = 5;
-    private static final int MAX_SKILL = 60;
-    private static final int RAND_SKILL = MAX_SKILL - MIN_SKILL;
-
     //Maximum obtainable base intelligence (traits may increase final intelligence)
     private static final double BASE_INT_CAP = 100;
 
@@ -46,7 +38,7 @@ abstract public class AbleCrewman extends AbstractCrewman {
     private static final double CRISIS_TRIGGER_STRESS = 100.0;
 
     //Skill values for the crewman.
-    private int[] skillValues;
+    private final SkillSet skillSet;
 
     //The accumulated stress of this crewman.
     double stress;
@@ -76,38 +68,35 @@ abstract public class AbleCrewman extends AbstractCrewman {
      */
     public double getMorale() {return base_morale;} //todo: add and subtract morale based on workload, traits and amenities.
 
-    public int getSkill(SkillTypes skillType) {
-        int skillIndex = SkillTypes.GetIndexByType(skillType);
-        if(skillIndex < 0 || skillIndex >= skillValues.length)
-            throw new IllegalArgumentException("Skill " + skillType + " is not a valid skill. This is a bug. If you loaded from a save-file, please check the game version and the change logs for a change to skill-types.");
-        return getSkill(skillIndex);
+
+    //#region SkillSet passthough
+    //todo: add or subtract value according to traits
+    public int getSkill(SkillType skillType) {
+        return skillSet.getSkill(skillType);
     }
     public int getSkill(int skillIndex) {
-        if(skillIndex < 0 || skillIndex >= skillValues.length)
-            throw new IllegalArgumentException("index " + skillIndex + " is not a valid skill index.");
-        return skillValues[skillIndex]; //todo: add or subtract value according to traits
+        return skillSet.getSkill(skillIndex);
     }
 
-    //Trains skill at index skillIndex by amount
     public void trainSkill(int skillIndex, int amount) {
-        this.skillValues[skillIndex] += amount;
-        if (this.skillValues[skillIndex] > SKILL_CAP) {
-            this.skillValues[skillIndex] = SKILL_CAP;
-        }
+        skillSet.trainSkill(skillIndex, amount);
     }
     //Trains type skill by amount
-    public void trainSkill(SkillTypes type, int amount) {
-        trainSkill(SkillTypes.GetIndexByType(type), amount);
+    public void trainSkill(SkillType type, int amount) {
+        skillSet.trainSkill(type, amount);
     }
     //Trains type skill by 1
-    public void trainSkill(SkillTypes type) {
-        trainSkill(type, 1);
+    public void trainSkill(SkillType type) {
+        skillSet.trainSkill(type);
     }
+    //#endregion
 
     public AbleCrewman(int keyID, CrewmanState state, int birthDate, long randomSeed, int[] parents) {
         //Note: see onRandomize.
         super(keyID, state, birthDate, randomSeed, parents);
         assert (state.isWorkAble());
+        Random r = new Random(hashCode());
+        this.skillSet = new SkillSet(r, 40, 20, 20, 30, SkillType.random(r), SkillType.random(r));
     }
 
     /**
@@ -117,14 +106,14 @@ abstract public class AbleCrewman extends AbstractCrewman {
      * @param birthDate Month of birth after start of game (can be negative)
      * @param selfID Name, gender, presentation of crewman
      * @param geneData Genetic traits and history of crewman
-     * @param skillValues Proficiencies and abilities of crewman.
+     * @param skillSet Proficiencies and abilities of crewman.
      * @param base_intelligence Ability to learn and avoid stupid mistakes.
      * @param base_morale Tolerance for workload
      */
-    public AbleCrewman(int keyID, CrewmanState state, int birthDate, CrewSelfID selfID, CrewmanGeneData geneData, int[] skillValues, double base_intelligence, double base_morale) {
+    public AbleCrewman(int keyID, CrewmanState state, int birthDate, CrewSelfID selfID, CrewmanGeneData geneData, SkillSet skillSet, double base_intelligence, double base_morale) {
         super(keyID, state, birthDate, selfID, geneData);
+        this.skillSet = skillSet;
         assert (state.isWorkAble());
-        this.skillValues = skillValues;
         this.base_intelligence = base_intelligence;
         this.base_morale = base_morale;
     }
@@ -132,7 +121,7 @@ abstract public class AbleCrewman extends AbstractCrewman {
     protected AbleCrewman(AbleCrewman crewman, CrewmanState state) {
         super(crewman, state);
         assert (state.isWorkAble());
-        this.skillValues = crewman.skillValues;
+        this.skillSet = crewman.skillSet;
         this.base_morale = crewman.base_morale;
         this.base_intelligence = crewman.base_morale;
     }
@@ -140,7 +129,8 @@ abstract public class AbleCrewman extends AbstractCrewman {
         super(crewman, state);
         assert (state.isWorkAble());
         //TODO: calculate skills, morale and intelligence based on previous state.
-        this.skillValues = new int[SkillTypes.values().length];
+        Random r = new Random(hashCode());
+        this.skillSet = new SkillSet(r, 40, 20, 20, 30, SkillType.random(r), SkillType.random(r));
         this.base_morale = 1000;
         this.base_intelligence = 50;
 
@@ -153,12 +143,6 @@ abstract public class AbleCrewman extends AbstractCrewman {
         //randomizing crewman stats
         base_intelligence = r.nextInt(RAND_INT) + MIN_BASE_INT;
         base_morale = r.nextInt(RAND_MORALE) + MIN_BASE_MORALE;
-
-        //Randomize each skill with a minimum of 5 and a maximum of 60.
-        this.skillValues = new int[SkillTypes.values().length];
-        for (int i = 0; i < skillValues.length; i++) {
-            skillValues[i] = r.nextInt(RAND_SKILL) + MIN_SKILL;
-        }
     }
 
     /**
@@ -222,7 +206,7 @@ abstract public class AbleCrewman extends AbstractCrewman {
         text.append("Intelligence: ").append(getIntelligence()).append("\n");
         text.append("Stress: ").append(stress).append("\n");
 
-        for (SkillTypes s : SkillTypes.values()) {
+        for (SkillType s : SkillType.values()) {
             text.append(s.toString()).append(": ").append(getSkill(s)).append("\n");
         }
         text.append("Status update last month:\n");
@@ -230,21 +214,6 @@ abstract public class AbleCrewman extends AbstractCrewman {
         text.append("Stress-change: ").append(monthStressChange);
 
         return text;
-    }
-
-    /** This is a stub. Currently only returns a flat average on all skills.
-     * TODO: write a skill generator with bias and some random nudge
-     *
-     * Generates a skillset based on average skill level, and any bias they may have.
-     * @param average The average amount of points each skill have.
-     * @param bias List of skills that will get more points. Repeated entries will get more skills
-     * @return A skillset
-     */
-    public static int[] GenerateSkills(int average, SkillTypes... bias) {
-        SkillTypes[] types = SkillTypes.values();
-        int[] skills = new int[types.length];
-        Arrays.fill(skills, average);
-        return skills;
     }
 }
 

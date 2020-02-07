@@ -1,11 +1,13 @@
 package unicus.spacegame.crew;
 
+import java.util.Random;
+
 /*
 * Skills-types put in an enum.
 * This makes it easier to change the list in the future
 * - Lars
 */
-public enum SkillTypes
+public enum SkillType
 {
     socialization("The ability to come to agreement with other, be they fellow crew, or aliens."),
     navigation("The ability to steer and navigate spacecraft, be it in sublight or warp speeds."),
@@ -18,20 +20,20 @@ public enum SkillTypes
 
     public final String description;
 
-    public static int GetIndexByType(SkillTypes type) {
+    public static int GetIndexByType(SkillType type) {
         return type.ordinal();
     }
-    public static SkillTypes GetTypeByIndex(int index) {
-        return SkillTypes.values()[index];
+    public static SkillType GetTypeByIndex(int index) {
+        return SkillType.values()[index];
     }
-    public static SkillTypes GetTypeByString(String name) {
-        return SkillTypes.valueOf(name.toLowerCase().trim());
+    public static SkillType GetTypeByString(String name) {
+        return SkillType.valueOf(name.toLowerCase().trim());
     }
     public static int GetIndexByString(String name) {
         return GetIndexByType(GetTypeByString(name));
     }
     public static int GetNumSkills(){
-        return SkillTypes.values().length;
+        return SkillType.values().length;
     }
 
     //Individual functions for each value:
@@ -40,8 +42,11 @@ public enum SkillTypes
         return this.toString();
     }
 
-    SkillTypes(String description){
+    SkillType(String description){
 
         this.description = description;
     }
+
+    public static SkillType random(Random r){return values()[r.nextInt(values().length)];}
+    public static SkillType random(long randomSeed){return random(new Random(randomSeed));}
 }
