@@ -67,6 +67,15 @@ public enum ModuleType {
         public Color getColor() {
             return new Color(30, 168, 0);
         }
+    }, Clinic {
+        @Override
+        public boolean getNeedGravity() {
+            return true;
+        }
+        @Override
+        public Color getColor() {
+            return new Color(0, 182, 124);
+        }
     }, Special {
         @Override
         public boolean getNeedGravity() {
