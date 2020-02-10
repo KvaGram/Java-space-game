@@ -65,9 +65,9 @@ public class SpaceGame implements IUpdateable {
         Game.init();
         Game.window().cursor().set(cursor, 8, 8);
         Input.mouse().setGrabMouse(false);
+        Game.graphics().setBaseRenderScale(1.5f);
 
         GenerateStart1();
-
 
         Game.loop().attach(debugConsole);
         Game.loop().attach(this);
