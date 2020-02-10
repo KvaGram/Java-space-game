@@ -106,7 +106,7 @@ public abstract class AbstractJob {
         double max = 0;
         double min = Integer.MAX_VALUE;
         monthWorkDone = 0;
-        monthJobAssignments = SpaceCrew.getInstance().getJobAssignmentsByJob(keyID);
+        monthJobAssignments = SpaceCrew.SC().getJobAssignmentsByJob(keyID);
         for (JobAssignment ja : monthJobAssignments) {
             int crewID = ja.getCrewID();
             if (ja.getWorkshare() == WorkShare.vacation)
@@ -155,7 +155,7 @@ public abstract class AbstractJob {
         this.active = active;
         if (!active) {
             //This unassigns all crewmen assigned to this job.
-            SpaceCrew.getInstance().unassignAllJobCrew(keyID);
+            SpaceCrew.SC().unassignAllJobCrew(keyID);
         }
     }
 
@@ -174,7 +174,7 @@ public abstract class AbstractJob {
      */
     public AbleCrewman getMonthWorstCrewman() {
         try {
-            return (AbleCrewman) SpaceCrew.getInstance().getCrew(monthWorstCrewman);
+            return (AbleCrewman) SpaceCrew.SC().getCrew(monthWorstCrewman);
         } catch (Exception err) {
             System.err.println(err);
             return null;
@@ -188,7 +188,7 @@ public abstract class AbstractJob {
 
     public AbleCrewman getMonthBestCrewman() {
         try {
-            return (AbleCrewman) SpaceCrew.getInstance().getCrew(monthBestCrewman);
+            return (AbleCrewman) SpaceCrew.SC().getCrew(monthBestCrewman);
         } catch (Exception err) {
             System.err.println(err);
             return null;
@@ -202,7 +202,7 @@ public abstract class AbstractJob {
     public StringBuffer toString(StringBuffer text) {
         text.append("Job ID: ").append(keyID).append("/n");
         text.append("Monthly workload: ").append(getMonthlyWorkload()).append("\n");
-        JobAssignment[] workers = SpaceCrew.getInstance().getJobAssignmentsByJob(keyID);
+        JobAssignment[] workers = SpaceCrew.SC().getJobAssignmentsByJob(keyID);
         text.append("The job has ").append(workers.length).append(" assigned workers.\n");
         for (JobAssignment ja :
                 workers) {

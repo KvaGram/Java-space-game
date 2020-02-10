@@ -4,7 +4,6 @@ Note that some features of the AdultCrewman may be moved to a new superclass
  or interfaces as other implementations of AbstractCrewman are written.
  */
 
-import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -180,7 +179,7 @@ abstract public class AbleCrewman extends AbstractCrewman {
         monthRest = 0;
         monthWorkload = 0;
         monthStressChange = 0;
-        monthJobAssignments = SpaceCrew.getInstance().getJobAssignmentsByCrewman(keyID);
+        monthJobAssignments = SpaceCrew.SC().getJobAssignmentsByCrewman(keyID);
         for (JobAssignment ja: monthJobAssignments ) {
             monthWorkload += ja.getMonthWorkloadShare();
         }

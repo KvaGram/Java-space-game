@@ -1,7 +1,5 @@
 package unicus.spacegame.ui.crew;
 
-import de.gurkenlabs.litiengine.graphics.RenderEngine;
-import de.gurkenlabs.litiengine.graphics.TextRenderer;
 import unicus.spacegame.crew.AbstractCrewman;
 import unicus.spacegame.crew.CrewSelfID;
 import unicus.spacegame.crew.SpaceCrew;
@@ -35,7 +33,7 @@ public class CrewCard {
         }
         else {
             AbstractCrewman crewman;
-            crewman = SpaceCrew.getInstance().getCrew(crewID);
+            crewman = SpaceCrew.SC().getCrew(crewID);
             if(crewman == null) {
                 System.err.println("WARNING: Crewman ID is void : " + crewID);
                 displayImage = getImage(NO_CREW_IMAGE);

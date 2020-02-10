@@ -16,10 +16,10 @@ public class HydroponicsModule extends AbstractShipModule implements Workplace {
 
     public HydroponicsModule(ShipLoc loc) {
         super(loc);
-        int jobKey = SpaceCrew.getInstance().getJobKeys().yieldKey();
+        int jobKey = SpaceCrew.SC().getJobKeys().yieldKey();
         //Note that the module and job are co-linked and have shared private access to each other.
         job = new HydroponicsJob(jobKey);
-        SpaceCrew.getInstance().addJobs(job);
+        SpaceCrew.SC().addJobs(job);
 
         taskList = new ArrayList<>();
 
@@ -115,7 +115,7 @@ public class HydroponicsModule extends AbstractShipModule implements Workplace {
         public double getWorkModifierOfCrewman(int crewID) {
             AbleCrewman c;
             try {
-                c = (AbleCrewman) SpaceCrew.getInstance().getCrew(crewID);
+                c = (AbleCrewman) SpaceCrew.SC().getCrew(crewID);
             }catch (Error err) {
                 System.err.println(err);
                 return 0.0;

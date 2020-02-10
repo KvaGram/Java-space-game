@@ -16,6 +16,7 @@ import java.awt.event.MouseEvent;
 import java.util.Collections;
 
 import static unicus.spacegame.ui.Axis2D.*;
+import static unicus.spacegame.spaceship.HomeShip.HS;
 
 /**
  * The Homeship UI renders a 2D representation of the spaceship, its section frames and modules
@@ -26,7 +27,6 @@ public class HomeshipUI extends GuiComponent {
     public ModuleComponentUI[] modules;
     public GunSlotComponentUI[] gunSlots;
     public Scrollbar scrollbar;
-    private HomeShip homeship;
     private final Dimension viewArea = new Dimension(); //visible pixel screen-size of the homeship
     private final Dimension area = new Dimension(); //Full pixel screen-size of the homeship.
     private PopMenu popMenu;
@@ -40,9 +40,8 @@ public class HomeshipUI extends GuiComponent {
      * @param width  the width
      * @param height
      */
-    public HomeshipUI(HomeShip homeship, double x, double y, double width, double height) {
+    public HomeshipUI(double x, double y, double width, double height) {
         super(x, y, width, height);
-        this.homeship = homeship;
         this.viewArea.setSize((int)width, (int)height);
 
         //number of sections will not change (might refactor to allow this later)
@@ -60,20 +59,20 @@ public class HomeshipUI extends GuiComponent {
         for (int s = 0; s < numSections; s++) {
             //extra code-block, so variable-name loc can be reused.
             {
-                ShipLoc loc = homeship.getShipLoc(s+1, 0);
+                ShipLoc loc = HS().getShipLoc(s+1, 0);
                 sections[s] = new SectionComponentUI(loc);
                 scrollbar.addScrollListener(sections[s]);
                 sections[s].onClicked(componentMouseEvent -> onShipPartClicked(loc, componentMouseEvent));
             }
             for (int m = 0; m < sectionNumModules; m++) {
-                ShipLoc loc = homeship.getShipLoc(s+1, m+1);
+                ShipLoc loc = HS().getShipLoc(s+1, m+1);
                 int mm = s*sectionNumModules + m;
                 modules[mm] = new ModuleComponentUI(loc);
                 scrollbar.addScrollListener(modules[mm]);
                 modules[mm].onClicked(componentMouseEvent -> onShipPartClicked(loc, componentMouseEvent));
             }
             for (int g = 0; g < SectionNumGunSlots; g++) {
-                ShipLoc loc = homeship.getShipLoc(s+1, 0);
+                ShipLoc loc = HS().getShipLoc(s+1, 0);
                 int gg = s*sectionNumModules + g;
                 gunSlots[gg] = new GunSlotComponentUI(loc, g);
                 scrollbar.addScrollListener(gunSlots[gg]);

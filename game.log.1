@@ -1,0 +1,19 @@
+Feb 10, 2020 10:20:14 AM de.gurkenlabs.litiengine.DefaultUncaughtExceptionHandler uncaughtException
+SEVERE: Game crashed! :(
+de.gurkenlabs.litiengine.resources.ResourceLoadException: java.io.FileNotFoundException
+	at de.gurkenlabs.litiengine.resources.ResourcesContainer.loadResource(ResourcesContainer.java:389)
+	at java.base/java.util.concurrent.ConcurrentHashMap.computeIfAbsent(ConcurrentHashMap.java:1705)
+	at de.gurkenlabs.litiengine.resources.ResourcesContainer.get(ResourcesContainer.java:276)
+	at de.gurkenlabs.litiengine.resources.ResourcesContainer.get(ResourcesContainer.java:207)
+	at de.gurkenlabs.litiengine.environment.GameWorld.getEnvironment(GameWorld.java:160)
+	at unicus.spacegame.ui.homeship.ShipViewController.<init>(ShipViewController.java:82)
+	at unicus.spacegame.ui.homeship.ShipViewController.SVC(ShipViewController.java:32)
+	at unicus.spacegame.SpaceGame.startGame(SpaceGame.java:76)
+	at unicus.spacegame.SpaceGame.main(SpaceGame.java:131)
+Caused by: java.io.FileNotFoundException
+	at de.gurkenlabs.litiengine.util.io.XmlUtilities.readFromFile(XmlUtilities.java:92)
+	at de.gurkenlabs.litiengine.resources.Maps.load(Maps.java:29)
+	at de.gurkenlabs.litiengine.resources.Maps.load(Maps.java:15)
+	at de.gurkenlabs.litiengine.resources.ResourcesContainer.loadResource(ResourcesContainer.java:387)
+	... 8 more
+

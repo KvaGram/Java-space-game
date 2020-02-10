@@ -26,10 +26,10 @@ public class HomeShip {
      * Used for calculating the hash value for ShipLoc.*/
     public final static int MAX_MODULE_OBJECTS = MODULES_PER_SECTION + 1;
 
-    private static HomeShip instance;
+    private static HomeShip HS;
 	
-    public static HomeShip getInstance() {
-        return instance;
+    public static HomeShip HS() {
+        return HS;
     }
 
     protected final int headLocation;
@@ -46,7 +46,7 @@ public class HomeShip {
     private double monthAmenities;
 
     public static int getHeadLocation() {
-        return instance.headLocation;
+        return HS.headLocation;
     }
 
     /* TODO: static special modules
@@ -85,7 +85,7 @@ public class HomeShip {
         this.fullLength = middleLength + 2; //the full length of the ship
 
         modules = new Hashtable<>();
-        instance = this;
+        HS = this;
 
         HeadSection head = new HeadSection(new ShipLoc(headLocation, 0));
         MainBridge bridge = new MainBridge(new ShipLoc(headLocation, 1));
@@ -217,7 +217,7 @@ public class HomeShip {
             c.onDestroy();
             if(m instanceof Workplace) {
                 Workplace w = (Workplace) m;
-                SpaceCrew.getInstance().removeJobs(w.getDependentJobs());
+                SpaceCrew.SC().removeJobs(w.getDependentJobs());
             }
         }
         m.onDestroy();
@@ -246,13 +246,12 @@ public class HomeShip {
      * @param full How much of the potential space will be filled with cargo (range 0, 1)
      * @return A Spaceship
      */
-    private static HomeShip GenerateStart1(Random rand, int middleLength, float full){
+    public static HomeShip GenerateStart1(Random rand, int middleLength, float full){
         //middle length MUST be at least 2.
         if (middleLength < 2)
             middleLength = 2;
 
         HomeShip ship = new HomeShip(middleLength);
-
 
         AbstractShipSection wheelSection = ship.forceBuildSection(1, SectionType.Wheel);
         ship.forceBuildModule(ship.getShipLoc(1,2), ModuleType.Habitat);
@@ -315,7 +314,7 @@ public class HomeShip {
             return false;
         }
 		pay(typeToBuild.getBuildCost());
-        instance.forceBuildSection(loc.s, typeToBuild);
+        HS.forceBuildSection(loc.s, typeToBuild);
         return true;
 	}
 	static public boolean canBuildModule(ShipLoc loc, ModuleType typeToBuild, StringBuffer message) {
@@ -347,7 +346,7 @@ public class HomeShip {
             return false;
         }
         pay(typeToBuild.getBuildCost());
-        instance.forceBuildModule(loc, typeToBuild);
+        HS.forceBuildModule(loc, typeToBuild);
         return true;
     }
 
@@ -403,7 +402,7 @@ public class HomeShip {
             message.append(canDo);
             return false;
         }
-        instance.forceBuildModule(loc, ModuleType.Empty);
+        HS.forceBuildModule(loc, ModuleType.Empty);
         return true;
     }
 
@@ -474,7 +473,7 @@ public class HomeShip {
             message.append(canDo);
             return false;
         }
-        instance.forceBuildSection(loc.s, SectionType.None);
+        HS.forceBuildSection(loc.s, SectionType.None);
         return true;
     }
 
@@ -587,13 +586,13 @@ public class HomeShip {
     }
 
     public static int getMiddleLength() {
-        return instance.tailLocation;
+        return HS.tailLocation;
     }
     public static int getTailLocation() {
-        return instance.tailLocation;
+        return HS.tailLocation;
     }
     public static int getFullLength() {
-        return instance.fullLength;
+        return HS.fullLength;
     }
 }
 

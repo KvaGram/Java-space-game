@@ -10,7 +10,6 @@ import de.gurkenlabs.litiengine.gui.Menu;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
-import org.apache.commons.lang3.ArrayUtils;
 import unicus.spacegame.crew.SpaceCrew;
 import unicus.spacegame.spaceship.*;
 import unicus.spacegame.ui.crew.CrewMenu;
@@ -25,9 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
-import java.util.function.IntConsumer;
 
-public class TestShipView extends Screen implements IUpdateable {
+public class ShipViewController extends Screen implements IUpdateable {
+    private static ShipViewController SVC;
+    public static ShipViewController SVC(){
+        if(SVC == null)
+            new ShipViewController();
+        return SVC;
+    }
+
     Environment shipViewEnv;
     HomeshipGUI homeshipGUI;
     ConfigMenu configMenu;
@@ -51,14 +56,14 @@ public class TestShipView extends Screen implements IUpdateable {
 
         Game.init();
         Game.window().cursor().set(cursor, Align.CENTER, Valign.MIDDLE);
-        URL spaceshipURL = TestShipView.class.getResource("spaceship.litidata");
+        URL spaceshipURL = ShipViewController.class.getResource("spaceship.litidata");
         Resources.load(spaceshipURL);
         Input.mouse().setGrabMouse(false);
         Game.graphics().setBaseRenderScale(1.5f);
 
         SpaceCrew sc = SpaceCrew.GenerateStart1();
         HomeShip hs = HomeShip.GenerateStart1(new Random(0), 3, 10, 0.4f, 0.8f);
-        TestShipView view = new TestShipView();
+        ShipViewController view = new ShipViewController();
         Game.screens().display(view);
         Game.start();
 
@@ -67,13 +72,18 @@ public class TestShipView extends Screen implements IUpdateable {
 
     }
 
-    protected TestShipView() {
-        super("TEST_SHIP_VIEW");
+
+
+    protected ShipViewController() {
+        super("SHIP");
+        //Load the map environment.
+        URL spaceshipURL = ShipViewController.class.getResource("spaceship.litidata");
+        Resources.load(spaceshipURL);
+
         configMenu = new ConfigMenu(0, 0, Game.window().getResolution().width, Game.window().getResolution().height/2.0 );
         getComponents().add(configMenu);
-        configMenu.suspend();
         shipViewEnv = Game.world().getEnvironment("Spaceship");
-        selectionLoc = HomeShip.getInstance().getShipLoc(0,1);
+        selectionLoc = HomeShip.HS().getShipLoc(0,1);
 
         Input.keyboard().onKeyTyped(KeyEvent.VK_LEFT, keyEvent -> onLeft());
         Input.keyboard().onKeyTyped(KeyEvent.VK_A, keyEvent -> onLeft());
@@ -91,6 +101,9 @@ public class TestShipView extends Screen implements IUpdateable {
 
         Input.keyboard().onKeyTyped(KeyEvent.VK_ESCAPE, keyEvent -> onExit());
         Input.keyboard().onKeyTyped(KeyEvent.VK_BACK_SPACE, keyEvent -> onExit());
+
+        //set instance
+        SVC = this;
     }
     void onLeft(){
         if(!getMenuOpen()) {
@@ -176,12 +189,15 @@ public class TestShipView extends Screen implements IUpdateable {
     @Override
     public void prepare() {
         super.prepare();
+        configMenu.suspend();
         Game.world().reset("Spaceship");
         Game.world().loadEnvironment("Spaceship");
+
         homeshipGUI = new HomeshipGUI();
         shipViewEnv = Game.world().environment();
         shipViewEnv.add(homeshipGUI, RenderType.GROUND);
         homeshipGUI.drawMode = HomeshipGUI.HomeShipDrawMode.unwrapped;
+        homeshipGUI.setSelection(new ShipLoc(0,0), false);
     }
 
 
@@ -402,10 +418,10 @@ public class TestShipView extends Screen implements IUpdateable {
                     StringBuffer text = new StringBuffer();
                     boolean canDo = false;
                     if (value < buildableModules.length) {
-                        canDo = HomeShip.getInstance().canBuildModule(selectionLoc, buildableModules[value], text);
+                        canDo = HomeShip.HS().canBuildModule(selectionLoc, buildableModules[value], text);
                     }
                     else {
-                        canDo = HomeShip.getInstance().canRemoveModule(selectionLoc, text);
+                        canDo = HomeShip.HS().canRemoveModule(selectionLoc, text);
                     }
                     message = text.toString();
                     setAddTaskReady(canDo);
@@ -419,10 +435,10 @@ public class TestShipView extends Screen implements IUpdateable {
                     StringBuffer text = new StringBuffer();
                     boolean canDo = false;
                     if (value < buildableFrames.length) {
-                        canDo = HomeShip.getInstance().canBuildSection(selectionLoc, buildableFrames[value], text);
+                        canDo = HomeShip.HS().canBuildSection(selectionLoc, buildableFrames[value], text);
                     }
                     else {
-                        canDo = HomeShip.getInstance().canRemoveSection(selectionLoc, text);
+                        canDo = HomeShip.HS().canRemoveSection(selectionLoc, text);
                     }
                     message = text.toString();
                     setAddTaskReady(canDo);

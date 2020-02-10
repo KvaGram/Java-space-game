@@ -14,11 +14,11 @@ import java.util.Random;
 
 public class SpaceCrew {
 
-    private static SpaceCrew instance;
-    public static SpaceCrew getInstance() {
-        if (instance == null)
+    private static SpaceCrew SC;
+    public static SpaceCrew SC() {
+        if (SC == null)
             new SpaceCrew(); //constructor sets instance.
-        return instance;
+        return SC;
     }
 
     private final ObjectKey crewKeys;
@@ -46,7 +46,7 @@ public class SpaceCrew {
         this.jobAssignments = new JobAssignment[0];
         this.housings = new AbstractHousing[0];
         this.housingAssignments = new HousingAssignment[0];
-        instance = this;
+        SC = this;
 
         jobKeys = new ObjectKey();
         crewKeys = new ObjectKey();
@@ -87,7 +87,7 @@ public class SpaceCrew {
 
     //STUB!
     public static SpaceCrew GenerateStart1() {
-        SpaceCrew crew = getInstance();
+        SpaceCrew crew = SC();
 
         /*
         Starting crew, made mostly at random. Feel free to change minor details

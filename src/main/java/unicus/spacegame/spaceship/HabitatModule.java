@@ -20,8 +20,8 @@ import java.util.Collection;
 public class HabitatModule extends AbstractShipModule implements HousingPlace {
     public HabitatModule(ShipLoc loc) {
         super(loc);
-        housing = new HabitatHousing(SpaceCrew.getInstance().getHousingKeys().yieldKey());
-        SpaceCrew.getInstance().addHousing(housing);
+        housing = new HabitatHousing(SpaceCrew.SC().getHousingKeys().yieldKey());
+        SpaceCrew.SC().addHousing(housing);
     }
     HabitatHousing housing;
 
@@ -91,6 +91,6 @@ public class HabitatModule extends AbstractShipModule implements HousingPlace {
      */
     @Override
     public void onDestroy() {
-        SpaceCrew.getInstance().removeHousing(housing.getKeyID());
+        SpaceCrew.SC().removeHousing(housing.getKeyID());
     }
 }

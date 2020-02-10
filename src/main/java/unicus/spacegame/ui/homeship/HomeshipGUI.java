@@ -184,7 +184,7 @@ public class HomeshipGUI extends Entity implements IRenderable {
         //g.setColor(new Color(255, 255, 255));
         //g.fillRect(0, 0, 50, 50);
 
-        HomeShip homeShip = HomeShip.getInstance();
+        HomeShip homeShip = HomeShip.HS();
         //AbstractShipModule[][] modules = homeShip.getModules();
 
         ShipLoc loc;
