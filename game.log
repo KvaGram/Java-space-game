@@ -1,0 +1,18 @@
+Feb 10, 2020 9:57:22 AM de.gurkenlabs.litiengine.DefaultUncaughtExceptionHandler uncaughtException
+SEVERE: Game crashed! :(
+java.lang.IllegalArgumentException: bound must be positive
+	at java.base/java.util.Random.nextInt(Random.java:388)
+	at unicus.spacegame.spaceship.HomeShip.GenerateStart1(HomeShip.java:236)
+	at unicus.spacegame.SpaceGame.GenerateStart1(SpaceGame.java:120)
+	at unicus.spacegame.SpaceGame.startGame(SpaceGame.java:69)
+	at unicus.spacegame.SpaceGame.main(SpaceGame.java:131)
+
+Feb 10, 2020 10:09:02 AM de.gurkenlabs.litiengine.DefaultUncaughtExceptionHandler uncaughtException
+SEVERE: Game crashed! :(
+java.lang.IllegalArgumentException: bound must be positive
+	at java.base/java.util.Random.nextInt(Random.java:388)
+	at unicus.spacegame.spaceship.HomeShip.GenerateStart1(HomeShip.java:236)
+	at unicus.spacegame.SpaceGame.GenerateStart1(SpaceGame.java:120)
+	at unicus.spacegame.SpaceGame.startGame(SpaceGame.java:69)
+	at unicus.spacegame.SpaceGame.main(SpaceGame.java:131)
+

@@ -1,13 +1,23 @@
 package unicus.spacegame;
 
+import de.gurkenlabs.litiengine.Game;
 import de.gurkenlabs.litiengine.IUpdateable;
 import de.gurkenlabs.litiengine.configuration.ClientConfiguration;
+import de.gurkenlabs.litiengine.input.Input;
+import de.gurkenlabs.litiengine.resources.Resources;
 import unicus.spacegame.crew.SpaceCrew;
+import unicus.spacegame.gameevent.GameEvent;
 import unicus.spacegame.spaceship.HomeShip;
 import unicus.spacegame.ui.DebugConsole;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.time.Month;
 import java.util.Random;
+
+import static unicus.spacegame.ui.homeship.ShipViewController.SVC;
 
 /**
  * Main game class.
@@ -17,21 +27,54 @@ public class SpaceGame implements IUpdateable {
     private static final int START_YEAR = 2104;
     private static final int START_MONTH = 3;
 
-
+    private static SpaceGame SG;
     private static DebugConsole debugConsole;
     private static HomeShip homeShip;
     private static SpaceCrew spaceCrew;
 
     private static int GameMonth;
 
+    public static SpaceGame SG() {
+        if(SG == null)
+            new SpaceGame();
+        return SG;
+    }
+    public SpaceGame() {
+        SG = this;
+    }
 
-    /*
-    NOTE: List under construction, and may be moved out of source code
-    Dependency chart
-    '->' = depends on
+    private void startGame() {
+        Game.setInfo("gameinfo.xml");
+        Image cursor;
+        try {
 
-    Construction -> SpaceCrew
-     */
+            //try loading file.
+            cursor = ImageIO.read(Resources.getLocation("cursor1.png")).getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+        } catch (IOException | IllegalArgumentException err) {
+            //paint backup icon.
+            System.out.println(err);
+            cursor = new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
+            Graphics g = cursor.getGraphics();
+            g.setColor(Color.red);
+            g.drawOval(0, 0, 16, 16);
+        }
+
+        Random r = new Random(0);
+        SpaceCrew.GenerateStart1();
+        HomeShip.GenerateStart1(r, 6, 0.75f);
+        Game.init();
+        Game.window().cursor().set(cursor, 8, 8);
+        Input.mouse().setGrabMouse(false);
+
+        GenerateStart1();
+
+
+        Game.loop().attach(debugConsole);
+        Game.loop().attach(this);
+        Game.start();
+        //open the ship-view controller
+        Game.screens().display(SVC());
+    }
 
     public static int getGameMonth() {
         return GameMonth;
@@ -74,7 +117,7 @@ public class SpaceGame implements IUpdateable {
      */
     private static void GenerateStart1() {
         spaceCrew = SpaceCrew.GenerateStart1();
-        homeShip = HomeShip.GenerateStart1(new Random(0), 6, 6, .5f, .8f);
+        homeShip = HomeShip.GenerateStart1(new Random(0), 6, 0.75f);
 
         //TODO: add the cargostuff.
 
@@ -85,7 +128,7 @@ public class SpaceGame implements IUpdateable {
 
 
     public static void main(String[] args) {
-        GenerateStart1();
+        SG().startGame();
     }
 
     /**

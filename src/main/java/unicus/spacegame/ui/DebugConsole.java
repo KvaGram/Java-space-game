@@ -81,7 +81,7 @@ public class DebugConsole implements IUpdateable {
 
     public void addShipCommands() {
         //SpaceCrew crew = SpaceCrew.getInstance();
-        HomeShip ship = HomeShip.getInstance();
+        HomeShip ship = HomeShip.HS();
 
         /*
         Print - prints information about the homeship (todo: the crew, cargo etc)
@@ -198,7 +198,7 @@ public class DebugConsole implements IUpdateable {
                     literal("adult").then(
                         argument("birthdate", integer()).executes(
                             context -> {
-                                SpaceCrew spaceCrew = SpaceCrew.getInstance();
+                                SpaceCrew spaceCrew = SpaceCrew.SC();
                                 int key = spaceCrew.getCrewKeys().yieldKey();
                                 int birthday = context.getArgument("birthdate", int.class);
                                 //String name = context.getArgument("name", String.class);
@@ -214,7 +214,7 @@ public class DebugConsole implements IUpdateable {
                 literal("remove").then(
                     argument("crewID", integer()).executes(
                         context -> {
-                            SpaceCrew spaceCrew = SpaceCrew.getInstance();
+                            SpaceCrew spaceCrew = SpaceCrew.SC();
                             int key = context.getArgument("crewID", int.class);
                             AbstractCrewman crewman = spaceCrew.getCrew(key);
                             if(crewman == null) {
@@ -231,7 +231,7 @@ public class DebugConsole implements IUpdateable {
                 literal("print").then(
                     literal("all").executes(
                         context -> {
-                            AbstractCrewman[] crewlist =  SpaceCrew.getInstance().getCrewmen();
+                            AbstractCrewman[] crewlist =  SpaceCrew.SC().getCrewmen();
                             String separator = "\n--------------\n";
                             StringBuffer text = new StringBuffer();
                             text.append(separator);
@@ -246,7 +246,7 @@ public class DebugConsole implements IUpdateable {
                 ).then(
                     argument("crewID", integer()).executes(
                         context -> {
-                            SpaceCrew spaceCrew = SpaceCrew.getInstance();
+                            SpaceCrew spaceCrew = SpaceCrew.SC();
                             int key = context.getArgument("crewID", int.class);
                             AbstractCrewman crewman = spaceCrew.getCrew(key);
                             if(crewman == null) {
@@ -268,7 +268,7 @@ public class DebugConsole implements IUpdateable {
                 literal("print").then(
                     literal("all").executes(
                         context -> {
-                            AbstractJob[] joblist =  SpaceCrew.getInstance().getJobs();
+                            AbstractJob[] joblist =  SpaceCrew.SC().getJobs();
                             String separator = "\n--------------\n";
                             StringBuffer text = new StringBuffer();
                             text.append(separator);
@@ -283,7 +283,7 @@ public class DebugConsole implements IUpdateable {
                 ).then(
                     argument("jobID", integer()).executes(
                         context -> {
-                            SpaceCrew spaceCrew = SpaceCrew.getInstance();
+                            SpaceCrew spaceCrew = SpaceCrew.SC();
                             int key = context.getArgument("jobID", int.class);
                             AbstractJob job = spaceCrew.getJob(key);
                             if(job == null) {
@@ -302,7 +302,7 @@ public class DebugConsole implements IUpdateable {
                     argument("jobID", integer()).then(
                         argument("crewID", integer()).executes(
                             context -> {
-                                SpaceCrew spaceCrew = SpaceCrew.getInstance();
+                                SpaceCrew spaceCrew = SpaceCrew.SC();
                                 int jobID = context.getArgument("jobID", int.class);
                                 int crewID = context.getArgument("crewID", int.class);
                                 StringBuffer message = new StringBuffer();
@@ -324,7 +324,7 @@ public class DebugConsole implements IUpdateable {
                     argument("jobID", integer()).then(
                         argument("crewID", integer()).executes(
                             context -> {
-                                SpaceCrew spaceCrew = SpaceCrew.getInstance();
+                                SpaceCrew spaceCrew = SpaceCrew.SC();
                                 int jobID = context.getArgument("jobID", int.class);
                                 int crewID = context.getArgument("crewID", int.class);
                                 JobAssignment ja = spaceCrew.getJobAssignment(jobID, crewID);
@@ -379,7 +379,7 @@ public class DebugConsole implements IUpdateable {
     }
 
     private ShipLocArgument shipLocArgument(){
-        return new ShipLocArgument(HomeShip.getInstance());
+        return new ShipLocArgument(HomeShip.HS());
     }
 
     private void printShipLoc(ShipLoc loc){
@@ -398,7 +398,7 @@ public class DebugConsole implements IUpdateable {
         b.append("\nNumber of jobs - " + numJobs);
         b.append("\nNumber of buildable sections - " + HomeShip.getMiddleLength());
         b.append("\n------------------------------------");
-        for (AbstractShipModule m : HomeShip.getInstance().modules.values()) {
+        for (AbstractShipModule m : HomeShip.HS().modules.values()) {
             m.getInfo(b);
         }
         out.println(b.toString());

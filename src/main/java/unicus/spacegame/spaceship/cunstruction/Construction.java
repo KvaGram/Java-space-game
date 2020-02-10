@@ -24,7 +24,7 @@ public class Construction extends AbstractJob implements Workplace {
         workQueue = new ArrayList<>();
         if (instance == null)
             instance = this;
-        SpaceCrew.getInstance().addJobs(this);
+        SpaceCrew.SC().addJobs(this);
     }
 
     @Override

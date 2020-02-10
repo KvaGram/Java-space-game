@@ -30,7 +30,7 @@ public class ShipLoc {
     public ShipLoc(int s, int m){
         this.s = s; this.m = m;
         if(HS == null)
-            HS = HomeShip.getInstance();
+            HS = HomeShip.HS();
     }
 
     public boolean isValidSection() {return s >= 0 && s <= HS.tailLocation;}

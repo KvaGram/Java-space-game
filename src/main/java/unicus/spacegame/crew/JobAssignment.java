@@ -42,7 +42,7 @@ public class JobAssignment {
     public double calculateWork() {
         //Get modifier - crewman efficiency on job. factors in skill, traits, etc.
         //NOTE: getWorkModifierOfCrewman may or may not call AdultCrewman#getGeneralWorkModifier(), depending on implementation.
-        double m = SpaceCrew.getInstance().getJob(jobID).getWorkModifierOfCrewman(crewID);
+        double m = SpaceCrew.SC().getJob(jobID).getWorkModifierOfCrewman(crewID);
         //multiplies with the crewman's share in the job
         return m * getWorkloadShare();
     }
@@ -57,7 +57,7 @@ public class JobAssignment {
      */
     public double getWorkloadShare() {
         // Get how much work is expected or required on the job
-        double w = SpaceCrew.getInstance().getJob(jobID).getMonthlyWorkload();
+        double w = SpaceCrew.SC().getJob(jobID).getMonthlyWorkload();
         // Get a share of how much of this work is on the assigned crewman
         return w * getWorkloadShareModifier();
     }
@@ -69,7 +69,7 @@ public class JobAssignment {
      */
     public double getWorkloadShareModifier() {
         int totalShares = 0; //total 'shares' of the job.
-        for (JobAssignment ja:SpaceCrew.getInstance().getJobAssignmentsByJob(jobID)) {
+        for (JobAssignment ja:SpaceCrew.SC().getJobAssignmentsByJob(jobID)) {
             totalShares += ja.workshare.share;
         }
         //Divide the crewman's share with the total amount to get their share of the workload.
