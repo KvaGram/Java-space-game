@@ -14,7 +14,7 @@ import java.util.Arrays;
  */
 public class Construction extends AbstractJob implements Workplace {
     //The key for the Construction job is special and meant to be easily recognizable.
-    static final public int CONSTRUCTION_JOB_KEY = 1;
+    public static final int CONSTRUCTION_JOB_KEY = 200;
     private static Construction instance;
 
     private ArrayList<RefitTask> workQueue;

@@ -1,8 +1,11 @@
 package unicus.spacegame.crew;
 import org.apache.commons.lang3.ArrayUtils;
+import unicus.spacegame.spaceship.MainBridge;
 import unicus.spacegame.spaceship.cunstruction.Construction;
 import unicus.spacegame.utilities.ObjectKey;
 
+import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Random;
 /*
  * Refactor notes:
@@ -53,7 +56,10 @@ public class SpaceCrew {
         housingKeys = new ObjectKey();
 
         //set reserved keys
-        jobKeys.setReserved(Construction.CONSTRUCTION_JOB_KEY);
+        jobKeys.setReserved(
+                Construction.CONSTRUCTION_JOB_KEY,
+                MainBridge.CAPTAIN_JOB_KEY
+        );
     }
     public void endOfMonthJobsHousing(){
         int i;

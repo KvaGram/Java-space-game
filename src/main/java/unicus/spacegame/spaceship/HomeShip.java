@@ -733,17 +733,7 @@ abstract class SpecialModule extends AbstractShipModule {
 
     }
 }
-class MainBridge extends SpecialModule {
 
-    protected MainBridge(ShipLoc loc) {
-        super(loc);
-    }
-
-    @Override
-    public String GetName() {
-        return "(STUB) Main bridge";
-    }
-}
 class Engineering extends SpecialModule {
 
     protected Engineering(ShipLoc loc) {
