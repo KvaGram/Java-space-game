@@ -60,8 +60,8 @@ public class SpaceGame implements IUpdateable {
         }
 
         Random r = new Random(0);
-        SpaceCrew.GenerateStart1();
         HomeShip.GenerateStart1(r, 6, 0.75f);
+        SpaceCrew.GenerateStart1();
         Game.init();
         Game.window().cursor().set(cursor, 8, 8);
         Input.mouse().setGrabMouse(false);

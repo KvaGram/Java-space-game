@@ -1,5 +1,6 @@
 package unicus.spacegame.crew;
 import org.apache.commons.lang3.ArrayUtils;
+import unicus.spacegame.spaceship.HomeShip;
 import unicus.spacegame.spaceship.MainBridge;
 import unicus.spacegame.spaceship.cunstruction.Construction;
 import unicus.spacegame.ui.DebugConsole;
@@ -172,6 +173,17 @@ public class SpaceCrew {
                 skills, 60, 6000 );
         //#endregion
         crew.addReplaceCrewmen(Hugh, Zach, Cole, George, Eden, Rosie, Jessie, Ciara, Alicia, Norma);
+
+        //assign captain.
+        crew.assignJobCrew(MainBridge.CAPTAIN_JOB_KEY, Hugh.keyID);
+
+        //Assign bridge crew. (note: crewmen may have multiple jobs)
+        crew.assignJobCrew(MainBridge.BRIDGE_JOB_KEY, Hugh.keyID);
+        crew.assignJobCrew(MainBridge.BRIDGE_JOB_KEY, Rosie.keyID);
+        crew.assignJobCrew(MainBridge.BRIDGE_JOB_KEY, Jessie.keyID);
+
+        //TODO: Assign Engineering job
+
         return crew;
     }
 
