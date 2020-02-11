@@ -452,7 +452,7 @@ class ShipLocArgument implements ArgumentType<ShipLoc> {
 
         CommandExceptionType exceptionType = new CommandExceptionType() {};
 
-        ShipLoc loc = new ShipLoc(section, module);
+        ShipLoc loc = ShipLoc.get(section, module);
         if (!loc.isValidModule()) {
             Message msg = new Message() {
                 @Override public String getString() {return loc.toString() + " does not point to a valid module or section."; }

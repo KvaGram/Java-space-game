@@ -10,7 +10,7 @@ public class MainBridge extends SpecialModule implements Workplace {
     public BridgeDuty bridgeDuty;
 
     protected MainBridge() {
-        super(new ShipLoc(0,1));
+        super(ShipLoc.get(0,1));
         captainJob = new CaptainJob();
         bridgeDuty = new BridgeDuty();
     }

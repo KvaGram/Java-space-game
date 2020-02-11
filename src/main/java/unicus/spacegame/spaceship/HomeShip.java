@@ -25,6 +25,10 @@ public class HomeShip {
     /**total amount of module objects allowed per section (this includes the section object)
      * Used for calculating the hash value for ShipLoc.*/
     public final static int MAX_MODULE_OBJECTS = MODULES_PER_SECTION + 1;
+    /**
+     * Absolute maximum amount of sections allowed on the homeship (including head and tail).
+     */
+    public static final int MAX_SECTIONS = 32;
 
     private static HomeShip HS;
 	
@@ -69,7 +73,7 @@ public class HomeShip {
      */
     @Deprecated(since = "ShipLoc has been moved out of HomeShip, and should be used directly.")
     public ShipLoc getShipLoc(int s, int m) {
-        return new ShipLoc(s, m);
+        return ShipLoc.get(s, m);
     }
 
     /**
@@ -79,6 +83,11 @@ public class HomeShip {
      */
     public HomeShip(int middleLength)
     {
+        //Middle length is clamped to [2, MAX_SECTIONS-2].
+        // Reasons: full length is middle length + 2. Full length can never be above MAX_SECTIONS.
+        //         For the game to be playable, there must be 2 sections at a minimum.
+        middleLength = Math.min(MAX_SECTIONS-2, Math.max(middleLength, 2));
+
         this.headLocation = 0; //It's always 0, but hey, now the code might be more readable.
         this.middleLength = middleLength;
         this.tailLocation = 1 + middleLength; //The tail's index is right after the middle sections.
@@ -87,30 +96,30 @@ public class HomeShip {
         modules = new Hashtable<>();
         HS = this;
 
-        HeadSection head = new HeadSection(new ShipLoc(headLocation, 0));
-        MainBridge bridge = new MainBridge(new ShipLoc(headLocation, 1));
+        HeadSection head = new HeadSection();
+        MainBridge bridge = new MainBridge();
         modules.put(head.loc, head);
 
         int i, j;
 
         // Fill first sector with reference to bridge.
         for(i = 1; i <= MODULES_PER_SECTION; i++)
-            modules.put(new ShipLoc(headLocation,i), bridge);
+            modules.put(ShipLoc.get(headLocation,i), bridge);
 
-        TailSection tail = new TailSection(new ShipLoc(tailLocation, 0));
-        Engineering engineering = new Engineering(new ShipLoc(tailLocation, 1));
+        TailSection tail = new TailSection(ShipLoc.get(tailLocation, 0));
+        Engineering engineering = new Engineering(ShipLoc.get(tailLocation, 1));
         modules.put(tail.loc, tail);
 
         // Fill last sector with reference to engineering.
         for(i = 1; i <= MODULES_PER_SECTION; i++)
-            modules.put(new ShipLoc(tailLocation,i), engineering);
+            modules.put(ShipLoc.get(tailLocation,i), engineering);
 
         //Fill sectors in the middle with stripped frame sections with empty modules
         for(i = 1; i < tailLocation; i++) {
-            ShipLoc loc = new ShipLoc(i, 0);
+            ShipLoc loc = ShipLoc.get(i, 0);
             modules.put(loc, new StrippedFrame(loc));
             for(j = 1; j < MAX_MODULE_OBJECTS; j++) {
-                loc = new ShipLoc(i, j);
+                loc = ShipLoc.get(i, j);
                 modules.put(loc, new NullModule(loc));
             }
         }
@@ -135,7 +144,7 @@ public class HomeShip {
                     "Someone did a programming woopsie, because of that, the game will now quit.");
         }
         AbstractShipSection newSection;
-        ShipLoc sectionLoc = new ShipLoc(index, 0);
+        ShipLoc sectionLoc = ShipLoc.get(index, 0);
         switch (sectionType) {
             //TODO: add classes for missing types.
             case Normal:
@@ -671,8 +680,8 @@ abstract class SpecialSection extends AbstractShipSection {
 }
 class HeadSection extends SpecialSection {
 
-    public HeadSection(ShipLoc loc) {
-        super(loc);
+    public HeadSection() {
+        super(ShipLoc.get(0,0));
     }
 
     @Override

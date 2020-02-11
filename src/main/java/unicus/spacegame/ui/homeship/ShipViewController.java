@@ -197,7 +197,7 @@ public class ShipViewController extends Screen implements IUpdateable {
         shipViewEnv = Game.world().environment();
         shipViewEnv.add(homeshipGUI, RenderType.GROUND);
         homeshipGUI.drawMode = HomeshipGUI.HomeShipDrawMode.unwrapped;
-        homeshipGUI.setSelection(new ShipLoc(0,0), false);
+        homeshipGUI.setSelection(ShipLoc.get(0,0), false);
     }
 
 

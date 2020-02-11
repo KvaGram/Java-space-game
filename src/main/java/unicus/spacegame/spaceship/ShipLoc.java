@@ -22,15 +22,22 @@ package unicus.spacegame.spaceship;
  *
  */
 public class ShipLoc {
+
     private static HomeShip HS;
+    private static ShipLoc[][] vals = new ShipLoc[HomeShip.MAX_SECTIONS][HomeShip.MAX_MODULE_OBJECTS];
 
     //section, module.
     int s, m;
 
-    public ShipLoc(int s, int m){
+    private ShipLoc(int s, int m){
         this.s = s; this.m = m;
         if(HS == null)
             HS = HomeShip.HS();
+    }
+    public static ShipLoc get(int s, int m){
+        if(vals[s][m] == null)
+            vals[s][m] = new ShipLoc(s, m);
+        return vals[s][m];
     }
 
     public boolean isValidSection() {return s >= 0 && s <= HS.tailLocation;}
@@ -58,7 +65,7 @@ public class ShipLoc {
     }
     public AbstractShipSection getSection() {
         if (isValidSection()) {
-            return (AbstractShipSection) new ShipLoc(s, 0).getModule();
+            return (AbstractShipSection) ShipLoc.get(s, 0).getModule();
         }
         return null;
     }
@@ -68,7 +75,7 @@ public class ShipLoc {
 
         ShipLoc[] ret = new ShipLoc[HomeShip.MODULES_PER_SECTION];
         for (int i = 0; i < HomeShip.MODULES_PER_SECTION; i++) {
-            ret[i] = new ShipLoc(s, i + 1); //offset by 1, because the SectionObject occupies index 0.
+            ret[i] = ShipLoc.get(s, i + 1); //offset by 1, because the SectionObject occupies index 0.
         }
         return ret;
     }
@@ -129,7 +136,7 @@ public class ShipLoc {
         while (newM < 1) //Note: index 0 is reserved for the section-object.
             newM += HomeShip.MODULES_PER_SECTION;
 
-        return new ShipLoc(s, newM);
+        return ShipLoc.get(s, newM);
     }
     public ShipLoc nextModule(){return rollModule(1);}
     public ShipLoc prevModule(){return rollModule(-1);}
@@ -143,7 +150,7 @@ public class ShipLoc {
         // Clamp newS to [headLocation, tailLocation]
         // Where headLocation is always 0, and tailLocation is the last section index.
         int newS = Math.max(HS.headLocation, Math.min(HS.tailLocation, s + num));
-        return new ShipLoc(newS, m);
+        return ShipLoc.get(newS, m);
     }
     public ShipLoc nextSection() {return moveSection(1);}
     public ShipLoc prevSection() {return moveSection(-1);}
