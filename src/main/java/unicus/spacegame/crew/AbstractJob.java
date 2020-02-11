@@ -89,6 +89,9 @@ public abstract class AbstractJob {
      *
      */
     public abstract double getWorkModifierOfCrewman(int crewID);
+    /*TODO LATER: This method's implementation will be separate in each job, and depends a lot on the details of
+     *implementations of both jobs and crew. It is important, but too early to write at this stage (Jan 2020).
+     */
 
     /**
      * Completes work required for the month.
