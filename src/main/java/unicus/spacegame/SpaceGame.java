@@ -70,6 +70,7 @@ public class SpaceGame implements IUpdateable {
         GenerateStart1();
 
         Game.loop().attach(debugConsole);
+        debugConsole.run();
         Game.loop().attach(this);
         Game.start();
         //open the ship-view controller

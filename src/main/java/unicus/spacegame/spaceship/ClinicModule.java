@@ -48,7 +48,7 @@ public class ClinicModule extends AbstractShipModule implements Workplace {
     @Override
     public void onDestroy() {
 
-        SpaceCrew.getInstance().removeJobs(getDependentJobs());
+        SpaceCrew.SC().removeJobs(getDependentJobs());
     }
 
     @Override
@@ -64,7 +64,7 @@ public class ClinicModule extends AbstractShipModule implements Workplace {
     class ClinicJob extends AbstractJob{
 
         protected ClinicJob() {
-            super(SpaceCrew.getInstance().getJobKeys().yieldKey(), 3);
+            super(SpaceCrew.SC().getJobKeys().yieldKey(), 3);
         }
 
         @Override
