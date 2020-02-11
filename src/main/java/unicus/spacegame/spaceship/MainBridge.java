@@ -3,6 +3,13 @@ package unicus.spacegame.spaceship;
 import unicus.spacegame.crew.*;
 
 public class MainBridge extends SpecialModule implements Workplace {
+    private static MainBridge MB;
+    public static MainBridge MB(){
+        if(MB == null)
+            new MainBridge();
+        return MB;
+    }
+
     public static final int CAPTAIN_JOB_KEY = 100;
     public static final int BRIDGE_JOB_KEY  = 101;
 
@@ -13,6 +20,7 @@ public class MainBridge extends SpecialModule implements Workplace {
         super(ShipLoc.get(0,1));
         captainJob = new CaptainJob();
         bridgeDuty = new BridgeDuty();
+        MB = this; //Set instance
     }
 
     @Override
@@ -97,14 +105,20 @@ public class MainBridge extends SpecialModule implements Workplace {
 
             switch (numShifts) {
                 case 1:
+                    //With so few people, the bridge cannot be manned at all time.
+                    //Planning to neglect the bridge saves on much workload, but has consequences.
                     return 6000;
                 case 2:
+                    //With reduced crew manning the bridge, some tasks on the bridge may end up neglected.
+                    //Planning to delay or neglect some tasks saves a bit workload, but has consequences.
                     return 8000;
                 //case 3:
                 //    return 10000;
                 //case 4:
                 //    return 10000;
                 default:
+                    //Making sure the bridge stays fully operational is a tough and often boring job. It takes a toll
+                    // on the crew.
                     return 10000;
             }
         }
@@ -120,20 +134,43 @@ public class MainBridge extends SpecialModule implements Workplace {
          */
         @Override
         public double getWorkModifierOfCrewman(int crewID) {
-            return 1.0;
+            AbleCrewman crewman = (AbleCrewman) SpaceCrew.SC().getCrew(crewID);
+            double cArtifice = crewman.getSkill(SkillType.artifice);
+            double cNavigation = crewman.getSkill(SkillType.navigation);
+
+            double score = 1.0;
+
+            //crewmen with too low artifice score gets penalty.
+            double minArtifice = 20;
+            //crewmen with too low navigation gets a penalty.
+            double minNavigation = 30;
+
+            //crewmen with a high navigation gets a boost
+            double maxNavigation = 70;
+
+            if(cArtifice < minArtifice)
+                score *= (cArtifice / minArtifice);
+            if(cNavigation < minNavigation)
+                score *= (cNavigation / minNavigation);
+            else if(cNavigation > maxNavigation)
+                score *= (cNavigation / maxNavigation);
+
+            double crewmanBonus = crewman.getGeneralWorkModifier();
+            return score + crewmanBonus;
         }
-    }
 
-    private int getNumShifts() {
-        int numAssignments =  SpaceCrew.SC().getJobAssignmentsByJob(BRIDGE_JOB_KEY).length;
+        private int getNumShifts() {
+            int numAssignments =  SpaceCrew.SC().getJobAssignmentsByJob(BRIDGE_JOB_KEY).length;
 
-        if (numAssignments < 3)
-            return 1;
-        if(numAssignments < 9)
-            return 2;
-        if(numAssignments < 12)
-            return 3;
-        else
-            return 4;
+            if (numAssignments < 4)
+                return 1;
+            if(numAssignments < 9)
+                return 2;
+            if(numAssignments < 12)
+                return 3;
+            else
+                return 4;
+        }
+
     }
 }
