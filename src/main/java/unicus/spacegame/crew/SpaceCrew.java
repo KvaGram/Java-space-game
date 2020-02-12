@@ -5,6 +5,7 @@ import unicus.spacegame.spaceship.MainBridge;
 import unicus.spacegame.spaceship.cunstruction.Construction;
 import unicus.spacegame.ui.DebugConsole;
 import unicus.spacegame.utilities.ObjectKey;
+import static unicus.spacegame.utilities.Constants.*;
 
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -59,8 +60,10 @@ public class SpaceCrew {
 
         //set reserved keys
         jobKeys.setReserved(
-                Construction.CONSTRUCTION_JOB_KEY,
-                MainBridge.CAPTAIN_JOB_KEY
+                CONSTRUCTION_JOB_KEY,
+                CAPTAIN_JOB_KEY,
+                BRIDGE_JOB_KEY,
+                MAIN_ENGINEER_JOB_KEY
         );
         DebugConsole.getInstance().addCrewCommands();
     }
@@ -175,15 +178,18 @@ public class SpaceCrew {
         crew.addReplaceCrewmen(Hugh, Zach, Cole, George, Eden, Rosie, Jessie, Ciara, Alicia, Norma);
 
         //assign captain.
-        crew.assignJobCrew(MainBridge.CAPTAIN_JOB_KEY, Hugh.keyID);
+        crew.assignJobCrew(CAPTAIN_JOB_KEY, Hugh.keyID);
 
         //Assign bridge crew. (note: crewmen may have multiple jobs)
-        crew.assignJobCrew(MainBridge.BRIDGE_JOB_KEY, Hugh.keyID);
-        crew.assignJobCrew(MainBridge.BRIDGE_JOB_KEY, Rosie.keyID);
-        crew.assignJobCrew(MainBridge.BRIDGE_JOB_KEY, Jessie.keyID);
+        crew.assignJobCrew(BRIDGE_JOB_KEY, Hugh.keyID);
+        crew.assignJobCrew(BRIDGE_JOB_KEY, Rosie.keyID);
+        crew.assignJobCrew(BRIDGE_JOB_KEY, Jessie.keyID);
 
-        //TODO: Assign Engineering job
-
+        //Assign Engineering job
+        crew.assignJobCrew(MAIN_ENGINEER_JOB_KEY, Zach.keyID);
+        crew.assignJobCrew(MAIN_ENGINEER_JOB_KEY, Eden.keyID);
+        crew.assignJobCrew(MAIN_ENGINEER_JOB_KEY, Ciara.keyID);
+        
         return crew;
     }
 

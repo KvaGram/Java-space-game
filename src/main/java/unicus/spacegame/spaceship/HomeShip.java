@@ -743,14 +743,3 @@ abstract class SpecialModule extends AbstractShipModule {
     }
 }
 
-class Engineering extends SpecialModule {
-
-    protected Engineering(ShipLoc loc) {
-        super(loc);
-    }
-
-    @Override
-    public String GetName() {
-        return "(STUB) Engineering";
-    }
-}

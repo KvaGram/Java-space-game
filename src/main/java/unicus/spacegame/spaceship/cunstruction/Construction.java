@@ -9,12 +9,13 @@ import unicus.spacegame.spaceship.ShipLoc;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static unicus.spacegame.utilities.Constants.*;
+
 /**
  * Construction is a unique job and workplace.
  */
 public class Construction extends AbstractJob implements Workplace {
-    //The key for the Construction job is special and meant to be easily recognizable.
-    public static final int CONSTRUCTION_JOB_KEY = 200;
+
     private static Construction instance;
 
     private ArrayList<RefitTask> workQueue;

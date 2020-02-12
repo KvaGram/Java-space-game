@@ -2,6 +2,8 @@ package unicus.spacegame.spaceship;
 
 import unicus.spacegame.crew.*;
 
+import static unicus.spacegame.utilities.Constants.*;
+
 public class MainBridge extends SpecialModule implements Workplace {
     private static MainBridge MB;
     public static MainBridge MB(){
@@ -9,9 +11,6 @@ public class MainBridge extends SpecialModule implements Workplace {
             new MainBridge();
         return MB;
     }
-
-    public static final int CAPTAIN_JOB_KEY = 100;
-    public static final int BRIDGE_JOB_KEY  = 101;
 
     public CaptainJob captainJob;
     public BridgeDuty bridgeDuty;
