@@ -189,7 +189,7 @@ public class SpaceCrew {
         crew.assignJobCrew(MAIN_ENGINEER_JOB_KEY, Zach.keyID);
         crew.assignJobCrew(MAIN_ENGINEER_JOB_KEY, Eden.keyID);
         crew.assignJobCrew(MAIN_ENGINEER_JOB_KEY, Ciara.keyID);
-        
+
         return crew;
     }
 
