@@ -1,5 +1,6 @@
 package unicus.spacegame.ui.crew;
 
+import de.gurkenlabs.litiengine.gui.ImageComponent;
 import unicus.spacegame.crew.AbstractCrewman;
 import unicus.spacegame.crew.CrewSelfID;
 import unicus.spacegame.crew.SpaceCrew;
@@ -101,6 +102,17 @@ public class CrewCard {
             return fallbackImage;
         }
         return fallbackImage;
+    }
+
+    private static Image makeWorkCard(int width, int height, int crewID, Font font, Color fontColor, Image background){
+        int iconSize = width / 5;
+        int textX = iconSize + font.getSize()*2;
+        int textAllowedWidth = width - iconSize - font.getSize()*2;
+        int textY = font.getSize() / 2;
+        int textAllowedHeight = height - textY - font.getSize()/2;
+
+
+        Image icon = makeIcon(iconSize, height, crewID, NameDisplayMode.FULL, font, fontColor);
     }
 
     enum NameDisplayMode{NONE,FULL};
