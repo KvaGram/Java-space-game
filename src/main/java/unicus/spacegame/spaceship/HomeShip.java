@@ -4,6 +4,7 @@ import unicus.spacegame.CargoCollection;
 import unicus.spacegame.CargoContainer;
 import unicus.spacegame.crew.*;
 import unicus.spacegame.spaceship.cunstruction.Construction;
+import unicus.spacegame.ui.DebugConsole;
 
 import java.util.*;
 
@@ -124,6 +125,8 @@ public class HomeShip {
             }
         }
         taskChain = new ArrayList<>();
+
+        DebugConsole.getInstance().addShipCommands();
     }
 
     /**

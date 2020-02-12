@@ -244,8 +244,24 @@ public class DebugConsole implements IUpdateable {
                         }
                     )
                 ).then(
-                    argument("crewID", integer()).executes(
+                    literal("unemployed").executes(
                         context -> {
+                            AbleCrewman[] crewlist = SpaceCrew.SC().getUnemployed();
+                            String separator = "\n--------------\n";
+                            StringBuffer text = new StringBuffer();
+                            text.append(separator);
+                            for (AbstractCrewman c : crewlist) {
+                                c.toString(text);
+                                text.append(separator);
+                            }
+                            out.print(text);
+                            return crewlist.length;
+                        }
+
+                    )
+                ).then(
+                    argument("crewID", integer()).executes(
+                            context -> {
                             SpaceCrew spaceCrew = SpaceCrew.SC();
                             int key = context.getArgument("crewID", int.class);
                             AbstractCrewman crewman = spaceCrew.getCrew(key);

@@ -7,6 +7,7 @@ import unicus.spacegame.ui.DebugConsole;
 import unicus.spacegame.utilities.ObjectKey;
 import static unicus.spacegame.utilities.Constants.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Random;
@@ -215,6 +216,22 @@ public class SpaceCrew {
         }
         return null;
     }
+
+    /**
+     * Get a list of all unemployed able crewmen.
+     * @return
+     */
+    public AbleCrewman[] getUnemployed() {
+        ArrayList<AbleCrewman> unemployed = new ArrayList<>();
+        for (AbstractCrewman crewman : crewmen) {
+            if(!crewman.getState().isWorkAble())
+                continue;
+            if(getJobAssignmentsByCrewman(crewman.keyID).length <= 0)
+                unemployed.add((AbleCrewman) crewman);
+        }
+        return unemployed.toArray(new AbleCrewman[0]);
+    }
+
 
     /**
      * Adds new crewmen to the list of crewmen.

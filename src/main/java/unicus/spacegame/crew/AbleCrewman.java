@@ -209,8 +209,8 @@ abstract public class AbleCrewman extends AbstractCrewman {
             text.append(s.toString()).append(": ").append(getSkill(s)).append("\n");
         }
         text.append("Status update last month:\n");
-        text.append("Number of jobs: ").append(monthJobAssignments.length);
-        text.append("Stress-change: ").append(monthStressChange);
+        text.append("  * Number of jobs: \n").append(monthJobAssignments.length);
+        text.append("  * Stress-change: \n").append(monthStressChange);
 
         return text;
     }
