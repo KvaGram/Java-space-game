@@ -19,6 +19,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
@@ -36,6 +38,7 @@ import unicus.spacegame.spaceship.ShipLoc;
 
 public class DebugConsole implements IUpdateable {
     private static DebugConsole instance;
+    private static boolean isFocus = false;
 
     public static void main(String[] args) {
         DebugConsole c = new DebugConsole();
@@ -43,11 +46,15 @@ public class DebugConsole implements IUpdateable {
         c.run();
     }
 
+    public static boolean isFocus(){
+        return isFocus;
+    }
 
     PrintStream out;
     JTextArea ta;
     JTextField tf;
     TextAreaOutputStream outStream;
+    private JFrame window;
 
     Random random;
 
@@ -361,13 +368,18 @@ public class DebugConsole implements IUpdateable {
         );
     }
 
+    public JFrame getWindow(){
+        return window;
+    }
+
     public void run() {
-        JFrame frame = new JFrame();
-        frame.add(new JLabel("debug terminal"), BorderLayout.NORTH);
+        isFocus = true;
+        window = new JFrame();
+        window.add(new JLabel("debug terminal"), BorderLayout.NORTH);
         System.setOut(out);
 
-        frame.add(new JScrollPane(ta), BorderLayout.CENTER);
-        frame.add(new JScrollPane(tf), BorderLayout.SOUTH);
+        window.add(new JScrollPane(ta), BorderLayout.CENTER);
+        window.add(new JScrollPane(tf), BorderLayout.SOUTH);
 
         tf.addKeyListener(new KeyAdapter() {
             /**
@@ -388,10 +400,23 @@ public class DebugConsole implements IUpdateable {
                 }
             }
         });
-        frame.pack();
-        frame.setVisible(true);
-        frame.setSize(800, 600);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.pack();
+        window.setVisible(true);
+        window.setSize(800, 600);
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.addWindowFocusListener(new WindowFocusListener() {
+            @Override
+            public void windowGainedFocus(WindowEvent e) {
+                //out.println("focus gained");
+                isFocus = true;
+            }
+
+            @Override
+            public void windowLostFocus(WindowEvent e) {
+                //out.println("focus lost");
+                isFocus = false;
+            }
+        });
     }
 
     private ShipLocArgument shipLocArgument(){

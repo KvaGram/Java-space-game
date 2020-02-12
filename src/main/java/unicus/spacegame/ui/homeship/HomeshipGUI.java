@@ -50,7 +50,7 @@ public class HomeshipGUI extends Entity implements IRenderable {
      * cutout: shows a cutout interior of the ship, only the modules directly above and below the spine are visible.
      * extruded: shows the cutout view, but the normally hidden modules are visible in a fake view extruding above and below.
      */
-    enum HomeShipDrawMode{closed, cutout, unwrapped}
+    public enum HomeShipDrawMode{closed, cutout, unwrapped}
     public HomeShipDrawMode drawMode;
     /**
      * Rotation of the ship, for displaying different modules.
@@ -189,7 +189,7 @@ public class HomeshipGUI extends Entity implements IRenderable {
 
         ShipLoc loc;
         for(int s = 0; s < HomeShip.getFullLength(); s++) {
-            loc = homeShip.getShipLoc(s, 0);
+            loc = ShipLoc.get(s, 0);
 
             Graphics2D partG = (Graphics2D) g.create();
             renderSection(partG, loc);
@@ -208,13 +208,13 @@ public class HomeshipGUI extends Entity implements IRenderable {
                 int m;
                 //Draw above
                 m = rollClamp(rotation + 1, 6) + 1;
-                loc = homeShip.getShipLoc(s, m);
+                loc = ShipLoc.get(s, m);
                 partG = (Graphics2D) g.create();
                 renderModule(partG, loc, 0, true);
                 partG.dispose();
                 //Draw below
                 m = rollClamp(rotation + 2, 6) + 1;
-                loc = homeShip.getShipLoc(s, m);
+                loc = ShipLoc.get(s, m);
                 partG = (Graphics2D) g.create();
                 renderModule(partG, loc, 0, false);
                 partG.dispose();
@@ -229,13 +229,13 @@ public class HomeshipGUI extends Entity implements IRenderable {
                 int m;
                 //Draw above
                 m = rollClamp(rotation + 0, 6) + 1;
-                loc = homeShip.getShipLoc(s, m);
+                loc = ShipLoc.get(s, m);
                 partG = (Graphics2D) g.create();
                 renderModule(partG, loc, 0, true);
                 partG.dispose();
                 //Draw below
                 m = rollClamp(rotation + 3, 6) + 1;
-                loc = homeShip.getShipLoc(s, m);
+                loc = ShipLoc.get(s, m);
                 partG = (Graphics2D) g.create();
                 renderModule(partG, loc, 0, false);
                 partG.dispose();
@@ -257,7 +257,7 @@ public class HomeshipGUI extends Entity implements IRenderable {
                 for(i=0; i < 6; i++) {
                     j = i % 3;
                     m = rollClamp(rotation + i, 6) + 1;
-                    loc = homeShip.getShipLoc(s, m);
+                    loc = ShipLoc.get(s, m);
                     partG = (Graphics2D) g.create();
                     renderModule(partG, loc, j, i<3);
                     partG.dispose();

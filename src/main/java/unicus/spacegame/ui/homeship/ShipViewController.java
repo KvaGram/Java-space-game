@@ -12,6 +12,7 @@ import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
 import unicus.spacegame.crew.SpaceCrew;
 import unicus.spacegame.spaceship.*;
+import unicus.spacegame.ui.DebugConsole;
 import unicus.spacegame.ui.crew.CrewMenu;
 
 import javax.imageio.ImageIO;
@@ -67,7 +68,7 @@ public class ShipViewController extends Screen implements IUpdateable {
         Game.screens().display(view);
         Game.start();
 
-        view.open(hs.getShipLoc(4, 5));
+        view.open(ShipLoc.get(4, 5));
 
 
     }
@@ -83,7 +84,7 @@ public class ShipViewController extends Screen implements IUpdateable {
         configMenu = new ConfigMenu(0, 0, Game.window().getResolution().width, Game.window().getResolution().height/2.0 );
         getComponents().add(configMenu);
         shipViewEnv = Game.world().getEnvironment("Spaceship");
-        selectionLoc = HomeShip.HS().getShipLoc(0,1);
+        selectionLoc = ShipLoc.get(0,1);
 
         Input.keyboard().onKeyTyped(KeyEvent.VK_LEFT, keyEvent -> onLeft());
         Input.keyboard().onKeyTyped(KeyEvent.VK_A, keyEvent -> onLeft());
@@ -102,35 +103,48 @@ public class ShipViewController extends Screen implements IUpdateable {
         Input.keyboard().onKeyTyped(KeyEvent.VK_ESCAPE, keyEvent -> onExit());
         Input.keyboard().onKeyTyped(KeyEvent.VK_BACK_SPACE, keyEvent -> onExit());
 
+        Input.keyboard().onKeyTyped(KeyEvent.VK_1, keyEvent -> setDrawMode(HomeshipGUI.HomeShipDrawMode.closed));
+        Input.keyboard().onKeyTyped(KeyEvent.VK_2, keyEvent -> setDrawMode(HomeshipGUI.HomeShipDrawMode.cutout));
+        Input.keyboard().onKeyTyped(KeyEvent.VK_3, keyEvent -> setDrawMode(HomeshipGUI.HomeShipDrawMode.unwrapped));
+
         //set instance
         SVC = this;
     }
+    //enum InputAction{LEFT, RIGHT, UP, DOWN, IN, OUT}
+
+    public void setDrawMode(HomeshipGUI.HomeShipDrawMode drawMode){
+        if(DebugConsole.isFocus())
+            return;
+        close();
+        homeshipGUI.drawMode = drawMode;
+    }
+
     void onLeft(){
-        if(!getMenuOpen()) {
+        if(!DebugConsole.isFocus() && !getMenuOpen()) {
             setSelection(selectionLoc.prevSection());
         }
     }
     void onRight(){
-        if(!getMenuOpen()) {
+        if(!DebugConsole.isFocus() && !getMenuOpen()) {
             setSelection(selectionLoc.nextSection());
         }
     }
     void onUp(){
-        if(!getMenuOpen()) {
+        if(!DebugConsole.isFocus() && !getMenuOpen()) {
             setSelection(selectionLoc.nextModule());
         }
     }
     void onDown(){
-        if(!getMenuOpen()) {
+        if(!DebugConsole.isFocus() && !getMenuOpen()) {
             setSelection(selectionLoc.prevModule());
         }
     }
     void onEnter(){
-        if(!getMenuOpen())
+        if(!DebugConsole.isFocus() && !getMenuOpen())
             open(selectionLoc);
     }
     void onExit(){
-        if(getMenuOpen())
+        if(!DebugConsole.isFocus() && getMenuOpen())
             close();
     }
 
@@ -144,7 +158,6 @@ public class ShipViewController extends Screen implements IUpdateable {
      */
     @Override
     public void update() {
-
     }
 
     public void open(ShipLoc loc) {
