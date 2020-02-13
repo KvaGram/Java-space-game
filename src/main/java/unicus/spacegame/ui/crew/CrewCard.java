@@ -9,6 +9,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Hashtable;
 
 /**
@@ -78,6 +79,40 @@ public class CrewCard {
         return makeIcon(width, height, crewID, NameDisplayMode.FULL, new Font(Font.SERIF, Font.ITALIC, 24), Color.lightGray);
     }
 
+    public static Image makeCard(Image icon, int width, int height, String[] textLines, Font font, Color fontColor, Image background) {
+        int iconSize = width / 5;
+        int textX = font.getSize()*2;
+        int textAllowedWidth = width - iconSize - font.getSize()*2;
+        int textY = font.getSize() / 2;
+        int textAllowedHeight = height - textY - font.getSize()/2;
+        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = (Graphics2D) img.getGraphics();
+        g.setFont(font);
+        g.setColor(fontColor);
+
+        int textHeight = textLines.length * font.getSize();
+        int textWidth = 0;
+        for(String line : textLines){textWidth = Math.max(textWidth, g.getFontMetrics().stringWidth(line));}
+        if(background != null) {
+            g.drawImage(background, 0, 0, width, height, null);
+        }
+        g.drawImage(icon, 0,0, iconSize, iconSize, null);
+
+        double scaleX = 1, scaleY = 1;
+        if(textHeight > textAllowedHeight) scaleY = (double) (textAllowedHeight) / (double) (textHeight);
+        if(textWidth > textAllowedWidth) scaleX = (double) (textAllowedWidth) / (double) (textWidth);
+
+        // move draw area to where the text will be drawn.
+        g.translate(textX, textY);
+        // rescale the text is needed
+        g.scale(scaleX, scaleY);
+        for (int i = 0; i < textLines.length; i++) {
+            g.drawString(textLines[i], 0, (i) * font.getSize());
+        }
+        g.dispose();
+        return img;
+    }
+
     private static Image getImage(String filename) {
         Image img;
         if (images.containsKey(filename)) {
@@ -104,18 +139,15 @@ public class CrewCard {
         return fallbackImage;
     }
 
-    private static Image makeWorkCard(int width, int height, int crewID, Font font, Color fontColor, Image background){
-        int iconSize = width / 5;
-        int textX = iconSize + font.getSize()*2;
-        int textAllowedWidth = width - iconSize - font.getSize()*2;
-        int textY = font.getSize() / 2;
-        int textAllowedHeight = height - textY - font.getSize()/2;
-
-
-        Image icon = makeIcon(iconSize, height, crewID, NameDisplayMode.FULL, font, fontColor);
+    public static Image makeCard(int width, int height, int crewID, String[] crewTextLine) {
+        Font font = new Font(Font.SERIF, Font.ITALIC, 24);
+        Color fontColor = Color.lightGray;
+        Image icon = makeIcon(height, height, crewID, NameDisplayMode.FULL, font, fontColor);
+        return makeCard(icon, width, height, crewTextLine, font, fontColor, null);
     }
 
     enum NameDisplayMode{NONE,FULL};
+
 
 
 }
