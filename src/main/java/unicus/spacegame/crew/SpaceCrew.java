@@ -1,15 +1,12 @@
 package unicus.spacegame.crew;
+import de.gurkenlabs.litiengine.gui.ListField;
 import org.apache.commons.lang3.ArrayUtils;
-import unicus.spacegame.spaceship.HomeShip;
-import unicus.spacegame.spaceship.MainBridge;
-import unicus.spacegame.spaceship.cunstruction.Construction;
 import unicus.spacegame.ui.DebugConsole;
 import unicus.spacegame.utilities.ObjectKey;
 import static unicus.spacegame.utilities.Constants.*;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.Comparator;
 import java.util.Random;
 /*
  * Refactor notes:
@@ -320,7 +317,7 @@ public class SpaceCrew {
 
     public boolean canAssignJobCrew(int jobID, int crewID, StringBuffer message) {
         AbstractJob job = getJob(jobID);
-        AbleCrewman crewman = getAbleCrew(crewID);
+        AbleCrewman crewman = getAbleCrewman(crewID);
         if(job == null) {
             message.append("Cannot assign crewman, invalid job ID.");
             return false;
@@ -351,13 +348,60 @@ public class SpaceCrew {
         return true;
     }
 
-    private AbleCrewman getAbleCrew(int crewID) {
+    public AbleCrewman getAbleCrewman(int crewID) {
         AbstractCrewman crewman = getCrew(crewID);
         if(crewman.getState().isWorkAble())
             return (AbleCrewman) crewman;
         else
             return null;
     }
+
+    /**
+     * Gets a list of all crewman that can be assigned jobs.
+     * @return A list of AbleCrewman
+     */
+    public AbleCrewman[] getAbleCrewmen() {
+        return getGetAbleCrewmen(0);
+    }
+
+    /**
+     * Returns a list of crewmen allowed to work at a specific job, then sorted by skills.
+     * @param jobID The key id of the job for crew to be tested for. If invalid, ignores checking if crew can work.
+     * @param skillSort Prioritized list of skills to sort for, with decreasing weights down the list.
+     * @return
+     */
+    public AbleCrewman[] getGetAbleCrewmen(int jobID, SkillType... skillSort) {
+        //Get and filter list of crewmen to only those who can have a job.
+        ArrayList<AbleCrewman> list = new ArrayList<>();
+        for (AbstractCrewman c : getCrewmen()) {
+            if (c.getState().isWorkAble())
+                list.add((AbleCrewman)c);
+        }
+
+        //Get the job to filter for (when applicable)
+        AbstractJob job = getJob(jobID);
+        if (job != null) {
+            for (AbleCrewman ac : list) {
+                if (!job.crewmanAllowedJob(ac, new StringBuffer()))
+                    list.remove(ac);
+            }
+        }
+        //Sort for best total skill points in the selected list of skills.
+        if(skillSort.length > 0) {
+            list.sort((a, b) -> {
+                double weight = 1.0;
+                double a_score = 0, b_score = 0;
+                for (SkillType s : skillSort) {
+                    a_score += a.getSkill(s);
+                    b_score += b.getSkill(s);
+                    weight *= 0.7; //weight decrease 30% for each skill.
+                }
+                return (int)(a_score - b_score);
+            });
+        }
+        return list.toArray(new AbleCrewman[0]);
+    }
+
 
     public void assignJobCrew(int jobID, int crewID) {
         if(!canAssignJobCrew(jobID, crewID))
