@@ -86,6 +86,11 @@ public class MainBridge extends SpecialModule implements Workplace {
             //TODO: Calculate consequences for captain job
         }
 
+        @Override
+        public String getName() {
+            return "Captain";
+        }
+
     }
 
     class BridgeDuty extends AbstractJob{
@@ -156,6 +161,11 @@ public class MainBridge extends SpecialModule implements Workplace {
 
             double crewmanBonus = crewman.getGeneralWorkModifier();
             return score + crewmanBonus;
+        }
+
+        @Override
+        public String getName() {
+            return "Bridge duty";
         }
 
         private int getNumShifts() {

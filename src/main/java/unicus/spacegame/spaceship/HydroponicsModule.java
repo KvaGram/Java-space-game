@@ -142,6 +142,11 @@ public class HydroponicsModule extends AbstractShipModule implements Workplace {
                 taskList.remove(0);
             }
         }
+
+        @Override
+        public String getName() {
+            return "Hydroponics";
+        }
     }
 
     /**

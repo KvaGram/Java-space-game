@@ -59,3 +59,57 @@ java.lang.ClassCastException: class [Ljava.lang.Object; cannot be cast to class 
 	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
 	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
 
+Feb 14, 2020 1:57:09 PM de.gurkenlabs.litiengine.DefaultUncaughtExceptionHandler uncaughtException
+SEVERE: Game crashed! :(
+java.lang.NullPointerException
+	at unicus.spacegame.ui.homeship.ShipViewController$ConfigMenu.setActivePanel(ShipViewController.java:320)
+	at unicus.spacegame.ui.homeship.ShipViewController$ConfigMenu.prepare(ShipViewController.java:334)
+	at de.gurkenlabs.litiengine.gui.GuiComponent.prepare(GuiComponent.java:683)
+	at unicus.spacegame.ui.homeship.ShipViewController.prepare(ShipViewController.java:209)
+	at de.gurkenlabs.litiengine.gui.screens.ScreenManager.display(ScreenManager.java:67)
+	at unicus.spacegame.SpaceGame.startGame(SpaceGame.java:77)
+	at unicus.spacegame.SpaceGame.main(SpaceGame.java:132)
+
+Feb 14, 2020 2:01:08 PM de.gurkenlabs.litiengine.DefaultUncaughtExceptionHandler uncaughtException
+SEVERE: Game crashed! :(
+java.lang.NullPointerException
+	at unicus.spacegame.spaceship.cunstruction.Construction.isLocationBusy(Construction.java:33)
+	at unicus.spacegame.ui.homeship.ShipViewController$ConfigMenu.open(ShipViewController.java:258)
+	at unicus.spacegame.ui.homeship.ShipViewController$ConfigMenu.prepare(ShipViewController.java:333)
+	at de.gurkenlabs.litiengine.gui.GuiComponent.prepare(GuiComponent.java:683)
+	at unicus.spacegame.ui.homeship.ShipViewController.prepare(ShipViewController.java:209)
+	at de.gurkenlabs.litiengine.gui.screens.ScreenManager.display(ScreenManager.java:67)
+	at unicus.spacegame.SpaceGame.startGame(SpaceGame.java:77)
+	at unicus.spacegame.SpaceGame.main(SpaceGame.java:132)
+
+Feb 14, 2020 2:02:50 PM de.gurkenlabs.litiengine.DefaultUncaughtExceptionHandler uncaughtException
+SEVERE: Game crashed! :(
+java.lang.NullPointerException
+	at unicus.spacegame.spaceship.cunstruction.Construction.isLocationBusy(Construction.java:33)
+	at unicus.spacegame.ui.homeship.ShipViewController$ConfigMenu.open(ShipViewController.java:258)
+	at unicus.spacegame.ui.homeship.ShipViewController$ConfigMenu.prepare(ShipViewController.java:333)
+	at de.gurkenlabs.litiengine.gui.GuiComponent.prepare(GuiComponent.java:683)
+	at unicus.spacegame.ui.homeship.ShipViewController.prepare(ShipViewController.java:209)
+	at de.gurkenlabs.litiengine.gui.screens.ScreenManager.display(ScreenManager.java:67)
+	at unicus.spacegame.SpaceGame.startGame(SpaceGame.java:77)
+	at unicus.spacegame.SpaceGame.main(SpaceGame.java:132)
+
+Feb 14, 2020 2:03:21 PM de.gurkenlabs.litiengine.DefaultUncaughtExceptionHandler uncaughtException
+SEVERE: Game crashed! :(
+java.lang.NullPointerException
+	at unicus.spacegame.ui.homeship.ShipViewController$ConfigMenu.open(ShipViewController.java:292)
+	at unicus.spacegame.ui.homeship.ShipViewController$ConfigMenu.prepare(ShipViewController.java:333)
+	at de.gurkenlabs.litiengine.gui.GuiComponent.prepare(GuiComponent.java:683)
+	at unicus.spacegame.ui.homeship.ShipViewController.prepare(ShipViewController.java:209)
+	at de.gurkenlabs.litiengine.gui.screens.ScreenManager.display(ScreenManager.java:67)
+	at unicus.spacegame.SpaceGame.startGame(SpaceGame.java:77)
+	at unicus.spacegame.SpaceGame.main(SpaceGame.java:132)
+
+Feb 14, 2020 2:06:44 PM de.gurkenlabs.litiengine.DefaultUncaughtExceptionHandler uncaughtException
+SEVERE: Game crashed! :(
+java.lang.NullPointerException
+	at unicus.spacegame.ui.homeship.ShipViewController.prepare(ShipViewController.java:211)
+	at de.gurkenlabs.litiengine.gui.screens.ScreenManager.display(ScreenManager.java:67)
+	at unicus.spacegame.SpaceGame.startGame(SpaceGame.java:77)
+	at unicus.spacegame.SpaceGame.main(SpaceGame.java:132)
+

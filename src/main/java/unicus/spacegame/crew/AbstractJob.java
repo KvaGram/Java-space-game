@@ -214,5 +214,7 @@ public abstract class AbstractJob {
 
         return text;
     }
+
+    public abstract String getName();
 }
 

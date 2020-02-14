@@ -10,8 +10,12 @@ import de.gurkenlabs.litiengine.gui.Menu;
 import de.gurkenlabs.litiengine.gui.screens.Screen;
 import de.gurkenlabs.litiengine.input.Input;
 import de.gurkenlabs.litiengine.resources.Resources;
+import unicus.spacegame.crew.AbstractJob;
+import unicus.spacegame.crew.HousingPlace;
 import unicus.spacegame.crew.SpaceCrew;
+import unicus.spacegame.crew.Workplace;
 import unicus.spacegame.spaceship.*;
+import unicus.spacegame.spaceship.cunstruction.Construction;
 import unicus.spacegame.ui.DebugConsole;
 import unicus.spacegame.ui.crew.CrewMenu;
 
@@ -163,7 +167,7 @@ public class ShipViewController extends Screen implements IUpdateable {
     public void open(ShipLoc loc) {
         selectionLoc = loc;
         homeshipGUI.setSelection(loc, true);
-        configMenu.open();
+        configMenu.prepare();
     }
     void close() {
         configMenu.suspend();
@@ -201,14 +205,15 @@ public class ShipViewController extends Screen implements IUpdateable {
 
     @Override
     public void prepare() {
-        super.prepare();
-        configMenu.suspend();
         Game.world().reset("Spaceship");
         Game.world().loadEnvironment("Spaceship");
-
         homeshipGUI = new HomeshipGUI();
         shipViewEnv = Game.world().environment();
         shipViewEnv.add(homeshipGUI, RenderType.GROUND);
+
+        super.prepare();
+        configMenu.suspend();
+
         homeshipGUI.drawMode = HomeshipGUI.HomeShipDrawMode.unwrapped;
         homeshipGUI.setSelection(ShipLoc.get(0,0), false);
     }
@@ -218,6 +223,9 @@ public class ShipViewController extends Screen implements IUpdateable {
     class ConfigMenu extends GuiComponent {
         private final ExitButton exitButton;
         Menu menu;
+        ArrayList<ConfigPanel> panels;
+
+        int activePanel;
 
         CrewMenu testCrewMenu;
         ModuleInfo testModuleInfo;
@@ -239,26 +247,87 @@ public class ShipViewController extends Screen implements IUpdateable {
             exitButton = new ExitButton(width - 50 + x, y, 50, 50);
             exitButton.onClicked(componentMouseEvent -> close());
         }
-        void open() {
-            menu = new Menu(0, 0, getWidth()/5, getHeight(), "test1", "test2", "test3", "test4");
-            this.getComponents().add(menu);
+        @Override
+        public void prepare() {
+            AbstractShipModule m = selectionLoc.getModule();
+            ArrayList<String> options = new ArrayList<>();
+            panels = new ArrayList<>();
+
+            options.add("Section Info");
+            panels.add(new placeholderPanel()); //TODO: Section info panel
+
+            if(Construction.isLocationBusy(selectionLoc)){
+                options.add("Refit job settings");
+                panels.add(new placeholderPanel()); //TODO: refit job panel
+            }
+            else{
+                options.add("Refit options");
+                panels.add(new placeholderPanel()); //TODO: refit option panel
+            }
+            options.add("Module settings");
+            panels.add(new placeholderPanel()); //TODO: module settings panel
+            if( m instanceof Workplace){
+                Workplace w = (Workplace) m;
+                for(int jobID : w.getAllJobs()) {
+                    AbstractJob job = SpaceCrew.SC().getJob(jobID);
+                    if(job == null) continue;
+                    options.add(job.getName());
+                    panels.add(new placeholderPanel()); //TODO: job settings panel
+                }
+            }
+            if(m instanceof HousingPlace) {
+                HousingPlace h = (HousingPlace) m;
+                options.add("housing settings");
+                panels.add(new placeholderPanel()); //TODO: housing panel
+            }
+            options.add("Battle settings");
+            panels.add(new placeholderPanel()); //TODO: battle panel
+
+            menu = new Menu(0,0,getWidth()/5, getHeight(), options.toArray(new String[0]));
+            getComponents().add(exitButton);
+            getComponents().addAll(panels);
+            getComponents().add(menu);
+
+            menu.onChange(this::setActivePanel);
+
             homeshipGUI.drawMode = HomeshipGUI.HomeShipDrawMode.cutout;
-            //Point2D focus = homeshipGUI.getSectionFocusPoint(loc.getS());
-            //homeshipGUI.setSelectionFocus(6, 30, true);
+            super.prepare();
+            setActivePanel(0);
 
-            //focus.setLocation(focus.getX(), focus.getY() - getHeight()/4);
-            //Game.world().camera().setFocus(focus);
 
-            //This is a test:
+
             //testCrewMenu = new CrewMenu(getWidth() / 5, 0, getWidth() / 5, getHeight(), testMenuRows, testMenuColumns, testCrewList);
             //testModuleInfo = new ModuleInfo(menu.getWidth(), 30, getWidth() - menu.getWidth(), getHeight());
-            testRefitPanel = new RefitPanel(menu.getWidth(), 30, getWidth() - menu.getWidth(), getHeight());
-            //this.getComponents().add(testModuleInfo);
-            //this.getComponents().add(testCrewMenu);
-            this.getComponents().add(testRefitPanel);
+            //testRefitPanel = new RefitPanel(menu.getWidth(), 30, getWidth() - menu.getWidth(), getHeight());
 
-            this.getComponents().add(exitButton);
-            this.prepare();
+            /* Get panels.
+            *  add section info
+            *  if is refit target
+            *       Add refit job
+            *  else
+            *       Add refit option
+            *  Add module and component info
+            *  if is workplace
+            *       for each job in get all jobs
+            *           Add job settings
+            *  if habitat
+            *       for each housing
+            *           Add housing settings
+            * Add battle settings
+            *
+            */
+        }
+        public void setActivePanel(int value) {
+            activePanel = value;
+            for (int i = 0; i < panels.size(); i++) {
+                ConfigPanel p = panels.get(i);
+                if (i == activePanel) {
+                    p.prepare();
+                }
+                else {
+                    p.suspend();
+                }
+            }
         }
 
         @Override
@@ -285,26 +354,24 @@ public class ShipViewController extends Screen implements IUpdateable {
         }
     }
     abstract class ConfigPanel extends GuiComponent{
-        /**
-         * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
-         *
-         * @param x      the x
-         * @param y      the y
-         * @param width  the width
-         * @param height the height
-         */
-        protected ConfigPanel(double x, double y, double width, double height) {
-            super(x, y, width, height);
-
+        protected ConfigPanel() {
+            super(ShipViewController.this.getWidth()/5, ShipViewController.this.getY(), ShipViewController.this.getWidth()/5 * 4, ShipViewController.this.getHeight());
         }
-
+    };
+    class placeholderPanel extends ConfigPanel {
+        protected placeholderPanel() {
+            setText("Placeholder object");
+        }
 
         @Override
         public void render(Graphics2D _g) {
             super.render(_g);
             Graphics2D g = (Graphics2D) _g.create();
+            g.translate(getX(), getY());
+            g.drawString("PLACEHOLDER OBJECT", 0, 20);
         }
-    };
+
+    }
     class ExitButton extends GuiComponent {
         Rectangle exitRect;
 
@@ -358,8 +425,8 @@ public class ShipViewController extends Screen implements IUpdateable {
 
 
 
-        protected RefitPanel(double x, double y, double width, double height) {
-            super(x, y, width, height);
+        protected RefitPanel() {
+            super();
 
             AbstractShipSection section = selectionLoc.getSection();
             AbstractShipModule module = selectionLoc.getModule();
@@ -396,13 +463,13 @@ public class ShipViewController extends Screen implements IUpdateable {
             }
 
             //Add components - because the coordinate system is global for child components, x and y is added.
-            moduleRefitOptions = new ListField((1/3.0) * width + x, y, (1/4.0) * width, (1/4.0) * height, moduleOptions.toArray(), 4, null, null);
-            sectionRefitOptions = new ListField((2/3.0) * width + x, y, (1/4.0) * width, (1/4.0) * height, sectionOptions.toArray(), 4, null, null);
-            addTask = new PlainButton((5/6.0) * width + x, (3/4.0) * height, (1/6.0)*width, (1/4.0) * height, Color.green, Color.white, "Add task");
+            moduleRefitOptions = new ListField((1/3.0) * getWidth() + getX(), getY(), (1/4.0) * getWidth(), (1/4.0) * getHeight(), moduleOptions.toArray(), 4, null, null);
+            sectionRefitOptions = new ListField((2/3.0) * getWidth() + getX(), getY(), (1/4.0) * getWidth(), (1/4.0) * getHeight(), sectionOptions.toArray(), 4, null, null);
+            addTask = new PlainButton((5/6.0) * getWidth() + getX(), (3/4.0) * getHeight(), (1/6.0)*getWidth(), (1/4.0) * getHeight(), Color.green, Color.white, "Add task");
 
             //Add text areas.
-            infoArea = new Rectangle.Double(0,0,(1/4.0) * width + y,(3/4.0) * height);
-            messageArea = new Rectangle.Double(0,(3/4.0) * height,(5/6.0) * width,(1/4.0) * height);
+            infoArea = new Rectangle.Double(0,0,(1/4.0) * getWidth() + getY(),(3/4.0) * getHeight());
+            messageArea = new Rectangle.Double(0,(3/4.0) * getHeight(),(5/6.0) * getWidth(),(1/4.0) * getHeight());
 
             List<GuiComponent> c = getComponents();
             c.add(moduleRefitOptions);
@@ -492,14 +559,10 @@ public class ShipViewController extends Screen implements IUpdateable {
 
         /**
          * Instantiates a new gui component at the point (x,y) with the dimension (width,height).
-         *
-         * @param x      the x
-         * @param y      the y
-         * @param width  the width
-         * @param height the height
+
          */
-        protected ModuleInfo(double x, double y, double width, double height) {
-            super(x, y, width, height);
+        protected ModuleInfo() {
+            super();
             module = selectionLoc.getModule();
 
 

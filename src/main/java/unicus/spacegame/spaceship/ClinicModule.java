@@ -82,6 +82,11 @@ public class ClinicModule extends AbstractShipModule implements Workplace {
             super.endOfMonth();
 
         }
+
+        @Override
+        public String getName() {
+            return "Clinic";
+        }
     }
     abstract class TreatmentTask {
         public final int patientID;

@@ -1,5 +1,6 @@
 package unicus.spacegame.spaceship.cunstruction;
 
+import org.apache.commons.lang3.ArrayUtils;
 import unicus.spacegame.crew.AbstractJob;
 import unicus.spacegame.crew.AbleCrewman;
 import unicus.spacegame.crew.SpaceCrew;
@@ -28,6 +29,14 @@ public class Construction extends AbstractJob implements Workplace {
         SpaceCrew.SC().addJobs(this);
     }
 
+    public static boolean isLocationBusy(ShipLoc selectionLoc) {
+        for (RefitTask task : CON().workQueue) {
+            if (ArrayUtils.contains(task.targets, selectionLoc))
+                return true;
+        }
+        return false;
+    }
+
     @Override
     public void endOfMonth() {
         super.endOfMonth();
@@ -46,6 +55,11 @@ public class Construction extends AbstractJob implements Workplace {
                 workRemaining = task.addProgress(workRemaining, true, message.append("\n"));
             }
         }
+    }
+
+    @Override
+    public String getName() {
+        return "Construction";
     }
 
     public static ArrayList<ShipLoc> getBusyLocations(){
@@ -105,26 +119,26 @@ public class Construction extends AbstractJob implements Workplace {
     }
 
 
-    public static Construction I() {
+    public static Construction CON() {
         if (instance == null)
             new Construction();
         return instance;
     }
 
     static public boolean AddTask(RefitTask task) {
-        if (I().workQueue.contains(task))
+        if (CON().workQueue.contains(task))
             return false;
-        I().workQueue.add(0, task);
-        I().setActive(!I().workQueue.isEmpty());
+        CON().workQueue.add(0, task);
+        CON().setActive(!CON().workQueue.isEmpty());
         return true;
     }
     static public boolean RemoveTask(RefitTask task) {
-        boolean success = I().workQueue.remove(task);
-        I().setActive(!I().workQueue.isEmpty());
+        boolean success = CON().workQueue.remove(task);
+        CON().setActive(!CON().workQueue.isEmpty());
         return success;
     }
     static public RefitTask[] getWorkQueue(){
-        return (RefitTask[]) I().workQueue.toArray();
+        return (RefitTask[]) CON().workQueue.toArray();
     }
 }
 

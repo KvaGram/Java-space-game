@@ -90,5 +90,10 @@ public class Engineering extends SpecialModule implements Workplace {
         public void endOfMonth() {
             super.endOfMonth();
         }
+
+        @Override
+        public String getName() {
+            return "Engineering";
+        }
     }
 }
