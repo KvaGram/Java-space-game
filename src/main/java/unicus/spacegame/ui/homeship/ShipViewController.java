@@ -249,6 +249,7 @@ public class ShipViewController extends Screen implements IUpdateable {
         }
         @Override
         public void prepare() {
+            getComponents().clear();
             AbstractShipModule m = selectionLoc.getModule();
             ArrayList<String> options = new ArrayList<>();
             panels = new ArrayList<>();
@@ -262,10 +263,10 @@ public class ShipViewController extends Screen implements IUpdateable {
             }
             else{
                 options.add("Refit options");
-                panels.add(new placeholderPanel()); //TODO: refit option panel
+                panels.add(new RefitPanel());
             }
             options.add("Module settings");
-            panels.add(new placeholderPanel()); //TODO: module settings panel
+            panels.add(new ModuleInfo()); //TODO: module settings panel
             if( m instanceof Workplace){
                 Workplace w = (Workplace) m;
                 for(int jobID : w.getAllJobs()) {
@@ -288,10 +289,13 @@ public class ShipViewController extends Screen implements IUpdateable {
             getComponents().addAll(panels);
             getComponents().add(menu);
 
+
+
             menu.onChange(this::setActivePanel);
 
             homeshipGUI.drawMode = HomeshipGUI.HomeShipDrawMode.cutout;
             super.prepare();
+            menu.getComponents().forEach(c -> c.setFontSize(20));
             setActivePanel(0);
 
 
@@ -357,10 +361,11 @@ public class ShipViewController extends Screen implements IUpdateable {
         protected ConfigPanel() {
             super(ShipViewController.this.getWidth()/5, ShipViewController.this.getY(), ShipViewController.this.getWidth()/5 * 4, ShipViewController.this.getHeight());
         }
-    };
+    }
+
     class placeholderPanel extends ConfigPanel {
         protected placeholderPanel() {
-            setText("Placeholder object");
+
         }
 
         @Override
@@ -368,6 +373,7 @@ public class ShipViewController extends Screen implements IUpdateable {
             super.render(_g);
             Graphics2D g = (Graphics2D) _g.create();
             g.translate(getX(), getY());
+            g.setFont(this.getFont());
             g.drawString("PLACEHOLDER OBJECT", 0, 20);
         }
 
@@ -498,10 +504,10 @@ public class ShipViewController extends Screen implements IUpdateable {
                     StringBuffer text = new StringBuffer();
                     boolean canDo = false;
                     if (value < buildableModules.length) {
-                        canDo = HomeShip.HS().canBuildModule(selectionLoc, buildableModules[value], text);
+                        canDo = HomeShip.canBuildModule(selectionLoc, buildableModules[value], text);
                     }
                     else {
-                        canDo = HomeShip.HS().canRemoveModule(selectionLoc, text);
+                        canDo = HomeShip.canRemoveModule(selectionLoc, text);
                     }
                     message = text.toString();
                     setAddTaskReady(canDo);
@@ -515,10 +521,10 @@ public class ShipViewController extends Screen implements IUpdateable {
                     StringBuffer text = new StringBuffer();
                     boolean canDo = false;
                     if (value < buildableFrames.length) {
-                        canDo = HomeShip.HS().canBuildSection(selectionLoc, buildableFrames[value], text);
+                        canDo = HomeShip.canBuildSection(selectionLoc, buildableFrames[value], text);
                     }
                     else {
-                        canDo = HomeShip.HS().canRemoveSection(selectionLoc, text);
+                        canDo = HomeShip.canRemoveSection(selectionLoc, text);
                     }
                     message = text.toString();
                     setAddTaskReady(canDo);
@@ -590,6 +596,7 @@ public class ShipViewController extends Screen implements IUpdateable {
             }
         }
     }
+
 }
 class PlainButton extends GuiComponent {
 
